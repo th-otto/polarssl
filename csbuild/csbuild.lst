@@ -1,0 +1,2889 @@
+$M 64000 $S< $F> $P< $%0 $*% $O3 $A0
+'
+REM #KEY ColdFire v4e|Classic 68K
+REM #IFK 0
+REM #BRK MA
+REM #EIK 1 !ColdFire v4e
+REM #LIB ColdFire
+REM #EXT PRG
+REM #EIK 2 !Classic 68K
+REM #LIB 68000
+REM #EXT PRX
+REM #FIK
+'
+IF FATAL
+  ~FORM_ALERT(1,"[1][This version is not suited |for this CPU. Please get |the correct archive. ][ Ok ]")
+  @quiet_quit
+ENDIF
+IF ERR=8
+  ~FORM_ALERT(1,"[1][Insuffisant or fragmented |memory. ][ Ok ]")
+  @quiet_quit
+ENDIF
+'
+@init_start
+@init_end
+@main
+'
+> PROCEDURE leave_ask
+  '
+  IF record_changed!(1)
+    IF @alert(2,3)=1
+      leave
+    ENDIF
+  ELSE
+    leave
+  ENDIF
+  '
+RETURN
+> PROCEDURE leave
+  '
+  @ldg_exit
+  '
+  record_close(1)
+  record_general_exit
+  gxalloc_main_exit(1)
+  '
+  close_all_win
+  mxfree(m_adr%)
+  mxfree(v_adr%)
+  mxfree(mnet_addr%)
+  mxfree(shell_buf%)
+  IF raster_image%>0
+    mxfree(raster_image%)
+    IF long_photo%=0 AND xmenu!=FALSE
+      mxfree(buf_photo%)
+    ENDIF
+  ENDIF
+  ~RSRC_FREE()
+  v_clsvwk
+  ~APPL_EXIT()
+  QUIT 0
+RETURN
+> PROCEDURE quiet_quit
+  QUIT 0
+RETURN
+'
+> PROCEDURE init_start
+  LOCAL xmenu_extmsg&,xmenu_wf&
+  '
+  global%=LONG{ADD(GB,4)}
+  '
+  ~GRAF_MOUSE(0,0)
+  ap_id&=APPL_INIT()
+  '
+  vdi_handle&=@v_opnvwk
+  '
+  IF ap_id&<0
+    leave
+  ENDIF
+  '
+  mx_mask%=@mx_mask
+  mxalloc!=(GEMDOS(48)>=&H1900)
+  '
+  magic!=@test_cookie("MagX",dummy%)
+  mint!=@test_cookie("MiNT",dummy%)
+  multi!=magic! OR mint!
+  xmenu!=FALSE
+  '
+  IF magic! OR mint!
+    naes!=TRUE
+  ELSE IF VAL(HEX$(INT{{ADD(GB,4)}}))>=399
+    naes!=TRUE
+  ELSE
+    naes!=FALSE
+  ENDIF
+  IF mint!
+    xaaes!=(WIND_GET(0,&H5841,dummy&,dummy&,dummy&,dummy&)=&H5841)
+  ENDIF
+  IF xaaes!
+    ~@appl_getinfo(9,dummy&,dummy&,dummy&,xmenu_extmsg&)
+    ~@appl_getinfo(11,xmenu_wf&,dummy&,dummy&,dummy&)
+    '
+    xmenu!=BTST(xmenu_extmsg&,0) AND BTST(xmenu_wf&,12)
+  ENDIF
+  '
+  IF naes!=TRUE
+    ~@menu_register(ap_id&,"  CS Builder ")
+  ENDIF
+  '
+  ~WIND_UPDATE(1)
+  ~WIND_UPDATE(3)
+  '
+  ~WIND_GET(0,4,screenx&,screeny&,screenl&,screenh&)
+  '
+  @declare_variables
+  IF mint!=FALSE
+    RESERVE 32000
+  ENDIF
+  @declare_allocations
+  '
+  ~RSRC_FREE()
+  IF @s_exist(chemin$+csb_rsc$)=TRUE
+    IF RSRC_LOAD(chemin$+csb_rsc$)=0
+      ~FORM_ALERT(1,"[1][CSBUILD.RSC couldn't be| loaded as a RSC file.][ Quit ]")
+      leave
+    ELSE
+      FOR i&=0 TO nb_tree&
+        ~RSRC_GADDR(0,i&,adtree%(i&))
+      NEXT i&
+      '
+      OB_H(adtree%(0),0)=OB_H(adtree%(1),1)
+      OB_W(adtree%(0),0)=OB_W(adtree%(2),0)
+      FOR i&=0 TO nb_tree&
+        ~FORM_CENTER(adtree%(i&),xd&(i&),yd&(i&),dummy&,dummy&)
+        IF i&=0
+          hd&(0)=OB_H(adtree%(0),1)
+        ELSE
+          hd&(i&)=OB_H(adtree%(i&),0)
+          wd&(i&)=OB_W(adtree%(i&),0)
+        ENDIF
+      NEXT i&
+      '
+    ENDIF
+  ELSE
+    ~FORM_ALERT(1,"[1][|CSBUILD.RSC not found.|Put it beside CSBUILD.PRG ][ Ok ]")
+    leave
+  ENDIF
+  '
+  IF xmenu!=FALSE
+    OB_SPEC(adtree%(0),1)=OB_SPEC(adtree%(0),1) OR &X111111110000000000000000
+    OB_TYPE(adtree%(0),0)=20
+  ENDIF
+  menu_titre_deb&=3
+  menu_titre_fin&=OB_TAIL(adtree%(0),2)
+  menu_box_deb&=OB_HEAD(adtree%(0),OB_TAIL(adtree%(0),0))
+  menu_box_fin&=OB_TAIL(adtree%(0),OB_TAIL(adtree%(0),0))
+  '
+RETURN
+> PROCEDURE declare_variables
+  lect%=GEMDOS(25)
+  chemin$=CHR$(ADD(lect%,65))+":"+DIR$(SUCC(lect%))+"\"
+  c0$=CHR$(0)
+  '
+  IF mint!
+    csb_rsc$="csbuild.rsc"+c0$
+    csb_guide$="csbuild.hyp"+c0$
+    cs_mask$="*.cs"+c0$
+    cs_new$="unnamed.cs"+c0$
+  ELSE
+    csb_rsc$="CSBUILD.RSC"+c0$
+    csb_guide$="CSBUILD.HYP"+c0$
+    cs_mask$="*.CS"+c0$
+    cs_new$="UNNAMED.CS"+c0$
+  ENDIF
+  '
+  fi_path$=SPACE$(256)
+  fi_name$=SPACE$(256)
+  '
+  nb_tree&=4
+  alert_tree&=4
+  nb_win&=2
+  '
+  DIM adtree%(nb_tree&),xd&(nb_tree&),yd&(nb_tree&),wd&(nb_tree&),hd&(nb_tree&)
+  DIM hand_win&(nb_tree&),wx&(nb_tree&),wy&(nb_tree&),ww&(nb_tree&),wh&(nb_tree&)
+  DIM pwx&(nb_tree&),pwy&(nb_tree&),pwl&(nb_tree&),pwh&(nb_tree&)
+  '
+  DIM boolean$(1)
+  boolean$(0)="FALSE"
+  boolean$(1)="TRUE"
+  '
+  DIM win!(nb_win&),cp_win&(nb_win&),aff!(nb_win&),ful!(nb_win&)
+  win!(1)=FALSE
+  aff!(1)=FALSE
+  ful!(1)=FALSE
+  cp_win&(1)=&X111101111
+  IF xmenu!
+    cp_win&(1)=BSET(cp_win&(1),12)
+  ENDIF
+  IF naes!=TRUE
+    cp_win&(1)=BSET(cp_win&(1),14)
+  ENDIF
+  cp_win&(2)=&X1111
+  '
+RETURN
+> PROCEDURE declare_allocations
+  '
+  m_adr%=@mxalloc(320,3)
+  IF m_adr%<1
+    leave
+  ELSE
+    ABSOLUTE m_type&,m_adr%
+    ABSOLUTE m_ap_id&,ADD(m_adr%,2)
+    ABSOLUTE m_nothing&,ADD(m_adr%,4)
+    ABSOLUTE m_titre&,ADD(m_adr%,6)
+    ABSOLUTE m_win&,ADD(m_adr%,6)
+    ABSOLUTE m_entree&,ADD(m_adr%,8)
+    ABSOLUTE m_x&,ADD(m_adr%,8)
+    ABSOLUTE m_y&,ADD(m_adr%,10)
+    ABSOLUTE m_l&,ADD(m_adr%,12)
+    ABSOLUTE m_h&,ADD(m_adr%,14)
+    '
+    s_adr%=ADD(m_adr%,16)
+    vtxt_buf%=ADD(s_adr%,16)
+  ENDIF
+  '
+  buf_photo%=0
+  '
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{INTIN}=1
+  VDISYS 102,1,0
+  nb_plan&=INT{ADD(INTOUT,8)}
+  '
+  raster_image%=@mxalloc(64,3)
+  IF raster_image%>0
+    '
+    IF xmenu!=FALSE
+      ~WIND_GET(0,17)
+      buf_photo%={ADD(GINTOUT,2)}
+      long_photo%={ADD(GINTOUT,6)}
+      IF long_photo%<MUL(15000,nb_plan&) OR nb_plan&>8
+        buf_photo%=@mxalloc(MUL(15000,nb_plan&),3)
+        long_photo%=0
+      ENDIF
+    ENDIF
+    '
+    pscrmfdb%=raster_image%
+    pdesmfdb%=ADD(pscrmfdb%,20)
+    pxyarray%=ADD(pdesmfdb%,20)
+    '
+    make_zero_mfdb(pscrmfdb%)
+    make_zero_mfdb(pdesmfdb%)
+    '
+    LONG{pdesmfdb%}=buf_photo%
+    INT{ADD(pdesmfdb%,4)}=288
+    INT{ADD(pdesmfdb%,6)}=400
+    INT{ADD(pdesmfdb%,8)}=18
+    INT{ADD(pdesmfdb%,12)}=nb_plan&
+  ENDIF
+  '
+  v_adr%=@mxalloc_global(256,3)
+  shell_buf%=@mxalloc_global(512,3)
+  '
+RETURN
+> PROCEDURE init_end
+  '
+  vsl_type(1)
+  vsl_color(0)
+  vsl_ends(0,0)
+  vsl_width(1)
+  '
+  vsf_interior(1)
+  vsf_color(0)
+  vsf_style(0)
+  vsf_perimeter(0)
+  '
+  vst_alignment(0,5)
+  '
+  IF screenh&<300
+    font_real_height&=SUCC(@vst_point(9))
+  ELSE
+    font_real_height&=SUCC(@vst_point(13))
+  ENDIF
+  '
+  gxalloc_main_init(1)
+  record_general_init(1)
+  record_open(1,128,134)
+  '
+  @ldg_init
+  @cs_init
+  '
+  ~WIND_UPDATE(2)
+  ~WIND_UPDATE(0)
+  IF multi!=FALSE
+    ~FORM_DIAL(3,0,0,0,0,screenx&,screeny&,screenl&,screenh&)
+  ENDIF
+  win(1)
+  '
+RETURN
+'
+> PROCEDURE main
+  DO
+    evnt&=@ev_multi(&X110011,258,3,0,300,mo_x&,mo_y&,mo_k&,m_touche&,m_clavier&,mo_c&)
+    IF BTST(evnt&,0)=TRUE
+      gere_keyboard
+      mo_c&=0
+      mo_k&=0
+    ENDIF
+    IF BTST(evnt&,1)=TRUE
+      IF mo_c&=1 AND mo_k&=1
+        clic_win&=WIND_FIND(mo_x&,mo_y&)
+        delai
+        IF clic_win&=hand_win&(1) AND win!(1)=TRUE
+          IF icon!
+          ELSE IF xmenu!
+            gere_pannel
+          ELSE
+            SELECT OBJC_FIND(adtree%(0),0,5,mo_x&,mo_y&)
+            CASE menu_titre_deb& TO menu_titre_fin&
+              gere_menu
+            DEFAULT
+              gere_pannel
+            ENDSELECT
+          ENDIF
+        ENDIF
+      ENDIF
+    ENDIF
+    IF BTST(evnt&,4)=TRUE
+      SELECT m_type&
+      CASE 10
+        IF xmenu!=TRUE AND LONG{ADD(m_adr%,10)}=adtree%(0) AND icon!=FALSE
+          ~MENU_TNORMAL(adtree%(0),m_titre&,1)
+          '
+          ~WIND_GET(hand_win&(1),5,xf&,yf&,lf&,hf&)
+          ~WIND_GET(hand_win&(1),4,dummy&,dummy&,dummy&,rh&)
+          ~FORM_DIAL(3,0,0,0,0,xf&,yf&,lf&,SUB(hf&,rh&))
+          '
+          gere_menu
+        ENDIF
+      CASE 20
+        redraw
+      CASE 21
+        win_topped
+      CASE 29,31
+        win_ontop
+      CASE 30,33
+        win_untopped
+      CASE 22
+        win_closed
+      CASE 23
+        win_fulled
+      CASE 24
+        win_arrowed
+      CASE 26
+        win_vslided
+      CASE 28
+        win_moved
+      CASE 27
+        win_sized
+      CASE 34
+        iconify
+      CASE 35
+        uniconify
+      CASE 50
+        shut_down
+      CASE 63
+      CASE 18193
+        win(1)
+      CASE 22360
+        IF m_win&=hand_win&(1) AND win!(1)=TRUE AND aff!(1)=TRUE
+          aff!(1)=FALSE
+        ENDIF
+      CASE 22361
+        IF m_win&=hand_win&(1) AND win!(1)=TRUE AND aff!(1)=FALSE
+          aff!(1)=TRUE
+        ENDIF
+      ENDSELECT
+    ENDIF
+    IF BTST(evnt&,5)
+      INC cpt_free&
+      IF cpt_free&>300
+        IF FRE()<4000
+          ~FRE(0)
+        ENDIF
+        cpt_free&=0
+      ENDIF
+    ENDIF
+  LOOP
+RETURN
+'
+> PROCEDURE win(dial&)
+  IF win!(dial&)=TRUE
+    force_top(dial&)
+  ELSE
+    create_win(dial&)
+  ENDIF
+RETURN
+> PROCEDURE create_win(dial&)
+  hand_win&(dial&)=@window_create(cp_win&(dial&))
+  IF hand_win&(dial&)>0
+    win!(dial&)=TRUE
+    ful!(dial&)=FALSE
+    '
+    IF pwx&(dial&)=0 AND pwy&(dial&)=0
+      IF dial&=1
+        xd&(dial&)=ADD(ADD(screenx&,16),MUL(dial&,8))
+        yd&(dial&)=ADD(ADD(screeny&,16),MUL(dial&,8))
+        wd&(dial&)=400
+        hd&(dial&)=200
+      ELSE
+        ~FORM_CENTER(adtree%(dial&),xd&(dial&),yd&(dial&),wd&(dial&),dummy&)
+      ENDIF
+      IF dial&=1
+        IF xmenu!
+          ~WIND_CALC(0,cp_win&(1),xd&(1),yd&(1),wd&(1),hd&(1),wx&(1),wy&(1),ww&(1),wh&(1))
+        ELSE
+          ~WIND_CALC(0,cp_win&(1),xd&(1),yd&(1),wd&(1),ADD(hd&(0),SUCC(hd&(1))),wx&(1),wy&(1),ww&(1),wh&(1))
+        ENDIF
+      ELSE
+        ~WIND_CALC(0,cp_win&(dial&),xd&(dial&),yd&(dial&),wd&(dial&),hd&(dial&),wx&(dial&),wy&(dial&),ww&(dial&),wh&(dial&))
+      ENDIF
+    ELSE
+      wx&(dial&)=MIN(SUB(screenl&,ADD(screenx&,40)),pwx&(dial&))
+      wy&(dial&)=MIN(SUB(screenh&,ADD(screeny&,40)),pwy&(dial&))
+      IF NOT BTST(cp_win&(dial&),5)
+        IF dial&=0
+          IF xmenu!
+            ~WIND_CALC(0,cp_win&(1),xd&(1),yd&(1),wd&(1),hd&(1),dummy&,dummy&,pwl&(1),pwh&(1))
+          ELSE
+            ~WIND_CALC(0,cp_win&(1),xd&(1),yd&(1),wd&(1),ADD(hd&(0),SUCC(hd&(1))),dummy&,dummy&,pwl&(1),pwh&(1))
+          ENDIF
+        ELSE
+          ~WIND_CALC(0,cp_win&(dial&),xd&(dial&),yd&(dial&),wd&(dial&),hd&(dial&),dummy&,dummy&,pwl&(dial&),pwh&(dial&))
+        ENDIF
+      ENDIF
+      ww&(dial&)=pwl&(dial&)
+      wh&(dial&)=pwh&(dial&)
+      IF dial&=1
+        ~WIND_CALC(1,cp_win&(1),wx&(1),wy&(1),ww&(1),wh&(1),xd&(1),yd&(1),wd&(1),hd&(1))
+        IF xmenu!=FALSE
+          SUB hd&(1),SUCC(hd&(0))
+        ENDIF
+      ELSE
+        ~WIND_CALC(1,cp_win&(dial&),wx&(dial&),wy&(dial&),ww&(dial&),wh&(dial&),xd&(dial&),yd&(dial&),wd&(dial&),hd&(dial&))
+      ENDIF
+    ENDIF
+    '
+    IF dial&=1
+      IF xmenu!
+        ~WIND_SET(hand_win&(1),33,CARD(SWAP(adtree%(0))),CARD(adtree%(0)),0,0)
+      ENDIF
+      ~WIND_SET(hand_win&(1),2,CARD(SWAP(OB_SPEC(adtree%(alert_tree&),4))),CARD(OB_SPEC(adtree%(alert_tree&),4)),0,0)
+    ELSE IF dial&=2
+      ~WIND_SET(hand_win&(dial&),2,CARD(SWAP(OB_SPEC(adtree%(alert_tree&),6))),CARD(OB_SPEC(adtree%(alert_tree&),6)),0,0)
+    ENDIF
+    ~WIND_SET(hand_win&(dial&),24,&X1,0,0,0)
+    '
+    wx&(dial&)=MAX(SUCC(screenx&),wx&(dial&))
+    wy&(dial&)=MAX(SUCC(screeny&),wy&(dial&))
+    move_win(dial&,wx&(dial&),wy&(dial&),ww&(dial&),wh&(dial&))
+    '
+    IF WIND_OPEN(hand_win&(dial&),wx&(dial&),wy&(dial&),ww&(dial&),wh&(dial&))=0
+      win!(dial&)=FALSE
+      IF dial&=1
+        icon!=FALSE
+      ENDIF
+    ELSE IF dial&=1
+      set_vslide(1)
+      record_start&(1)=@get_vslide(1)
+    ENDIF
+  ELSE
+    no_more_win
+  ENDIF
+  aff!(dial&)=win!(dial&)
+RETURN
+> PROCEDURE no_more_win
+  ~@alert(1,6)
+  win!(dial&)=FALSE
+RETURN
+> PROCEDURE close_win(dial&)
+  IF win!(dial&)=TRUE
+    v_hide_c
+    ~WIND_CLOSE(hand_win&(dial&))
+    ~WIND_DELETE(hand_win&(dial&))
+    v_show_c
+    win!(dial&)=FALSE
+    aff!(dial&)=FALSE
+    ful!(dial&)=FALSE
+    IF dial&=1
+      icon!=FALSE
+    ENDIF
+  ENDIF
+RETURN
+> PROCEDURE move_win(dial&,x0&,y0&,l0&,h0&)
+  IF win!(dial&)=TRUE AND dial&<>3
+    ~WIND_CALC(1,cp_win&(dial&),x0&,y0&,l0&,h0&,xd&(dial&),yd&(dial&),wd&(dial&),dummy&)
+    OB_X(adtree%(dial&),0)=xd&(dial&)
+    OB_Y(adtree%(dial&),0)=yd&(dial&)
+    OB_W(adtree%(dial&),0)=wd&(dial&)
+    IF dial&=1
+      OB_X(adtree%(1),0)=xd&(0)
+      IF xmenu!
+        OB_Y(adtree%(1),0)=yd&(0)
+      ELSE
+        OB_Y(adtree%(1),0)=ADD(yd&(1),SUCC(hd&(0)))
+        '
+        OB_X(adtree%(0),0)=xd&(dial&)
+        OB_Y(adtree%(0),0)=yd&(dial&)
+        OB_W(adtree%(0),0)=wd&(dial&)
+      ENDIF
+    ENDIF
+    '
+    pwx&(dial&)=x0&
+    pwy&(dial&)=y0&
+    IF BTST(cp_win&(dial&),5)
+      pwl&(dial&)=l0&
+      pwh&(dial&)=h0&
+    ELSE
+      pwl&(dial&)=0
+      pwh&(dial&)=0
+    ENDIF
+    '
+  ELSE IF dial&=3
+    IF icon_win&>0
+      ~WIND_GET(icon_win&,4,xd&(3),yd&(3),wd&(3),hd&(3))
+    ELSE
+      ~WIND_CALC(1,&X1001,x0&,y0&,l0&,h0&,xd&(3),yd&(3),wd&(3),hd&(3))
+    ENDIF
+    OB_X(adtree%(3),0)=xd&(3)
+    OB_Y(adtree%(3),0)=yd&(3)
+    OB_W(adtree%(3),0)=wd&(3)
+    OB_H(adtree%(3),0)=hd&(3)
+    IF naes!=TRUE
+      OB_X(adtree%(3),1)=MAX(0,(OB_W(adtree%(3),0)-OB_W(adtree%(3),1))/2)
+      OB_Y(adtree%(3),1)=MAX(0,(OB_H(adtree%(3),0)-OB_H(adtree%(3),1))/2)
+    ENDIF
+    '
+    pwx&(3)=x0&
+    pwy&(3)=y0&
+    pwl&(3)=l0&
+    pwh&(3)=h0&
+  ENDIF
+RETURN
+> PROCEDURE noir_blanc(arbre&,fils&,nb_etat&)
+  IF BTST(OB_FLAGS(adtree%(arbre&),fils&),9)=0
+    black_white(arbre&,fils&,OB_STATE(adtree%(arbre&),fils&))
+  ENDIF
+  black_white(arbre&,fils&,nb_etat&)
+RETURN
+> PROCEDURE black_white(arbre&,fils&,etat&)
+  SELECT etat&
+  CASE 0
+    obj_deselect(arbre&,fils&)
+  CASE 1
+    obj_select(arbre&,fils&)
+  ENDSELECT
+  SELECT arbre&
+  CASE 0
+    IF fils&>6
+      xf&=screenx&
+      yf&=screeny&
+      lf&=screenl&
+      hf&=screenh&
+      rx&=xf&
+      ry&=yf&
+      rl&=lf&
+      rh&=hf&
+    ELSE
+      ~WIND_GET(hand_win&(1),4,xf&,yf&,lf&,hf&)
+      ~WIND_GET(hand_win&(1),11,rx&,ry&,rl&,rh&)
+    ENDIF
+  DEFAULT
+    ~WIND_GET(hand_win&(arbre&),4,xf&,yf&,lf&,hf&)
+    ~WIND_GET(hand_win&(arbre&),11,rx&,ry&,rl&,rh&)
+  ENDSELECT
+  IF (arbre&=0 AND icon!=FALSE) OR ((arbre&=1 OR arbre&=2) AND aff!(0)=TRUE)
+    control
+    WHILE rl&<>0 AND rh&<>0
+      IF RC_INTERSECT(xf&,yf&,lf&,hf&,rx&,ry&,rl&,rh&)
+        ~OBJC_DRAW(adtree%(arbre&),fils&,3,rx&,ry&,rl&,rh&)
+      ENDIF
+      IF arbre&=0
+        ~WIND_GET(hand_win&(1),12,rx&,ry&,rl&,rh&)
+      ELSE
+        ~WIND_GET(hand_win&(arbre&),12,rx&,ry&,rl&,rh&)
+      ENDIF
+    WEND
+    uncontrol
+  ENDIF
+RETURN
+'
+> PROCEDURE force_top(bar&)
+  ~WIND_GET(0,10,top_win&,dummy&,dummy&,dummy&)
+  IF top_win&<>hand_win&(bar&) AND win!(bar&)=TRUE
+    clear_s
+    '
+    INT{s_adr%}=21
+    INT{ADD(s_adr%,2)}=ap_id&
+    INT{ADD(s_adr%,6)}=hand_win&(bar&)
+    ~APPL_WRITE(ap_id&,16,s_adr%)
+  ENDIF
+RETURN
+> PROCEDURE force_update(bar&,xr&,yr&,lr&,hr&)
+  IF win!(bar&)
+    INT{s_adr%}=20
+    INT{ADD(s_adr%,2)}=ap_id&
+    INT{ADD(s_adr%,4)}=0
+    INT{ADD(s_adr%,6)}=hand_win&(bar&)
+    INT{ADD(s_adr%,8)}=xr&
+    INT{ADD(s_adr%,10)}=yr&
+    INT{ADD(s_adr%,12)}=lr&
+    INT{ADD(s_adr%,14)}=hr&
+    ~APPL_WRITE(ap_id&,16,s_adr%)
+  ENDIF
+RETURN
+> PROCEDURE force_update_xywh(bar&,fline&,sx&,sy&,sl&,sh&)
+  IF fline&<0
+    IF win!(bar&) AND sl&>0 AND sh&>0
+      INT{s_adr%}=20
+      INT{ADD(s_adr%,2)}=ap_id&
+      INT{ADD(s_adr%,4)}=0
+      INT{ADD(s_adr%,6)}=hand_win&(bar&)
+      INT{ADD(s_adr%,8)}=sx&
+      INT{ADD(s_adr%,10)}=sy&
+      INT{ADD(s_adr%,12)}=sl&
+      INT{ADD(s_adr%,14)}=sh&
+      ~APPL_WRITE(ap_id&,16,s_adr%)
+    ENDIF
+  ELSE IF fline&>-1
+    xfe&=sx&
+    yfe&=sy&
+    lfe&=sl&
+    hfe&=sh&
+    ~WIND_GET(hand_win&(bar&),11,rx&,ry&,rl&,rh&)
+    '
+    control
+    WHILE rl&<>0 AND rh&<>0
+      IF RC_INTERSECT(xfe&,yfe&,lfe&,hfe&,rx&,ry&,rl&,rh&)
+        '
+        redraw_grid(bar&)
+        SELECT bar&
+        CASE 1
+          cs_redraw(fline&)
+        ENDSELECT
+      ENDIF
+      ~WIND_GET(hand_win&(bar&),12,rx&,ry&,rl&,rh&)
+    WEND
+    uncontrol
+    '
+  ENDIF
+RETURN
+> PROCEDURE clear_s
+  IF s_adr%>0
+    LONG{s_adr%}=0
+    LONG{ADD(s_adr%,4)}=0
+    LONG{ADD(s_adr%,8)}=0
+    LONG{ADD(s_adr%,12)}=0
+  ENDIF
+RETURN
+'
+> PROCEDURE shut_down
+  ~APPL_EXIT()
+  QUIT
+RETURN
+> PROCEDURE win_closed
+  IF m_win&=hand_win&(1) AND win!(1)=TRUE
+    @leave_ask
+  ENDIF
+  IF m_win&=hand_win&(2) AND win!(2)=TRUE
+    close_win(2)
+  ENDIF
+RETURN
+> PROCEDURE win_sized
+  m_x&=MAX(SUCC(screenx&),m_x&)
+  m_y&=MAX(SUCC(screeny&),m_y&)
+  m_l&=MAX(400,m_l&)
+  m_h&=MAX(200,m_h&)
+  '
+  IF m_win&=hand_win&(1) AND win!(1)=TRUE
+    ~WIND_SET(hand_win&(1),5,m_x&,m_y&,m_l&,m_h&)
+    move_win(1,m_x&,m_y&,m_l&,m_h&)
+    @set_vslide(1)
+    IF record_start&(1)<>@get_vslide(1)
+      force_update(1,screenx&,screeny&,screenl&,screenh&)
+    ENDIF
+    record_start&(1)=@get_vslide(1)
+    ful!(1)=FALSE
+  ENDIF
+RETURN
+> PROCEDURE win_moved
+  m_x&=MAX(SUCC(screenx&),m_x&)
+  m_y&=MAX(SUCC(screeny&),m_y&)
+  FOR i&=1 TO nb_win&
+    IF m_win&=hand_win&(i&) AND win!(i&)=TRUE
+      ~WIND_SET(hand_win&(i&),5,m_x&,m_y&,m_l&,m_h&)
+      IF icon!=TRUE AND i&=1
+        move_win(3,m_x&,m_y&,m_l&,m_h&)
+      ELSE
+        move_win(i&,m_x&,m_y&,m_l&,m_h&)
+        ful!(i&)=FALSE
+      ENDIF
+    ENDIF
+  NEXT i&
+RETURN
+> PROCEDURE win_topped
+  FOR i&=1 TO nb_win&
+    IF m_win&=hand_win&(i&) AND win!(i&)=TRUE
+      ~WIND_SET(hand_win&(i&),10,0,0,0,0)
+    ENDIF
+  NEXT i&
+RETURN
+> PROCEDURE win_untopped
+RETURN
+> PROCEDURE win_ontop
+RETURN
+> PROCEDURE win_top
+RETURN
+> PROCEDURE win_fulled
+  IF m_win&=hand_win&(1) AND win!(1)=TRUE
+    IF ful!(1)=FALSE
+      wx&(1)=SUCC(screenx&)
+      wy&(1)=SUCC(screeny&)
+      ww&(1)=SUB(screenl&,4)
+      wh&(1)=ADD(SUB(screenh&,4),MUL(20,multi!))
+      ful!(1)=TRUE
+    ELSE
+      ~WIND_GET(hand_win&(1),6,wx&(1),wy&(1),ww&(1),wh&(1))
+      ful!(1)=FALSE
+    ENDIF
+    move_win(1,wx&(1),wy&(1),ww&(1),wh&(1))
+    ~WIND_SET(hand_win&(1),5,wx&(1),wy&(1),ww&(1),wh&(1))
+    @set_vslide(1)
+    IF record_start&(1)<>@get_vslide(1)
+      force_update(1,screenx&,screeny&,screenl&,screenh&)
+    ENDIF
+    record_start&(1)=@get_vslide(1)
+  ENDIF
+RETURN
+> PROCEDURE win_vslided
+  IF m_win&=hand_win&(1) AND win!(1)=TRUE
+    ~WIND_SET(hand_win&(1),9,m_x&,0,0,0)
+    record_start&(1)=@get_vslide(1)
+    force_update(1,screenx&,screeny&,screenl&,screenh&)
+  ENDIF
+RETURN
+> PROCEDURE win_arrowed
+  IF m_win&=hand_win&(1) AND win!(1)=TRUE
+    SELECT m_x&
+    CASE 0
+      SUB record_start&(1),record_height&(1)
+      record_start&(1)=MAX(0,record_start&(1))
+      @set_vslide(1)
+      record_start&(1)=@get_vslide(1)
+      ~WIND_GET(hand_win&(1),4,rx&,ry&,rl&,rh&)
+      control
+      redraw_table(1)
+      uncontrol
+    CASE 1
+      ADD record_start&(1),record_height&(1)
+      record_start&(1)=MAX(0,MIN(record_start&(1),SUB(head_nbline&(1),record_height&(1))))
+      @set_vslide(1)
+      record_start&(1)=@get_vslide(1)
+      ~WIND_GET(hand_win&(1),4,rx&,ry&,rl&,rh&)
+      control
+      redraw_table(1)
+      uncontrol
+    CASE 2
+      IF m_win&=@get_top_window
+        control
+        REPEAT
+          ~GRAF_MKSTATE(dummy&,dummy&,mo_c&,dummy&)
+          IF record_start&(1)>0
+            DEC record_start&(1)
+            scroll_to_top(1)
+          ENDIF
+        UNTIL NOT mo_c&
+        uncontrol
+      ELSE
+        force_top(1)
+      ENDIF
+    CASE 3
+      IF m_win&=@get_top_window
+        control
+        REPEAT
+          ~GRAF_MKSTATE(dummy&,dummy&,mo_c&,dummy&)
+          IF record_start&(1)<SUB(PRED(head_nbline&(1)),record_height&(1))
+            INC record_start&(1)
+            scroll_to_bottom(1)
+          ENDIF
+        UNTIL NOT mo_c&
+        uncontrol
+      ELSE
+        force_top(1)
+      ENDIF
+    ENDSELECT
+  ENDIF
+RETURN
+> PROCEDURE iconify
+  IF naes!=TRUE
+    IF m_win&=hand_win&(1) AND win!(1)=TRUE
+      close_win(2)
+      icon!=TRUE
+      icon_win&=m_win&
+      ~WIND_SET(m_win&,26,m_x&,m_y&,m_l&,m_h&)
+      ~WIND_GET(m_win&,5,m_x&,m_y&,m_l&,m_h&)
+      move_win(3,m_x&,m_y&,m_l&,m_h&)
+    ENDIF
+  ENDIF
+RETURN
+> PROCEDURE uniconify
+  IF m_win&=hand_win&(1) AND win!(1)=TRUE AND naes!=TRUE
+    icon!=FALSE
+    icon_win&=0
+    ~WIND_SET(m_win&,27,m_x&,m_y&,m_l&,m_h&)
+  ENDIF
+RETURN
+> PROCEDURE redraw
+  '
+  control
+  '
+  ~WIND_GET(m_win&,11,rx&,ry&,rl&,rh&)
+  WHILE rl&<>0 AND rh&<>0
+    IF RC_INTERSECT(m_x&,m_y&,m_l&,m_h&,rx&,ry&,rl&,rh&)
+      FOR i&=1 TO nb_win&
+        IF m_win&=hand_win&(i&) AND win!(i&)=TRUE
+          '
+          IF i&=1
+            IF icon!=TRUE
+              ~OBJC_DRAW(adtree%(3),0,3,rx&,ry&,rl&,rh&)
+            ELSE
+              IF xmenu!=FALSE
+                ~OBJC_DRAW(adtree%(0),1,3,rx&,ry&,rl&,rh&)
+              ENDIF
+              redraw_table(1)
+            ENDIF
+          ELSE
+            ~OBJC_DRAW(adtree%(i&),0,4,rx&,ry&,rl&,rh&)
+          ENDIF
+        ENDIF
+      NEXT i&
+    ENDIF
+    ~WIND_GET(m_win&,12,rx&,ry&,rl&,rh&)
+  WEND
+  '
+  win_ontop
+  '
+  uncontrol
+RETURN
+'
+> PROCEDURE set_vslide(dial&)
+  IF win!(dial&)=TRUE AND dial&=1
+    ~WIND_GET(hand_win&(dial&),4,dummy&,dummy&,dummy&,hf&)
+    IF xmenu!=FALSE
+      SUB hf&,hd&(0)
+    ENDIF
+    record_height&(dial&)=PRED(MIN(INT(hf&/font_real_height&),MAX(1,head_nbline&(dial&))))
+    '
+    len_slide&=MAX(0,MIN(1000,1000*(SUCC(record_height&(dial&))/MAX(1,head_nbline&(dial&)))))
+    ~WIND_SET(hand_win&(dial&),16,len_slide&,dummy&,dummy&,dummy&)
+    pos_slide&=MAX(0,MIN(1000,(1000*record_start&(dial&))/(MAX(1,SUB(head_nbline&(dial&),SUCC(record_height&(dial&)))))))
+    ~WIND_SET(hand_win&(dial&),9,pos_slide&,dummy&,dummy&,dummy&)
+  ENDIF
+RETURN
+> PROCEDURE set_vslide_pos(dial&)
+  IF win!(dial&)=TRUE AND dial&=1
+    pos_slide&=MAX(0,MIN(1000,(1000*record_start&(dial&))/(MAX(1,SUB(head_nbline&(dial&),SUCC(record_height&(dial&)))))))
+    ~WIND_SET(hand_win&(dial&),9,pos_slide&,dummy&,dummy&,dummy&)
+  ENDIF
+RETURN
+> FUNCTION get_vslide(dial&)
+  $F%
+  IF win!(dial&)=TRUE AND dial&=1
+    ~WIND_GET(hand_win&(dial&),4,dummy&,dummy&,dummy&,hf&)
+    IF xmenu!=FALSE
+      SUB hf&,hd&(0)
+    ENDIF
+    record_height&(dial&)=PRED(MIN(INT(hf&/font_real_height&),head_nbline&(dial&)))
+    '
+    ~WIND_GET(hand_win&(dial&),9,pos_slide&,dummy&,dummy&,dummy&)
+    pos_slide&=INT(((SUB(head_nbline&(dial&),SUCC(record_height&(dial&))))*pos_slide&)/1000)
+    '
+    RETURN MAX(0,MIN(pos_slide&,SUB(PRED(head_nbline&(dial&)),record_height&(dial&))))
+  ENDIF
+  RETURN 0
+ENDFUNC
+'
+> PROCEDURE redraw_table(dial&)
+  redraw_grid(dial&)
+  SELECT dial&
+  CASE 1
+    cs_redraw(-1)
+  ENDSELECT
+RETURN
+> PROCEDURE redraw_grid(dial&)
+  '
+  ~WIND_GET(hand_win&(dial&),4,xf&,yf&,lf&,hf&)
+  IF xmenu!=FALSE
+    ADD yf&,SUCC(hd&(0))
+    SUB hf&,SUCC(hd&(0))
+  ENDIF
+  v_hide_c
+  clip(1,rx&,ry&,rl&,rh&)
+  vswr_mode(1)
+  vsf_color(0)
+  v_bar(xf&,yf&,ADD(lf&,PRED(xf&)),ADD(hf&,PRED(yf&)))
+  '
+  IF head_nbline&(dial&)>0
+    vsl_color(8)
+    ef&=MIN(SUCC(ADD(record_start&(dial&),record_height&(dial&))),PRED(head_nbline&(dial&)))
+    '
+    FOR j&=record_start&(dial&) TO ef&
+      yp&=MUL(font_real_height&,SUB(SUCC(j&),record_start&(dial&)))
+      v_line(xf&,ADD(yf&,yp&),lf&,1)
+    NEXT j&
+  ENDIF
+  '
+  clip(0,rx&,ry&,rl&,rh&)
+  v_show_c
+  '
+RETURN
+> PROCEDURE scroll_to_bottom(dial&)
+  set_vslide_pos(dial&)
+  '
+  ~WIND_GET(hand_win&(dial&),4,xf&,yf&,lf&,hf&)
+  IF ADD(yf&,hf&)>ADD(screeny&,screenh&)
+    ~WIND_GET(hand_win&(dial&),4,rx&,ry&,rl&,rh&)
+    redraw_table(dial&)
+  ELSE
+    IF xmenu!=FALSE
+      ADD yf&,SUCC(hd&(0))
+      SUB hf&,SUCC(hd&(0))
+    ENDIF
+    '
+    eh&=MUL(font_real_height&,record_height&(dial&))
+    make_xywh(xf&,ADD(yf&,font_real_height&),lf&,eh&,xf&,yf&,lf&,eh&)
+    vro_cpyfm(pscrmfdb%,pscrmfdb%)
+    '
+    rx&=xf&
+    ry&=ADD(yf&,eh&)
+    rl&=lf&
+    rh&=SUB(hf&,eh&)
+    redraw_table(dial&)
+    '
+  ENDIF
+RETURN
+> PROCEDURE scroll_to_top(dial&)
+  set_vslide_pos(dial&)
+  '
+  ~WIND_GET(hand_win&(dial&),4,xf&,yf&,lf&,hf&)
+  IF xmenu!=FALSE
+    ADD yf&,SUCC(hd&(0))
+    SUB hf&,SUCC(hd&(0))
+  ENDIF
+  '
+  eh&=MAX(0,SUB(hf&,font_real_height&))
+  make_xywh(xf&,yf&,lf&,eh&,xf&,ADD(yf&,font_real_height&),lf&,eh&)
+  vro_cpyfm(pscrmfdb%,pscrmfdb%)
+  '
+  rx&=xf&
+  ry&=yf&
+  rl&=lf&
+  rh&=SUCC(font_real_height&)
+  redraw_table(dial&)
+  '
+RETURN
+'
+> FUNCTION get_record_under_cursor(dial&,co_y&,co_x&)
+  $F%
+  LOCAL cu_y&
+  ~WIND_GET(hand_win&(dial&),4,xf&,yf&,lf&,hf&)
+  IF xmenu!=FALSE
+    ADD yf&,hd&(0)
+  ENDIF
+  '
+  IF co_y&>yf& AND co_x&>xf& AND co_x&<ADD(xf&,lf&)
+    cu_y&=MAX(0,SUB(co_y&,yf&))/font_real_height&
+    IF cu_y&>PRED(head_nbline&(dial&))
+      RETURN -1
+    ENDIF
+    IF head_nbline&(dial&)>0
+      RETURN MAX(0,MIN(ADD(record_start&(dial&),MIN(cu_y&,SUCC(record_height&(dial&)))),PRED(head_nbline&(dial&))))
+    ENDIF
+  ENDIF
+  RETURN -1
+ENDFUNC
+> PROCEDURE get_record_xywh(dial&,record_id&,VAR sx&,sy&,sl&,sh&)
+  ~WIND_GET(hand_win&(dial&),4,xf&,yf&,lf&,hf&)
+  sx&=xf&
+  sl&=lf&
+  '
+  IF xmenu!=FALSE
+    ADD yf&,hd&(0)
+  ENDIF
+  IF record_id&>=record_start&(dial&) AND record_id&=<MIN(ADD(record_start&(dial&),SUCC(record_height&(dial&))),PRED(head_nbline&(dial&)))
+    sy&=ADD(yf&,MUL(SUB(record_id&,record_start&(dial&)),font_real_height&))
+    sh&=font_real_height&
+  ELSE
+    sy&=0
+    sh&=0
+  ENDIF
+  '
+RETURN
+'
+> PROCEDURE gere_menu
+  IF xmenu!
+    old_result&=m_entree&
+    menu_tit&=m_titre&
+  ELSE
+    menu_tit&=0
+    DO
+      result&=OBJC_FIND(adtree%(0),2,menu_titre_fin&,mo_x&,mo_y&)
+      IF result&>=menu_titre_deb& AND result&=<menu_titre_fin&
+        menu_tit&=result&
+        noir_blanc(0,menu_tit&,1)
+        gere_shell_menu(menu_tit&)
+        noir_blanc(0,menu_tit&,0)
+      ELSE
+        menu_tit&=0
+        result&=0
+      ENDIF
+    LOOP UNTIL menu_tit&=0 OR old_result&<>0
+    delai
+    flush_clic
+  ENDIF
+  '
+  IF old_result&>0
+    SELECT old_result&
+    CASE 9
+      win(2)
+    CASE 11
+      cs_new
+    CASE 13
+      cs_load
+    CASE 15
+      cs_save
+    CASE 16
+      cs_save_as
+    CASE 18
+      @leave_ask
+    DEFAULT
+      IF menu_tit&=5
+        cs_select(CHAR{OB_SPEC(adtree%(0),old_result&)})
+      ELSE IF menu_tit&=6
+        cs_deselect(CHAR{OB_SPEC(adtree%(0),old_result&)})
+      ENDIF
+    ENDSELECT
+  ENDIF
+RETURN
+> PROCEDURE gere_shell_menu(menu_tit&)
+  old_menu_tit&=menu_tit&
+  j&=PRED(menu_titre_deb&)
+  FOR i&=menu_box_deb& TO menu_box_fin&
+    IF OB_TYPE(adtree%(0),i&)=20
+      INC j&
+      IF j&=menu_tit&
+        menu_deb&=i&
+      ENDIF
+    ENDIF
+  NEXT i&
+  menu_fin&=OB_TAIL(adtree%(0),menu_deb&)
+  control
+  get_photo(0,menu_deb&)
+  v_show_c
+  old_result&=0
+  DO
+    IF NOT magic!
+      evnt&=@ev_multi(&X100010,258,3,0,30,mo_x&,mo_y&,mo_k&,dummy&,dummy&,mo_c&)
+    ELSE
+      evnt&=@ev_multi(&X10,2,0,1,30,mo_x&,mo_y&,mo_k&,dummy&,dummy&,mo_c&)
+    ENDIF
+    menu_result&=OBJC_FIND(adtree%(0),menu_deb&,menu_fin&,mo_x&,mo_y&)
+    menu_tit&=OBJC_FIND(adtree%(0),2,menu_titre_fin&,mo_x&,mo_y&)
+    IF menu_tit&<>old_menu_tit&
+      SELECT menu_tit&
+      CASE 3 TO menu_titre_fin&
+        mo_c&=1
+        mo_k&=1
+      ENDSELECT
+    ENDIF
+    IF BTST(OB_STATE(adtree%(0),menu_result&),3)
+      menu_result&=0
+    ENDIF
+    IF old_result&<>menu_result&
+      IF menu_result&>menu_deb& AND menu_result&=<menu_fin&
+        v_hide_c
+        IF old_result&>menu_titre_fin&
+          noir_blanc(0,old_result&,0)
+        ENDIF
+        old_result&=menu_result&
+        noir_blanc(0,old_result&,1)
+        v_show_c
+      ELSE
+        IF old_result&>menu_titre_fin&
+          v_hide_c
+          noir_blanc(0,old_result&,0)
+          v_show_c
+        ENDIF
+        old_result&=0
+      ENDIF
+    ENDIF
+  LOOP UNTIL mo_c&=1 AND (mo_k&=1 OR mo_k&=2)
+  v_hide_c
+  put_photo(0)
+  uncontrol
+  IF old_result&>menu_titre_fin&
+    OB_STATE(adtree%(0),old_result&)=0
+  ENDIF
+RETURN
+> PROCEDURE gere_pannel
+  @cs_mouse_select
+RETURN
+> PROCEDURE gere_keyboard
+  IF m_touche&=4
+    SELECT BYTE(m_clavier&)
+    CASE 9 ! ^I
+      win(2)
+    CASE 13 ! ^M
+      @cs_save_as
+    CASE 14 ! ^N
+      @cs_new
+    CASE 15 ! ^O
+      @cs_load
+    CASE 17 ! ^Q
+      @leave_ask
+    CASE 19 ! ^S
+      @cs_save
+    ENDSELECT
+  ELSE IF m_clavier&=25088
+    call_documentation("")
+  ENDIF
+RETURN
+'
+> PROCEDURE cs_mouse_select
+  dummy&=@get_record_under_cursor(1,mo_y&,mo_x&)
+  IF dummy&>-1
+    IF @is_record_selected(1,dummy&)
+      record_deselect(1,dummy&)
+    ELSE
+      record_select(1,dummy&)
+    ENDIF
+    get_record_xywh(1,dummy&,sx&,sy&,sl&,sh&)
+    force_update_xywh(1,dummy&,sx&,sy&,sl&,sh&)
+    record_changed!(1)=TRUE
+  ELSE
+    win(1)
+  ENDIF
+RETURN
+> PROCEDURE cs_select(cs_str$)
+  cs_str$=UPPER$(TRIM$(cs_str$))
+  '
+  IF cs_str$="ALL"
+    cs_select_all
+  ELSE
+    dummy&=PRED(head_nbline&(1))
+    IF dummy&>-1
+      FOR ipo&=0 TO dummy&
+        IF INSTR(@cs_get_label$(@px(1,ipo&)),cs_str$)>0
+          record_select(1,ipo&)
+        ENDIF
+      NEXT ipo&
+    ENDIF
+  ENDIF
+  record_changed!(1)=TRUE
+  force_update(1,screenx&,screeny&,screenl&,screenh&)
+RETURN
+> PROCEDURE cs_select_all
+  dummy&=PRED(head_nbline&(1))
+  IF dummy&>-1
+    FOR ipo&=0 TO dummy&
+      record_select(1,ipo&)
+    NEXT ipo&
+  ENDIF
+RETURN
+> PROCEDURE cs_deselect(cs_str$)
+  cs_str$=UPPER$(TRIM$(cs_str$))
+  '
+  IF cs_str$="ALL"
+    cs_deselect_all
+  ELSE
+    dummy&=PRED(head_nbline&(1))
+    IF dummy&>-1
+      FOR ipo&=0 TO dummy&
+        IF INSTR(@cs_get_label$(@px(1,ipo&)),cs_str$)>0
+          record_deselect(1,ipo&)
+        ENDIF
+      NEXT ipo&
+    ENDIF
+  ENDIF
+  record_changed!(1)=TRUE
+  force_update(1,screenx&,screeny&,screenl&,screenh&)
+RETURN
+> PROCEDURE cs_deselect_all
+  dummy&=PRED(head_nbline&(1))
+  IF dummy&>-1
+    FOR ipo&=0 TO dummy&
+      record_deselect(1,ipo&)
+    NEXT ipo&
+  ENDIF
+RETURN
+> PROCEDURE cs_set_title(cs_file$)
+  LOCAL cs_work$
+  cs_work$=MID$(cs_file$,SUCC(RINSTR(cs_file$,"\")))
+  CHAR{OB_SPEC(adtree%(alert_tree&),4)}=LEFT$(cs_work$,60)
+  IF win!(1)
+    ~WIND_SET(hand_win&(1),2,CARD(SWAP(OB_SPEC(adtree%(alert_tree&),4))),CARD(OB_SPEC(adtree%(alert_tree&),4)),0,0)
+  ENDIF
+  IF cs_is_new!
+    ~MENU_IENABLE(adtree%(0),15,0)
+  ELSE
+    ~MENU_IENABLE(adtree%(0),15,1)
+  ENDIF
+RETURN
+> PROCEDURE cs_init
+  '
+  cs_add(&HC02C,"TLS-ECDHE-ECDSA-WITH-AES-256-GCM-SHA384")
+  cs_add(&HC030,"TLS-ECDHE-RSA-WITH-AES-256-GCM-SHA384")
+  cs_add(&H9F,"TLS-DHE-RSA-WITH-AES-256-GCM-SHA384")
+  cs_add(&HC0AD,"TLS-ECDHE-ECDSA-WITH-AES-256-CCM")
+  cs_add(&HC09F,"TLS-DHE-RSA-WITH-AES-256-CCM")
+  cs_add(&HC024,"TLS-ECDHE-ECDSA-WITH-AES-256-CBC-SHA384")
+  cs_add(&HC028,"TLS-ECDHE-RSA-WITH-AES-256-CBC-SHA384")
+  cs_add(&H6B,"TLS-DHE-RSA-WITH-AES-256-CBC-SHA256")
+  cs_add(&HC00A,"TLS-ECDHE-ECDSA-WITH-AES-256-CBC-SHA")
+  cs_add(&HC014,"TLS-ECDHE-RSA-WITH-AES-256-CBC-SHA")
+  cs_add(&H39,"TLS-DHE-RSA-WITH-AES-256-CBC-SHA")
+  cs_add(&HC0AF,"TLS-ECDHE-ECDSA-WITH-AES-256-CCM-8")
+  cs_add(&HC0A3,"TLS-DHE-RSA-WITH-AES-256-CCM-8")
+  cs_add(&HC087,"TLS-ECDHE-ECDSA-WITH-CAMELLIA-256-GCM-SHA384")
+  cs_add(&HC08B,"TLS-ECDHE-RSA-WITH-CAMELLIA-256-GCM-SHA384")
+  cs_add(&HC07D,"TLS-DHE-RSA-WITH-CAMELLIA-256-GCM-SHA384")
+  cs_add(&HC073,"TLS-ECDHE-ECDSA-WITH-CAMELLIA-256-CBC-SHA384")
+  cs_add(&HC077,"TLS-ECDHE-RSA-WITH-CAMELLIA-256-CBC-SHA384")
+  cs_add(&HC4,"TLS-DHE-RSA-WITH-CAMELLIA-256-CBC-SHA256")
+  cs_add(&H88,"TLS-DHE-RSA-WITH-CAMELLIA-256-CBC-SHA")
+  cs_add(&HC02B,"TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256")
+  cs_add(&HC02F,"TLS-ECDHE-RSA-WITH-AES-128-GCM-SHA256")
+  cs_add(&H9E,"TLS-DHE-RSA-WITH-AES-128-GCM-SHA256")
+  cs_add(&HC0AC,"TLS-ECDHE-ECDSA-WITH-AES-128-CCM")
+  cs_add(&HC09E,"TLS-DHE-RSA-WITH-AES-128-CCM")
+  cs_add(&HC023,"TLS-ECDHE-ECDSA-WITH-AES-128-CBC-SHA256")
+  cs_add(&HC027,"TLS-ECDHE-RSA-WITH-AES-128-CBC-SHA256")
+  cs_add(&H67,"TLS-DHE-RSA-WITH-AES-128-CBC-SHA256")
+  cs_add(&HC009,"TLS-ECDHE-ECDSA-WITH-AES-128-CBC-SHA")
+  cs_add(&HC013,"TLS-ECDHE-RSA-WITH-AES-128-CBC-SHA")
+  cs_add(&H33,"TLS-DHE-RSA-WITH-AES-128-CBC-SHA")
+  cs_add(&HC0AE,"TLS-ECDHE-ECDSA-WITH-AES-128-CCM-8")
+  cs_add(&HC0A2,"TLS-DHE-RSA-WITH-AES-128-CCM-8")
+  cs_add(&HC086,"TLS-ECDHE-ECDSA-WITH-CAMELLIA-128-GCM-SHA256")
+  cs_add(&HC08A,"TLS-ECDHE-RSA-WITH-CAMELLIA-128-GCM-SHA256")
+  cs_add(&HC07C,"TLS-DHE-RSA-WITH-CAMELLIA-128-GCM-SHA256")
+  cs_add(&HC072,"TLS-ECDHE-ECDSA-WITH-CAMELLIA-128-CBC-SHA256")
+  cs_add(&HC076,"TLS-ECDHE-RSA-WITH-CAMELLIA-128-CBC-SHA256")
+  cs_add(&HBE,"TLS-DHE-RSA-WITH-CAMELLIA-128-CBC-SHA256")
+  cs_add(&H45,"TLS-DHE-RSA-WITH-CAMELLIA-128-CBC-SHA")
+  cs_add(&HC008,"TLS-ECDHE-ECDSA-WITH-3DES-EDE-CBC-SHA")
+  cs_add(&HC012,"TLS-ECDHE-RSA-WITH-3DES-EDE-CBC-SHA")
+  cs_add(&H16,"TLS-DHE-RSA-WITH-3DES-EDE-CBC-SHA")
+  cs_add(&HAB,"TLS-DHE-PSK-WITH-AES-256-GCM-SHA384")
+  cs_add(&HC0A7,"TLS-DHE-PSK-WITH-AES-256-CCM")
+  cs_add(&HC038,"TLS-ECDHE-PSK-WITH-AES-256-CBC-SHA384")
+  cs_add(&HB3,"TLS-DHE-PSK-WITH-AES-256-CBC-SHA384")
+  cs_add(&HC036,"TLS-ECDHE-PSK-WITH-AES-256-CBC-SHA")
+  cs_add(&H91,"TLS-DHE-PSK-WITH-AES-256-CBC-SHA")
+  cs_add(&HC091,"TLS-DHE-PSK-WITH-CAMELLIA-256-GCM-SHA384")
+  cs_add(&HC09B,"TLS-ECDHE-PSK-WITH-CAMELLIA-256-CBC-SHA384")
+  cs_add(&HC097,"TLS-DHE-PSK-WITH-CAMELLIA-256-CBC-SHA384")
+  cs_add(&HC0AB,"TLS-DHE-PSK-WITH-AES-256-CCM-8")
+  cs_add(&HAA,"TLS-DHE-PSK-WITH-AES-128-GCM-SHA256")
+  cs_add(&HC0A6,"TLS-DHE-PSK-WITH-AES-128-CCM")
+  cs_add(&HC037,"TLS-ECDHE-PSK-WITH-AES-128-CBC-SHA256")
+  cs_add(&HB2,"TLS-DHE-PSK-WITH-AES-128-CBC-SHA256")
+  cs_add(&HC035,"TLS-ECDHE-PSK-WITH-AES-128-CBC-SHA")
+  cs_add(&H90,"TLS-DHE-PSK-WITH-AES-128-CBC-SHA")
+  cs_add(&HC090,"TLS-DHE-PSK-WITH-CAMELLIA-128-GCM-SHA256")
+  cs_add(&HC096,"TLS-DHE-PSK-WITH-CAMELLIA-128-CBC-SHA256")
+  cs_add(&HC09A,"TLS-ECDHE-PSK-WITH-CAMELLIA-128-CBC-SHA256")
+  cs_add(&HC0AA,"TLS-DHE-PSK-WITH-AES-128-CCM-8")
+  cs_add(&HC034,"TLS-ECDHE-PSK-WITH-3DES-EDE-CBC-SHA")
+  cs_add(&H8F,"TLS-DHE-PSK-WITH-3DES-EDE-CBC-SHA")
+  cs_add(&H9D,"TLS-RSA-WITH-AES-256-GCM-SHA384")
+  cs_add(&HC09D,"TLS-RSA-WITH-AES-256-CCM")
+  cs_add(&H3D,"TLS-RSA-WITH-AES-256-CBC-SHA256")
+  cs_add(&H35,"TLS-RSA-WITH-AES-256-CBC-SHA")
+  cs_add(&HC032,"TLS-ECDH-RSA-WITH-AES-256-GCM-SHA384")
+  cs_add(&HC02A,"TLS-ECDH-RSA-WITH-AES-256-CBC-SHA384")
+  cs_add(&HC00F,"TLS-ECDH-RSA-WITH-AES-256-CBC-SHA")
+  cs_add(&HC02E,"TLS-ECDH-ECDSA-WITH-AES-256-GCM-SHA384")
+  cs_add(&HC026,"TLS-ECDH-ECDSA-WITH-AES-256-CBC-SHA384")
+  cs_add(&HC005,"TLS-ECDH-ECDSA-WITH-AES-256-CBC-SHA")
+  cs_add(&HC0A1,"TLS-RSA-WITH-AES-256-CCM-8")
+  cs_add(&HC07B,"TLS-RSA-WITH-CAMELLIA-256-GCM-SHA384")
+  cs_add(&HC0,"TLS-RSA-WITH-CAMELLIA-256-CBC-SHA256")
+  cs_add(&H84,"TLS-RSA-WITH-CAMELLIA-256-CBC-SHA")
+  cs_add(&HC08D,"TLS-ECDH-RSA-WITH-CAMELLIA-256-GCM-SHA384")
+  cs_add(&HC079,"TLS-ECDH-RSA-WITH-CAMELLIA-256-CBC-SHA384")
+  cs_add(&HC089,"TLS-ECDH-ECDSA-WITH-CAMELLIA-256-GCM-SHA384")
+  cs_add(&HC075,"TLS-ECDH-ECDSA-WITH-CAMELLIA-256-CBC-SHA384")
+  cs_add(&H9C,"TLS-RSA-WITH-AES-128-GCM-SHA256")
+  cs_add(&HC09C,"TLS-RSA-WITH-AES-128-CCM")
+  cs_add(&H3C,"TLS-RSA-WITH-AES-128-CBC-SHA256")
+  cs_add(&H2F,"TLS-RSA-WITH-AES-128-CBC-SHA256")
+  cs_add(&HC031,"TLS-ECDH-RSA-WITH-AES-128-GCM-SHA256")
+  cs_add(&HC029,"TLS-ECDH-RSA-WITH-AES-128-CBC-SHA256")
+  cs_add(&HC00E,"TLS-ECDH-RSA-WITH-AES-128-CBC-SHA")
+  cs_add(&HC02D,"TLS-ECDH-ECDSA-WITH-AES-128-GCM-SHA256")
+  cs_add(&HC025,"TLS-ECDH-ECDSA-WITH-AES-128-CBC-SHA256")
+  cs_add(&HC004,"TLS-ECDH-ECDSA-WITH-AES-128-CBC-SHA")
+  cs_add(&HC0A0,"TLS-RSA-WITH-AES-128-CCM-8")
+  cs_add(&HC07A,"TLS-RSA-WITH-CAMELLIA-128-GCM-SHA256")
+  cs_add(&HBA,"TLS-RSA-WITH-CAMELLIA-128-CBC-SHA256")
+  cs_add(&H41,"TLS-RSA-WITH-CAMELLIA-128-CBC-SHA")
+  cs_add(&HC08C,"TLS-ECDH-RSA-WITH-CAMELLIA-128-GCM-SHA256")
+  cs_add(&HC078,"TLS-ECDH-RSA-WITH-CAMELLIA-128-CBC-SHA256")
+  cs_add(&HC088,"TLS-ECDH-ECDSA-WITH-CAMELLIA-128-GCM-SHA256")
+  cs_add(&HC074,"TLS-ECDH-ECDSA-WITH-CAMELLIA-128-CBC-SHA256")
+  cs_add(&HA,"TLS-RSA-WITH-3DES-EDE-CBC-SHA")
+  cs_add(&HC00D,"TLS-ECDH-RSA-WITH-3DES-EDE-CBC-SHA")
+  cs_add(&HC003,"TLS-ECDH-ECDSA-WITH-3DES-EDE-CBC-SHA")
+  cs_add(&HAD,"TLS-RSA-PSK-WITH-AES-256-GCM-SHA384")
+  cs_add(&HB7,"TLS-RSA-PSK-WITH-AES-256-CBC-SHA384")
+  cs_add(&H95,"TLS-RSA-PSK-WITH-AES-256-CBC-SHA")
+  cs_add(&HC093,"TLS-RSA-PSK-WITH-CAMELLIA-256-GCM-SHA384")
+  cs_add(&HC099,"TLS-RSA-PSK-WITH-CAMELLIA-256-CBC-SHA384")
+  cs_add(&HAC,"TLS-RSA-PSK-WITH-AES-128-GCM-SHA256")
+  cs_add(&HB6,"TLS-RSA-PSK-WITH-AES-128-CBC-SHA256")
+  cs_add(&H94,"TLS-RSA-PSK-WITH-AES-128-CBC-SHA")
+  cs_add(&HC092,"TLS-RSA-PSK-WITH-CAMELLIA-128-GCM-SHA256")
+  cs_add(&HC098,"TLS-RSA-PSK-WITH-CAMELLIA-128-CBC-SHA256")
+  cs_add(&H93,"TLS-RSA-PSK-WITH-3DES-EDE-CBC-SHA")
+  cs_add(&HA9,"TLS-PSK-WITH-AES-256-GCM-SHA384")
+  cs_add(&HC0A5,"TLS-PSK-WITH-AES-256-CCM")
+  cs_add(&HAF,"TLS-PSK-WITH-AES-256-CBC-SHA384")
+  cs_add(&H8D,"TLS-PSK-WITH-AES-256-CBC-SHA")
+  cs_add(&HC08F,"TLS-PSK-WITH-CAMELLIA-256-GCM-SHA384")
+  cs_add(&HC095,"TLS-PSK-WITH-CAMELLIA-256-CBC-SHA384")
+  cs_add(&HC0A9,"TLS-PSK-WITH-AES-256-CCM-8")
+  cs_add(&HA8,"TLS-PSK-WITH-AES-128-GCM-SHA256")
+  cs_add(&HC0A4,"TLS-PSK-WITH-AES-128-CCM")
+  cs_add(&HAE,"TLS-PSK-WITH-AES-128-CBC-SHA256")
+  cs_add(&H8C,"TLS-PSK-WITH-AES-128-CBC-SHA")
+  cs_add(&HC08E,"TLS-PSK-WITH-CAMELLIA-128-GCM-SHA256")
+  cs_add(&HC094,"TLS-PSK-WITH-CAMELLIA-128-CBC-SHA256")
+  cs_add(&HC0A8,"TLS-PSK-WITH-AES-128-CCM-8")
+  cs_add(&H8B,"TLS-PSK-WITH-3DES-EDE-CBC-SHA")
+  cs_add(&HC007,"TLS-ECDHE-ECDSA-WITH-RC4-128-SHA")
+  cs_add(&HC011,"TLS-ECDHE-RSA-WITH-RC4-128-SHA")
+  cs_add(&HC033,"TLS-ECDHE-PSK-WITH-RC4-128-SHA")
+  cs_add(&H8E,"TLS-DHE-PSK-WITH-RC4-128-SHA")
+  cs_add(&H5,"TLS-RSA-WITH-RC4-128-SHA")
+  cs_add(&H4,"TLS-RSA-WITH-RC4-128-MD5")
+  cs_add(&HC00C,"TLS-ECDH-RSA-WITH-RC4-128-SHA")
+  cs_add(&HC002,"TLS-ECDH-ECDSA-WITH-RC4-128-SHA")
+  cs_add(&H92,"TLS-RSA-PSK-WITH-RC4-128-SHA")
+  cs_add(&H8A,"TLS-PSK-WITH-RC4-128-SHA")
+  cs_add(&H15,"TLS-DHE-RSA-WITH-DES-CBC-SHA")
+  cs_add(&H9,"TLS-RSA-WITH-DES-CBC-SHA")
+  cs_add(&HC006,"TLS-ECDHE-ECDSA-WITH-NULL-SHA")
+  cs_add(&HC010,"TLS-ECDHE-RSA-WITH-NULL-SHA")
+  cs_add(&HC03B,"TLS-ECDHE-PSK-WITH-NULL-SHA384")
+  cs_add(&HC03A,"TLS-ECDHE-PSK-WITH-NULL-SHA256")
+  cs_add(&HC039,"TLS-ECDHE-PSK-WITH-NULL-SHA")
+  cs_add(&HB5,"TLS-DHE-PSK-WITH-NULL-SHA384")
+  cs_add(&HB4,"TLS-DHE-PSK-WITH-NULL-SHA256")
+  cs_add(&H2D,"TLS-DHE-PSK-WITH-NULL-SHA")
+  cs_add(&H3B,"TLS-RSA-WITH-NULL-SHA256")
+  cs_add(&H2,"TLS-RSA-WITH-NULL-SHA")
+  cs_add(&H1,"TLS-RSA-WITH-NULL-MD5")
+  cs_add(&HC00B,"TLS-ECDH-RSA-WITH-NULL-SHA")
+  cs_add(&HC001,"TLS-ECDH-ECDSA-WITH-NULL-SHA")
+  cs_add(&HB9,"TLS-RSA-PSK-WITH-NULL-SHA384")
+  cs_add(&HB8,"TLS-RSA-PSK-WITH-NULL-SHA256")
+  cs_add(&H2E,"TLS-RSA-PSK-WITH-NULL-SHA")
+  cs_add(&HB1,"TLS-PSK-WITH-NULL-SHA384")
+  cs_add(&HB0,"TLS-PSK-WITH-NULL-SHA256")
+  cs_add(&H2C,"TLS-PSK-WITH-NULL-SHA")
+  '
+  record_changed!(1)=FALSE
+  cs_new
+  '
+RETURN
+> PROCEDURE cs_add(cs_id%,cs_label$)
+  record_clear_buffer(1)
+  cs_set_id(record_buffer%(1),cs_id%)
+  cs_set_label(record_buffer%(1),cs_label$)
+  record_insert(1,head_nbline&(1))
+RETURN
+> PROCEDURE cs_redraw(rline&)
+  '
+  IF head_nbline&(1)>0
+    '
+    IF FRE()<4000
+      ~FRE(0)
+    ENDIF
+    '
+    v_hide_c
+    IF nb_plan&<4
+      vswr_mode(3)
+    ELSE
+      vswr_mode(1)
+    ENDIF
+    vst_color(1)
+    '
+    ~WIND_GET(hand_win&(1),4,xf&,yf&,lf&,hf&)
+    IF xmenu!=FALSE
+      ADD yf&,hd&(0)
+      SUB hf&,hd&(0)
+    ENDIF
+    '
+    ex&=xf&
+    ed&=ADD(ex&,3)
+    ey&=yf&
+    el&=lf&
+    eh&=hf&
+    IF rline&<0
+      ee&=ADD(yf&,2)
+      ef&=MIN(ADD(record_start&(1),SUCC(record_height&(1))),PRED(head_nbline&(1)))
+      ei&=record_start&(1)
+    ELSE
+      ee&=ADD(ADD(yf&,2),MUL(font_real_height&,SUB(rline&,record_start&(1))))
+      ef&=rline&
+      ei&=rline&
+    ENDIF
+    '
+    IF RC_INTERSECT(rx&,ry&,rl&,rh&,ex&,ey&,el&,eh&)
+      clip(1,ex&,ey&,el&,eh&)
+      FOR j&=ei& TO ef&
+        yp&=MUL(font_real_height&,SUB(j&,ei&))
+        cs_ptr%=@px(1,j&)
+        '
+        txt$=" "
+        IF nb_plan&>3
+          IF @is_record_selected(1,j&)
+            vst_color(1)
+          ELSE
+            vst_color(8)
+          ENDIF
+        ELSE
+          IF @is_record_selected(1,j&)
+            txt$=txt$+CHR$(8)+" "
+          ELSE
+            txt$=txt$+"  "
+          ENDIF
+        ENDIF
+        txt$=txt$+@cs_get_label$(cs_ptr%)+" "
+        IF LEN(txt$)<56
+          txt$=txt$+SPACE$(SUB(56,LEN(txt$)))
+        ENDIF
+        txt$=txt$+" 0x"+HEX$(@cs_get_id(cs_ptr%),8)
+        '
+        v_text(ed&,ADD(ee&,yp&),txt$)
+        '
+      NEXT j&
+      clip(0,ex&,ey&,el&,eh&)
+    ENDIF
+    '
+    v_show_c
+    '
+  ENDIF
+  '
+RETURN
+> PROCEDURE cs_new
+  LOCAL cs_proceed!
+  '
+  cs_proceed!=FALSE
+  IF record_changed!(1)
+    IF @alert(1,5)=1
+      cs_proceed!=TRUE
+    ENDIF
+  ELSE
+    cs_proceed!=TRUE
+  ENDIF
+  '
+  IF cs_proceed!
+    cs_is_new!=TRUE
+    cs_select_all
+    cs_current_file$=@polarssl_cs_getfolder$(chemin$)+"\"+cs_new$
+    record_changed!(1)=FALSE
+    cs_set_title(cs_current_file$)
+    '
+    record_start&(1)=0
+    @set_vslide(1)
+    record_start&(1)=@get_vslide(1)
+    '
+    force_update(1,screenx&,screeny&,screenl&,screenh&)
+  ENDIF
+RETURN
+> PROCEDURE cs_load
+  LOCAL cs_file_len%
+  '
+  cs_file$=@fileselector$(10,@polarssl_cs_getfolder$(chemin$)+"\"+cs_mask$,c0$)
+  '
+  IF LEN(cs_file$)>2
+    IF @s_exist(cs_file$)=TRUE
+      '
+      cs_current_file$=cs_file$
+      '
+      mem_pos%=0
+      '
+      file_handle&=GEMDOS(61,L:V:cs_current_file$,W:0)
+      IF file_handle&>0
+        '
+        cs_file_len%=GEMDOS(66,L:0,W:file_handle&,W:2)
+        ~GEMDOS(66,L:0,W:file_handle&,W:0)
+        '
+        IF cs_file_len%>0
+          mem_pos%=@mem_init(cs_file_len%)
+          '
+          IF mem_pos%>0
+            IF GEMDOS(63,W:file_handle&,L:cs_file_len%,L:mem_pos%)<>cs_file_len%
+              mem_pos%=@mem_close
+            ENDIF
+          ENDIF
+        ENDIF
+        ~GEMDOS(62,W:file_handle&)
+      ENDIF
+      '
+      IF mem_pos%>0
+        '
+        cs_deselect_all
+        '
+        mem_start_ptr%=mem_pos%
+        mem_end_ptr%=ADD(mem_pos%,cs_file_len%)
+        DO
+          dummy&=@cs_get_head_line(LONG{mem_start_ptr%})
+          IF dummy&>-1
+            record_select(1,dummy&)
+          ENDIF
+          ADD mem_start_ptr%,4
+        LOOP UNTIL mem_start_ptr%>mem_end_ptr% OR LONG{mem_start_ptr%}=0
+        mem_start_ptr%=mem_pos%
+        record_changed!(1)=FALSE
+        '
+        cs_is_new!=FALSE
+        cs_set_title(cs_current_file$)
+        '
+        record_start&(1)=0
+        @set_vslide(1)
+        record_start&(1)=@get_vslide(1)
+        '
+        force_update(1,screenx&,screeny&,screenl&,screenh&)
+      ENDIF
+      '
+      ~@mem_close
+    ENDIF
+  ENDIF
+RETURN
+> PROCEDURE cs_save_as
+  LOCAL cs_proceed!
+  '
+  IF @cs_is_one_selected
+    '
+    cs_file$=@fileselector$(9,@polarssl_cs_getfolder$(chemin$)+"\"+cs_mask$,cs_new$)
+    '
+    IF LEN(cs_file$)>2
+      cs_proceed!=FALSE
+      IF @s_exist(cs_file$)
+        IF @alert(2,11)=1
+          cs_proceed!=TRUE
+        ENDIF
+      ELSE
+        cs_proceed!=TRUE
+      ENDIF
+      '
+      IF cs_proceed!
+        cs_current_file$=cs_file$
+        cs_save
+        cs_is_new!=FALSE
+        cs_set_title(cs_current_file$)
+      ENDIF
+    ENDIF
+  ELSE
+    ~@alert(1,12)
+  ENDIF
+RETURN
+> PROCEDURE cs_save
+  '
+  IF @cs_is_one_selected
+    '
+    mouse_busy
+    '
+    mem_pos%=@mem_init(-1)
+    mem_start_ptr%=mem_pos%
+    '
+    dummy&=PRED(head_nbline&(1))
+    IF dummy&>-1
+      FOR ipo&=0 TO dummy&
+        IF @is_record_selected(1,ipo&)
+          mem_pos%=@mem_put_long(@cs_get_id(@px(1,ipo&)),mem_pos%)
+        ENDIF
+      NEXT ipo&
+    ENDIF
+    mem_pos%=@mem_put_long(0,mem_pos%)
+    '
+    IF mem_pos%>0 AND mem_start_ptr%>0
+      '
+      ~FRE(0)
+      '
+      IF @s_exist(cs_current_file$)
+        ~GEMDOS(65,L:V:cs_current_file$)
+      ENDIF
+      '
+      file_handle&=GEMDOS(60,L:V:cs_current_file$,W:0)
+      IF file_handle&>0
+        IF GEMDOS(64,W:file_handle&,L:SUB(mem_pos%,mem_start_ptr%),L:mem_start_ptr%)<>SUB(mem_pos%,mem_start_ptr%)
+          ~@alert(1,7)
+        ENDIF
+        ~GEMDOS(62,W:file_handle&)
+      ELSE
+        ~@alert(1,8)
+      ENDIF
+    ENDIF
+    record_changed!(1)=FALSE
+    '
+    ~@mem_close
+    '
+    mouse_free
+    '
+  ELSE
+    ~@alert(1,12)
+  ENDIF
+RETURN
+> FUNCTION cs_is_one_selected
+  $F%
+  LOCAL cs_one!
+  '
+  cs_one!=FALSE
+  dummy&=PRED(head_nbline&(1))
+  IF dummy&>-1
+    FOR ipo&=0 TO dummy&
+      IF @is_record_selected(1,ipo&)
+        cs_one!=TRUE
+      ENDIF
+      EXIT IF cs_one!
+    NEXT ipo&
+  ENDIF
+  RETURN cs_one!
+ENDFUNC
+'
+> FUNCTION cs_get_pointer(id%)
+  $F%
+  '
+  IF id%=0
+    RETURN 0
+  ENDIF
+  '
+  dummy&=PRED(head_nbline&(1))
+  IF dummy&>-1
+    FOR ipo&=0 TO dummy&
+      IF @cs_get_id(@px(1,ipo&))=id%
+        RETURN @px(1,ipo&)
+      ENDIF
+    NEXT ipo&
+  ENDIF
+  RETURN 0
+ENDFUNC
+> FUNCTION cs_get_head_line(id%)
+  $F%
+  '
+  IF id%=0
+    RETURN -1
+  ENDIF
+  '
+  dummy&=PRED(head_nbline&(1))
+  IF dummy&>-1
+    FOR ipo&=0 TO dummy&
+      IF @cs_get_id(@px(1,ipo&))=id%
+        RETURN ipo&
+      ENDIF
+    NEXT ipo&
+  ENDIF
+  RETURN -1
+ENDFUNC
+> PROCEDURE cs_set_id(cs_ptr%,id%)
+  LONG{ADD(cs_ptr%,0)}=id%
+RETURN
+> FUNCTION cs_get_id(cs_ptr%)
+  $F%
+  RETURN LONG{ADD(cs_ptr%,0)}
+ENDFUNC
+> PROCEDURE cs_set_label(cs_ptr%,wording$)
+  CHAR{ADD(cs_ptr%,4)}=TRIM$(LEFT$(wording$,128))
+RETURN
+> FUNCTION cs_get_label$(cs_ptr%)
+  IF cs_ptr%>0
+    RETURN CHAR{ADD(cs_ptr%,4)}
+  ENDIF
+  RETURN ""
+ENDFUNC
+'
+> FUNCTION mem_init(mem_wished_len%)
+  $F%
+  ~@mem_close
+  mem_len%=MAX(16000,SHL(SHR(ADD(mem_wished_len%,31),4),4))
+  mem_start_adr%=@mxalloc(mem_len%,3)
+  IF mem_start_adr%<0
+    mem_start_adr%=0
+  ENDIF
+  RETURN mem_start_adr%
+ENDFUNC
+> FUNCTION mem_close
+  $F%
+  @mxfree(mem_start_adr%)
+  mem_start_adr%=0
+  mem_len%=0
+  RETURN 0
+ENDFUNC
+> FUNCTION mem_put_long(mem_long%,mem_ptr%)
+  $F%
+  LOCAL mem_str_len%
+  '
+  mem_str_len%=4
+  IF @mem_add(mem_ptr%,mem_str_len%,mem_ptr%)
+    IF mem_ptr%>0
+      LONG{mem_ptr%}=mem_long%
+      ADD mem_ptr%,mem_str_len%
+    ENDIF
+  ENDIF
+  '
+  RETURN mem_ptr%
+ENDFUNC
+> FUNCTION mem_add(mem_old_pos%,mem_add%,VAR mem_new_pos%)
+  $F%
+  LOCAL mem_new_start_adr%,mem_new_len%
+  '
+  IF mem_old_pos%=0
+    RETURN FALSE
+  ENDIF
+  '
+  IF ADD(SUB(mem_old_pos%,mem_start_adr%),mem_add%)>mem_len%
+    mem_new_len%=SHL(SHR(ADD(ADD(mem_len%,MAX(ADD(mem_add%,16),16000)),32),4),4)
+    mem_new_start_adr%=@mxalloc(mem_new_len%,3)
+    IF mem_new_start_adr%>0
+      BMOVE mem_start_adr%,mem_new_start_adr%,mem_len%
+      @mxfree(mem_start_adr%)
+      mem_new_pos%=ADD(mem_new_start_adr%,SUB(mem_old_pos%,mem_start_adr%))
+      mem_start_adr%=mem_new_start_adr%
+      mem_len%=mem_new_len%
+      RETURN TRUE
+    ELSE
+      ~@alert(1,1)
+      mem_new_pos%=0
+      RETURN FALSE
+    ENDIF
+  ENDIF
+  mem_new_pos%=mem_old_pos%
+  RETURN TRUE
+ENDFUNC
+'
+> PROCEDURE ldg_init
+  '
+  ldg_cookie_ptr%=0
+  '
+  ldgm_cookie!=@test_cookie("LDGM",ldg_cookie_ptr%)
+  IF ldgm_cookie!=TRUE AND ldg_cookie_ptr%>0
+    ldg_libpath%=LONG{ADD(ldg_cookie_ptr%,164)}
+  ELSE
+    ldg_libpath%=0
+  ENDIF
+  '
+RETURN
+> PROCEDURE ldg_exit
+  '
+  ldgm_cookie!=FALSE
+  ldg_libpath%=0
+  '
+RETURN
+'
+> FUNCTION polarssl_cs_getfolder$(default_path$)
+  LOCAL polarssl_cs_str$,polarssl_cs_pos&
+  '
+  polarssl_cs_str$=""
+  '
+  IF shell_buf%>0 AND ldg_libpath%>0
+    CHAR{shell_buf%}="polarssl.ldg"
+    polarssl_cs_pos&=C:ldg_libpath%(L:shell_buf%,L:global%)
+    IF polarssl_cs_pos&=1
+      polarssl_cs_str$=CHAR{shell_buf%}
+      polarssl_cs_pos&=RINSTR(UPPER$(polarssl_cs_str$),".LDG")
+      IF polarssl_cs_pos&>0
+        polarssl_cs_str$=LEFT$(polarssl_cs_str$,PRED(polarssl_cs_pos&))
+      ENDIF
+      polarssl_cs_str$=polarssl_cs_str$+".cs"
+    ENDIF
+  ENDIF
+  IF LEN(polarssl_cs_str$)=0
+    polarssl_cs_str$=default_path$+"polarssl.cs"
+  ENDIF
+  IF mint!=FALSE
+    polarssl_cs_str$=UPPER$(polarssl_cs_str$)
+  ENDIF
+  polarssl_cs_str$=polarssl_cs_str$+c0$
+  '
+  ~FRE(0)
+  IF @d_exist(polarssl_cs_str$)=FALSE
+    ~GEMDOS(57,L:V:polarssl_cs_str$)
+  ENDIF
+  '
+  RETURN @remove_c0$(polarssl_cs_str$)
+ENDFUNC
+'
+> PROCEDURE call_documentation(node$)
+  LOCAL guide_path$
+  '
+  IF LEN(node$)>0
+    node$=" "+node$
+  ENDIF
+  guide_path$=chemin$+csb_guide$
+  IF @s_exist(guide_path$)=TRUE
+    guide_acc&=APPL_FIND("ST-GUIDE")
+    IF (@s_exist(stguide_file$)=TRUE AND stguide_file$<>c0$) OR guide_acc&>0
+      IF guide_acc&<0
+        close_multi
+        num_drive&=SUB(ASC(stguide_file$),65)
+        ~GEMDOS(14,W:num_drive&)
+        CHDIR LEFT$(stguide_file$,RINSTR(stguide_file$,"\"))+c0$
+      ENDIF
+      IF multi!
+        IF guide_acc&<0
+          dummy$=@remove_c0$(guide_path$)+node$
+          dummy$=CHR$(LEN(dummy$))+dummy$
+          shl_write(1,1,100,dummy$,stguide_file$)
+          FOR i&=0 TO 7
+            delai
+          NEXT i&
+        ELSE
+          call_accessory(guide_acc&)
+        ENDIF
+      ELSE
+        IF guide_acc&<0
+          dummy$=@remove_c0$(guide_path$)+node$
+          dummy$=CHR$(LEN(dummy$))+dummy$
+          ~EXEC(0,stguide_file$,dummy$,c0$+c0$)
+          mouse_free
+        ELSE
+          call_accessory(guide_acc&)
+        ENDIF
+      ENDIF
+      open_multi
+    ELSE
+      ~@alert(1,1)
+    ENDIF
+  ELSE
+    ~@alert(1,2)
+  ENDIF
+RETURN
+> PROCEDURE call_accessory(guide_id&)
+  IF guide_path$<>c0$ AND v_adr%>0
+    CHAR{v_adr%}=LEFT$(guide_path$,255)
+    clear_s
+    '
+    INT{s_adr%}=18193
+    INT{ADD(s_adr%,2)}=ap_id&
+    LONG{ADD(s_adr%,6)}=v_adr%
+    ~APPL_WRITE(id_aide&,16,s_adr%)
+  ENDIF
+RETURN
+'
+> PROCEDURE close_all_win
+  FOR i&=1 TO nb_win&
+    close_win(i&)
+  NEXT i&
+RETURN
+> PROCEDURE control
+  ~WIND_UPDATE(1)
+  ~WIND_UPDATE(3)
+  v_hide_c
+RETURN
+> PROCEDURE uncontrol
+  ~WIND_UPDATE(2)
+  ~WIND_UPDATE(0)
+  v_show_c
+RETURN
+> PROCEDURE form_display(dial&)
+  ~WIND_UPDATE(1)
+  ~WIND_UPDATE(3)
+  ~FORM_CENTER(adtree%(dial&),xd&(dial&),yd&(dial&),wd&(dial&),hd&(dial&))
+  DEC xd&(dial&)
+  DEC yd&(dial&)
+  ADD wd&(dial&),8
+  ADD hd&(dial&),8
+  ~FORM_DIAL(0,0,0,0,0,xd&(dial&),yd&(dial&),wd&(dial&),hd&(dial&))
+  ~OBJC_DRAW(adtree%(dial&),0,3,screenx&,screeny&,screenl&,screenh&)
+RETURN
+> PROCEDURE form_clear(dial&)
+  ~WIND_UPDATE(0)
+  ~WIND_UPDATE(2)
+  ~FORM_DIAL(3,0,0,0,0,xd&(dial&),yd&(dial&),wd&(dial&),hd&(dial&))
+RETURN
+> PROCEDURE delai
+  ~EVNT_TIMER(75)
+RETURN
+> PROCEDURE flush_clic
+  LOCAL flush_state&
+  '
+  WHILE flush_state&>0
+    ~GRAF_MKSTATE(dammy&,dammy&,flush_state&,dammy&)
+  WEND
+  mo_k&=0
+  mo_c&=0
+  '
+RETURN
+> PROCEDURE mouse_busy
+  ~GRAF_MOUSE(2,0)
+RETURN
+> PROCEDURE mouse_free
+  ~GRAF_MOUSE(0,0)
+RETURN
+> PROCEDURE scrap_read
+  '
+  ~FRE()
+  ~FRE(0)
+  '
+  GCONTRL(0)=80
+  GCONTRL(1)=0
+  GCONTRL(2)=1
+  GCONTRL(3)=1
+  GCONTRL(4)=0
+  '
+  ADDRIN(0)=V:scrap_text_file$
+  '
+  GEMSYS
+  '
+  dummy%=GINTOUT(0)
+  IF dummy%
+    scrap_text_file$=CHAR{V:scrap_text_file$}
+  ENDIF
+  scrap_text_file$=LEFT$(scrap_text_file$,RINSTR(scrap_text_file$,"\"))
+  IF LEN(scrap_text_file$)<4
+    dummy%=0
+  ENDIF
+  '
+  IF dummy%=0
+    IF BTST(BIOS(10),2)
+      result%=FSFIRST(clipboard_path$,16)
+    ELSE
+      result%=-33
+    ENDIF
+  ENDIF
+  '
+  IF dummy%
+    scrap_text_file$=scrap_text_file$+"SCRAP.TXT"+c0$
+  ELSE
+    IF result%=0
+      scrap_text_file$=clipboard_path$+"\"+"SCRAP.TXT"+c0$
+    ELSE
+      scrap_text_file$=chemin$+"SCRAP.TXT"+c0$
+    ENDIF
+  ENDIF
+  '
+RETURN
+'
+> FUNCTION window_create(cp_win_recu&)
+  $F%
+  '
+  GCONTRL(0)=100
+  GCONTRL(1)=5
+  GCONTRL(2)=1
+  GCONTRL(3)=0
+  GCONTRL(4)=0
+  '
+  GINTIN(0)=cp_win_recu&
+  GINTIN(1)=30
+  GINTIN(2)=30
+  GINTIN(3)=30
+  GINTIN(4)=30
+  '
+  GEMSYS
+  '
+  RETURN GINTOUT(0)
+ENDFUNC
+> FUNCTION get_top_window
+  $F%
+  '
+  INT{ADD(GCONTRL,2)}=2
+  INT{ADD(GCONTRL,4)}=5
+  LONG{ADD(GCONTRL,6)}=0
+  '
+  INT{GINTIN}=0
+  INT{ADD(GINTIN,2)}=10
+  '
+  GEMSYS 104
+  '
+  RETURN INT{ADD(GINTOUT,2)}
+ENDFUNC
+> FUNCTION test_cookie(cookie_name$,VAR cookie_valeur%)
+  $F%
+  LOCAL read_cook%,nom_cook%,cookie%
+  '
+  IF GEMDOS(340,W:&HFFFF,L:1,L:0)=0
+    IF GEMDOS(340,W:8,L:CVL(cookie_name$),L:V:cookie_valeur%)=0
+      RETURN TRUE
+    ENDIF
+  ELSE
+    nom_cook%=CVL(cookie_name$)
+    cookie%=LPEEK(&H5A0)
+    cookie_valeur%=0
+    '
+    IF cookie%<>0
+      REPEAT
+        read_cook%=LPEEK(cookie%)
+        cookie_valeur%=LPEEK(cookie%+4)
+        ADD cookie%,8
+      UNTIL read_cook%=0 OR read_cook%=nom_cook%
+      IF read_cook%=nom_cook%
+        RETURN TRUE
+      ENDIF
+    ENDIF
+  ENDIF
+  RETURN FALSE
+ENDFUNC
+> FUNCTION ev_multi(em_flags&,em_cl&,em_ma&,em_st&,em_ct%,VAR em_mx&,em_my&,em_mk&,em_kbd&,em_key&,em_click&)
+  $F%
+  '
+  INT{ADD(GCONTRL,2)}=16
+  INT{ADD(GCONTRL,4)}=7
+  INT{ADD(GCONTRL,6)}=1
+  INT{ADD(GCONTRL,8)}=0
+  '
+  INT{GINTIN}=em_flags&
+  INT{ADD(GINTIN,2)}=em_cl&
+  INT{ADD(GINTIN,4)}=em_ma&
+  INT{ADD(GINTIN,6)}=em_st&
+  INT{ADD(GINTIN,8)}=0
+  INT{ADD(GINTIN,10)}=0
+  INT{ADD(GINTIN,12)}=0
+  INT{ADD(GINTIN,14)}=0
+  INT{ADD(GINTIN,16)}=0
+  INT{ADD(GINTIN,18)}=0
+  INT{ADD(GINTIN,20)}=0
+  INT{ADD(GINTIN,22)}=0
+  INT{ADD(GINTIN,24)}=0
+  INT{ADD(GINTIN,26)}=0
+  INT{ADD(GINTIN,28)}=WORD(em_ct%)
+  INT{ADD(GINTIN,30)}=WORD(SWAP(em_ct%))
+  '
+  LONG{ADDRIN}=m_adr%
+  '
+  GEMSYS 25
+  '
+  em_mx&=INT{ADD(GINTOUT,2)}
+  em_my&=INT{ADD(GINTOUT,4)}
+  em_mk&=INT{ADD(GINTOUT,6)}
+  em_kbd&=INT{ADD(GINTOUT,8)}
+  em_key&=INT{ADD(GINTOUT,10)}
+  em_click&=INT{ADD(GINTOUT,12)}
+  '
+  RETURN INT{GINTOUT}
+ENDFUNC
+> FUNCTION s_exist(exist_name$)
+  $F%
+  exist_name$=exist_name$+c0$
+  LOCAL existe&
+  IF LEN(exist_name$)=0 OR LEFT$(exist_name$)=c0$
+    RETURN FALSE
+  ELSE
+    existe&=GEMDOS(61,L:V:exist_name$,W:0)
+    IF existe&>0
+      ~GEMDOS(62,W:existe&)
+      RETURN TRUE
+    ENDIF
+  ENDIF
+  RETURN FALSE
+ENDFUNC
+> FUNCTION d_exist(exist_name$)
+  $F%
+  LOCAL d_handle%,d_exist!,d_name$,d_path$,d_err%,d_dta%
+  '
+  IF shell_buf%>0
+    IF FRE()<4000
+      ~FRE(0)
+    ENDIF
+    '
+    d_exist!=FALSE
+    d_path$=LEFT$(exist_name$,PRED(RINSTR(exist_name$,"\")))+c0$
+    d_test$=""
+    d_name$=@remove_c0$(MID$(exist_name$,SUCC(RINSTR(exist_name$,"\"))))
+    '
+    IF (magic!=TRUE OR mint!=TRUE) AND xattr_buf%>0
+      IF LEN(d_path$)=3
+        d_path$=@remove_c0$(d_path$)+"\"+c0$
+      ENDIF
+      '
+      d_handle%=GEMDOS(296,L:V:d_path$,0)
+      IF d_handle%>0
+        '
+        WHILE GEMDOS(297,W:250,L:d_handle%,L:shell_buf%)=0 AND d_exist!=FALSE
+          IF UPPER$(CHAR{ADD(shell_buf%,4)})=UPPER$(d_name$)
+            d_test$=@remove_c0$(d_path$)+"\"+d_name$+c0$
+            IF GEMDOS(300,W:0,L:V:d_test$,L:xattr_buf%)=0
+              IF (INT{xattr_buf%} AND &HF000)=&H4000
+                d_exist!=TRUE
+              ENDIF
+            ENDIF
+          ENDIF
+        WEND
+        '
+        ~GEMDOS(299,L:d_handle%)
+      ENDIF
+      '
+      RETURN d_exist!
+    ELSE
+      d_path$=@remove_c0$(d_path$)+"\*"+c0$
+      d_err%=GEMDOS(78,L:V:d_path$,W:16)
+      DO
+        EXIT IF d_err%<>0 OR d_exist!=TRUE
+        d_dta%=FGETDTA()
+        IF CHAR{ADD(d_dta%,30)}=UPPER$(d_name$) AND BTST(BYTE{ADD(d_dta%,21)},4)=TRUE
+          d_exist!=TRUE
+        ENDIF
+        d_err%=GEMDOS(79)
+      LOOP
+      RETURN d_exist!
+    ENDIF
+  ENDIF
+  '
+  RETURN FALSE
+ENDFUNC
+> FUNCTION remove_c0$(remove_str$)
+  IF LEN(remove_str$)=0
+    RETURN ""
+  ENDIF
+  IF RIGHT$(remove_str$)=c0$
+    RETURN LEFT$(remove_str$,MAX(0,PRED(LEN(remove_str$))))
+  ENDIF
+  RETURN remove_str$
+ENDFUNC
+> FUNCTION remove_cx$(remove_str$,cx$)
+  IF LEN(remove_str$)=0
+    RETURN ""
+  ENDIF
+  IF RIGHT$(remove_str$)=cx$
+    RETURN LEFT$(remove_str$,MAX(0,PRED(LEN(remove_str$))))
+  ENDIF
+  RETURN remove_str$
+ENDFUNC
+> FUNCTION alert(al_type&,alerte&)
+  $F%
+  RETURN FORM_ALERT(al_type&,CHAR{OB_SPEC(adtree%(alert_tree&),alerte&)})
+ENDFUNC
+> FUNCTION fileselector$(type_msg&,path$,name$)
+  LOCAL path1$,name1$,choix_file&,retour_file&
+  LET path1$=path$
+  LET name1$=name$
+  retour_file&=@fi_input(type_msg&,path1$,name1$,choix_file&)
+  IF name1$=c0$ OR name1$=""
+    choix_file&=0
+  ENDIF
+  IF retour_file&=0 OR choix_file&=0
+    RETURN c0$
+  ENDIF
+  RETURN LEFT$(path1$,RINSTR(path1$,"\"))+name1$
+ENDFUNC
+> FUNCTION fi_input(type_msg&,VAR fi_path$,fi_name$,fi_choix&)
+  $F%
+  '
+  ~FRE(0)
+  '
+  IF GEMDOS(48)<&H1500
+    type_msg&=0
+  ENDIF
+  '
+  IF type_msg&>0
+    GCONTRL(0)=91
+  ELSE
+    GCONTRL(0)=90
+  ENDIF
+  GCONTRL(1)=0
+  GCONTRL(2)=2
+  IF type_msg&>0
+    GCONTRL(3)=3
+  ELSE
+    GCONTRL(3)=2
+  ENDIF
+  GCONTRL(4)=0
+  '
+  fi_path$=fi_path$+SPACE$(300)
+  fi_name$=fi_name$+SPACE$(100)
+  '
+  ADDRIN(0)=V:fi_path$
+  ADDRIN(1)=V:fi_name$
+  IF type_msg&>0
+    ADDRIN(2)=OB_SPEC(adtree%(alert_tree&),type_msg&)
+  ENDIF
+  '
+  GEMSYS
+  '
+  fi_path$=CHAR{V:fi_path$}+c0$
+  fi_name$=CHAR{V:fi_name$}+c0$
+  fi_choix&=GINTOUT(1)
+  '
+  RETURN GINTOUT(0)
+ENDFUNC
+> PROCEDURE shl_write(mode&,wisgr&,wiscr&,cmd$,tail$)
+  '
+  GCONTRL(0)=121
+  GCONTRL(1)=3
+  GCONTRL(2)=1
+  GCONTRL(3)=2
+  GCONTRL(4)=0
+  '
+  GINTIN(0)=mode&
+  GINTIN(1)=wisgr&
+  GINTIN(2)=wiscr&
+  '
+  ADDRIN(0)=V:tail$
+  ADDRIN(1)=V:cmd$
+  '
+  GEMSYS
+  '
+RETURN
+> PROCEDURE close_multi
+  IF multi!=FALSE
+    close_all_win
+    ~MENU_BAR(adtree%(0),0)
+  ENDIF
+RETURN
+> PROCEDURE open_multi
+  num_drive&=SUB(ASC(chemin$),65)
+  ~GEMDOS(14,W:num_drive&)
+  CHDIR chemin$+c0$
+  IF multi!=FALSE
+    ~MENU_BAR(adtree%(0),1)
+    ~FORM_DIAL(3,0,0,0,0,screenx&,screeny&,screenl&,screenh&)
+  ENDIF
+RETURN
+> PROCEDURE obj_select(arbre&,fils&)
+  OB_STATE(adtree%(arbre&),fils&)=BSET(OB_STATE(adtree%(arbre&),fils&),0)
+RETURN
+> PROCEDURE obj_deselect(arbre&,fils&)
+  OB_STATE(adtree%(arbre&),fils&)=BCLR(OB_STATE(adtree%(arbre&),fils&),0)
+RETURN
+> FUNCTION tst_selected(arbre&,fils&)
+  $F%
+  RETURN BTST(OB_STATE(adtree%(arbre&),fils&),0)
+ENDFUNC
+> FUNCTION menu_register(id&,t$)     ! Gok (20080628)
+  $F%
+  LOCAL sa%
+  INLINE sa%,32
+' ## INLINE:
+' $0000: 20 20 41 74 61 72 49 43 51 20 00 00 00 00 00 00 
+' $0010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+' 32  Bytes.
+  CHAR{sa%}=MID$(t$,1,30)
+  GCONTRL(FALSE)=35
+  GINTIN(FALSE)=id&
+  GCONTRL(1)=1
+  GCONTRL(2)=1
+  GCONTRL(3)=1
+  GCONTRL(4)=FALSE
+  ADDRIN(FALSE)=sa%
+  GEMSYS
+  RETURN GINTOUT(0)
+ENDFUNC
+> FUNCTION appl_getinfo(ap_gtype&,VAR ap_gout1&,ap_gout2&,ap_gout3&,ap_gout4&)
+  $F%
+  '
+  INT{ADD(GCONTRL,2)}=1
+  INT{ADD(GCONTRL,4)}=5
+  LONG{ADD(GCONTRL,6)}=0
+  '
+  INT{GINTIN}=ap_gtype&
+  '
+  GEMSYS 130
+  '
+  ap_gout1&=INT{ADD(GINTOUT,2)}
+  ap_gout2&=INT{ADD(GINTOUT,4)}
+  ap_gout3&=INT{ADD(GINTOUT,6)}
+  ap_gout4&=INT{ADD(GINTOUT,8)}
+  '
+  RETURN INT{GINTOUT}
+ENDFUNC
+'
+> FUNCTION v_opnvwk
+  $F%
+  '
+  INT{ADD(CONTRL,2)}=0
+  INT{ADD(CONTRL,6)}=11
+  INT{ADD(CONTRL,12)}=@graf_handle
+  '
+  INT{INTIN}=1           ! Num‚ro ID du p‚riph‚rique physique (‚cran)
+  INT{ADD(INTIN,2)}=1    ! Type de ligne
+  INT{ADD(INTIN,4)}=1    ! Index de couleur Polyline
+  INT{ADD(INTIN,6)}=1    ! Type de marqueur
+  INT{ADD(INTIN,8)}=1    ! Index de couleur Polymarker
+  INT{ADD(INTIN,10)}=1   ! Fonte de caractŠres
+  INT{ADD(INTIN,12)}=1   ! Index couleur texte
+  INT{ADD(INTIN,14)}=1   ! Fill interior Style
+  INT{ADD(INTIN,16)}=1   ! Fill style index
+  INT{ADD(INTIN,18)}=1   ! Fill index couleur
+  INT{ADD(INTIN,20)}=2   ! Flag coordonn‚es NDC ou RC
+  '
+  VDISYS 100
+  '
+  RETURN INT{ADD(CONTRL,12)}
+ENDFUNC
+> PROCEDURE v_clsvwk
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  VDISYS 101,0,0
+RETURN
+> FUNCTION graf_handle
+  $F%
+  '
+  INT{ADD(GCONTRL,2)}=0
+  INT{ADD(GCONTRL,4)}=5
+  LONG{ADD(GCONTRL,6)}=0
+  '
+  GEMSYS 77
+  '
+  RETURN INT{GINTOUT}
+ENDFUNC
+> PROCEDURE v_hide_c
+  IF naes!
+    ~GRAF_MOUSE(256,0)
+  ELSE
+    INT{ADD(CONTRL,12)}=vdi_handle&
+    VDISYS 123,0,0
+  ENDIF
+RETURN
+> PROCEDURE v_show_c
+  IF naes!
+    ~GRAF_MOUSE(257,0)
+  ELSE
+    INT{ADD(CONTRL,12)}=vdi_handle&
+    INT{INTIN}=1
+    VDISYS 122,1,0
+  ENDIF
+RETURN
+> PROCEDURE get_photo(abr&,menu_box&)
+  IF buf_photo%>0
+    ~OBJC_OFFSET(adtree%(abr&),menu_box&,x9&,y9&)
+    SUB x9&,3
+    SUB y9&,3
+    l9&=ADD(OB_W(adtree%(abr&),menu_box&),9)
+    h9&=ADD(OB_H(adtree%(abr&),menu_box&),9)
+    IF ADD(x9&,l9&)>ADD(screenx&,screenl&)
+      l9&=SUB(ADD(screenx&,screenl&),x9&)
+    ENDIF
+    IF ADD(y9&,h9&)>ADD(screeny&,screenh&)
+      h9&=SUB(ADD(screeny&,screenh&),y9&)
+    ENDIF
+    '
+    make_xyarray(x9&,y9&,ADD(x9&,l9&),ADD(y9&,h9&),1,1,l9&,h9&)
+    '
+    vro_cpyfm(pscrmfdb%,pdesmfdb%)
+    '
+  ENDIF
+  black_white(abr&,menu_box&,0)
+RETURN
+> PROCEDURE put_photo(abr&)
+  IF buf_photo%>0
+    '
+    make_xyarray(1,1,l9&,h9&,x9&,y9&,ADD(x9&,PRED(l9&)),ADD(y9&,PRED(h9&)))
+    '
+    vro_cpyfm(pdesmfdb%,pscrmfdb%)
+    '
+  ELSE
+    ~FORM_DIAL(3,0,0,0,0,screenx&,screeny&,screenl&,screenh&)
+  ENDIF
+RETURN
+> PROCEDURE make_zero_mfdb(pmfdb%)
+  LONG{pmfdb%}=0
+  LONG{ADD(pmfdb%,4)}=0
+  LONG{ADD(pmfdb%,8)}=0
+  LONG{ADD(pmfdb%,12)}=0
+  LONG{ADD(pmfdb%,16)}=0
+RETURN
+> PROCEDURE make_xywh(x0&,y0&,w0&,h0&,x1&,y1&,w1&,h1&)
+  WORD{pxyarray%}=x0&
+  WORD{ADD(pxyarray%,2)}=y0&
+  WORD{ADD(pxyarray%,4)}=ADD(x0&,PRED(w0&))
+  WORD{ADD(pxyarray%,6)}=ADD(y0&,PRED(h0&))
+  WORD{ADD(pxyarray%,8)}=x1&
+  WORD{ADD(pxyarray%,10)}=y1&
+  WORD{ADD(pxyarray%,12)}=ADD(x1&,PRED(w1&))
+  WORD{ADD(pxyarray%,14)}=ADD(y1&,PRED(h1&))
+RETURN
+> PROCEDURE make_xyarray(xq0&,yq0&,xq1&,yq1&,xz0&,yz0&,xz1&,yz1&)
+  WORD{pxyarray%}=xq0&
+  WORD{ADD(pxyarray%,2)}=yq0&
+  WORD{ADD(pxyarray%,4)}=xq1&
+  WORD{ADD(pxyarray%,6)}=yq1&
+  WORD{ADD(pxyarray%,8)}=xz0&
+  WORD{ADD(pxyarray%,10)}=yz0&
+  WORD{ADD(pxyarray%,12)}=xz1&
+  WORD{ADD(pxyarray%,14)}=yz1&
+RETURN
+> PROCEDURE vro_cpyfm(pscr_mfdb%,pdes_mfdb%)
+  '
+  v_hide_c
+  '
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  LONG{ADD(CONTRL,14)}=pscr_mfdb%
+  LONG{ADD(CONTRL,18)}=pdes_mfdb%
+  INT{INTIN}=3
+  BMOVE pxyarray%,PTSIN,16
+  '
+  VDISYS 109,1,4
+  '
+  v_show_c
+  '
+RETURN
+'
+> PROCEDURE v_text(x&,y&,str$)
+  '
+  CHAR{vtxt_buf%}=LEFT$(str$,255)
+  vtext_len&=MIN(LEN(str$),255)
+  str$=""
+  '
+  IF vtext_len&>0
+    INT{ADD(CONTRL,12)}=vdi_handle&
+    INT{ADD(PTSIN,2)}=y&
+    itext_len&=MIN(vtext_len&,255)
+    INT{PTSIN}=x&
+    DEC itext_len&
+    FOR it&=0 TO itext_len&
+      INT{ADD(INTIN,SHL&(it&,1))}=BYTE{ADD(vtxt_buf%,it&)}
+    NEXT it&
+    INC itext_len&
+    VDISYS 8,itext_len&,1,0
+  ENDIF
+RETURN
+> PROCEDURE vst_alignment(halign&,valign&)
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{INTIN}=halign&
+  INT{ADD(INTIN,2)}=valign&
+  VDISYS 39,2,0
+RETURN
+> PROCEDURE vst_color(color&)
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{INTIN}=color&
+  VDISYS 22,1,0
+RETURN
+> PROCEDURE vst_effect(effect&)
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{INTIN}=effect&
+  VDISYS 106,1,0
+RETURN
+> PROCEDURE vst_font(id&)
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{INTIN}=id&
+  VDISYS 21,1,0
+RETURN
+> FUNCTION vst_point(point&)
+  $F%
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{INTIN}=point&
+  VDISYS 107,1,0
+  RETURN SUCC(INT{ADD(PTSOUT,6)})
+ENDFUNC
+'
+> PROCEDURE clip(flag&,cx&,cy&,cw&,ch&)
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{INTIN}=flag&
+  INT{PTSIN}=cx&
+  INT{ADD(PTSIN,2)}=cy&
+  INT{ADD(PTSIN,4)}=ADD(cx&,PRED(cw&))
+  INT{ADD(PTSIN,6)}=ADD(cy&,PRED(ch&))
+  VDISYS 129,1,2
+RETURN
+> PROCEDURE vswr_mode(mode&)
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{INTIN}=mode&
+  VDISYS 32,1,0
+RETURN
+'
+> PROCEDURE v_bar(cx&,cy&,cw&,ch&)
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{PTSIN}=cx&
+  INT{ADD(PTSIN,2)}=cy&
+  INT{ADD(PTSIN,4)}=ADD(cx&,PRED(cw&))
+  INT{ADD(PTSIN,6)}=ADD(cy&,PRED(ch&))
+  VDISYS 11,0,2,1
+RETURN
+> PROCEDURE vsf_interior(mode&)
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{INTIN}=mode&
+  VDISYS 23,1,0
+RETURN
+> PROCEDURE vsf_style(mode&)
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{INTIN}=mode&
+  VDISYS 24,1,0
+RETURN
+> PROCEDURE vsf_color(mode&)
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{INTIN}=mode&
+  VDISYS 25,1,0
+RETURN
+> PROCEDURE vsf_perimeter(mode&)
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{INTIN}=mode&
+  VDISYS 104,1,0
+RETURN
+'
+> PROCEDURE v_line(cx&,cy&,cw&,ch&)
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{PTSIN}=cx&
+  INT{ADD(PTSIN,2)}=cy&
+  INT{ADD(PTSIN,4)}=ADD(cx&,MAX(0,PRED(cw&)))
+  INT{ADD(PTSIN,6)}=ADD(cy&,MAX(0,PRED(ch&)))
+  VDISYS 6,0,2,0
+RETURN
+> PROCEDURE vsl_type(type&)
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{INTIN}=type&
+  VDISYS 15,1,0
+RETURN
+> PROCEDURE vsl_width(width&)
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{INTIN}=width&
+  VDISYS 16,1,0
+RETURN
+> PROCEDURE vsl_ends(start&,end&)
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{INTIN}=start&
+  INT{ADD(INTIN,2)}=end&
+  VDISYS 108,2,0
+RETURN
+> PROCEDURE vsl_color(color&)
+  INT{ADD(CONTRL,12)}=vdi_handle&
+  INT{INTIN}=color&
+  VDISYS 17,1,0
+RETURN
+'
+> PROCEDURE record_general_init(n&)
+  '
+  record_number_max&=32000
+  '
+  DIM head%(n&),head_maxline&(n&),head_nbline&(n&)
+  '
+  DIM record_buffer%(n&),record_len&(n&)
+  DIM record_start&(n&),record_height&(n&),record_selected&(n&)
+  DIM record_changed!(n&)
+  '
+RETURN
+> PROCEDURE record_general_exit
+  '
+  ERASE head%(),head_maxline&(),head_nbline&()
+  '
+  ERASE record_buffer%(),record_len&()
+  ERASE record_start&(),record_height&(),record_selected&()
+  ERASE record_changed!()
+  '
+RETURN
+> PROCEDURE record_open(tid&,h_size&,r_len&)
+  '
+  ~FRE(0)
+  ~@head_init(tid&,h_size&)
+  ~@gxalloc_init(tid&)
+  '
+  record_len&(tid&)=MAX(2,r_len&)
+  record_buffer%(tid&)=@gxalloc(tid&,record_len&(tid&))
+  record_start&(tid&)=0
+  record_height&(tid&)=0
+  record_selected&(tid&)=-1
+  record_changed!(tid&)=FALSE
+  '
+RETURN
+> PROCEDURE record_close(tid&)
+  '
+  IF head%(tid&)>0
+    ~@gxalloc_exit(tid&)
+    ~@head_close(tid&)
+  ENDIF
+  '
+RETURN
+'
+> PROCEDURE record_set(tid&,line&)
+  '
+  BMOVE record_buffer%(tid&),@px(tid&,line&),record_len&(tid&)
+  '
+  record_changed!(tid&)=TRUE
+  '
+RETURN
+> PROCEDURE record_insert(tid&,line&)
+  '
+  IF @head_resize(tid&,SUCC(head_nbline&(tid&)))
+    IF line&<head_nbline&(tid&)
+      temp_len%=MUL(SUB(head_nbline&(tid&),line&),6)
+      temp_ptr%=ADD(head%(tid&),MUL(line&,6))
+      IF temp_len%>0
+        BMOVE temp_ptr%,ADD(temp_ptr%,6),temp_len%
+      ENDIF
+    ENDIF
+    '
+    temp_ptr%=@gxalloc(tid&,record_len&(tid&))
+    IF temp_ptr%>0
+      BMOVE record_buffer%(tid&),temp_ptr%,record_len&(tid&)
+      LONG{ADD(head%(tid&),MUL(line&,6))}=temp_ptr%
+      INT{ADD(head%(tid&),ADD(MUL(line&,6),4))}=0
+      INC head_nbline&(tid&)
+      record_changed!(tid&)=TRUE
+    ELSE
+      ~FORM_ALERT(1,"[1][|CS Builder's GXALLOC: can't insert a record.|][ Ok ]")
+    ENDIF
+    '
+  ENDIF
+RETURN
+> PROCEDURE record_delete(tid&,line&)
+  '
+  temp_len%=MUL(SUB(head_maxline&(tid&),line&),6)
+  temp_ptr%=ADD(head%(tid&),MUL(line&,6))
+  IF temp_len%>0
+    BMOVE ADD(temp_ptr%,6),temp_ptr%,temp_len%
+  ENDIF
+  '
+  head_nbline&(tid&)=MAX(0,PRED(head_nbline&(tid&)))
+  record_changed!(tid&)=TRUE
+  '
+RETURN
+> PROCEDURE record_select(tid&,line&)
+  LOCAL sx%
+  IF line&>-1
+    sx%=ADD(head%(tid&),ADD(MUL(line&,6),4))
+    BYTE{sx%}=1
+  ENDIF
+RETURN
+> PROCEDURE record_deselect(tid&,line&)
+  LOCAL sx%
+  IF line&>-1
+    sx%=ADD(head%(tid&),ADD(MUL(line&,6),4))
+    BYTE{sx%}=0
+  ENDIF
+RETURN
+> PROCEDURE record_select_all(tid&)
+  LOCAL sa_i&,sa_end&,sa_ptr%
+  '
+  sa_end&=PRED(head_nbline&(tid&))
+  IF sa_end&>-1
+    sa_ptr%=ADD(head%(tid&),4)
+    FOR sa_i&=0 TO sa_end&
+      BYTE{sa_ptr%}=1
+      ADD sa_ptr%,6
+    NEXT sa_i&
+  ENDIF
+  '
+RETURN
+> PROCEDURE record_deselect_all(tid&)
+  LOCAL da_i&,da_end&,da_ptr%
+  '
+  da_end&=PRED(head_nbline&(tid&))
+  IF da_end&>-1
+    da_ptr%=ADD(head%(tid&),4)
+    FOR da_i&=0 TO da_end&
+      BYTE{da_ptr%}=0
+      ADD da_ptr%,6
+    NEXT da_i&
+  ENDIF
+  '
+RETURN
+> FUNCTION is_record_selected(tid&,line&)
+  $F%
+  IF BYTE{ADD(head%(tid&),ADD(MUL(line&,6),4))}=1
+    RETURN TRUE
+  ENDIF
+  RETURN FALSE
+ENDFUNC
+> PROCEDURE record_clear_buffer(tid&)
+  LOCAL ips%,ipe%
+  '
+  ips%=record_buffer%(tid&)
+  ipe%=ADD(ips%,record_len&(tid&))
+  '
+  WHILE ips%<ipe%
+    INT{ips%}=0
+    ADD ips%,2
+  WEND
+  '
+RETURN
+'
+> FUNCTION head_init(tid&,n&)
+  $F%
+  ~@head_close(tid&)
+  head%(tid&)=@mxalloc(MUL(ADD(n&,10),6),3)
+  IF head%(tid&)>0
+    head_maxline&(tid&)=ADD(n&,10)
+    RETURN TRUE
+  ELSE
+    ~FORM_ALERT(1,"[1][|CS Builder's GXALLOC: failed in creating|memory block for line pointers.][ Ok ]")
+    head_maxline&(tid&)=0
+  ENDIF
+  RETURN FALSE
+ENDFUNC
+> FUNCTION head_close(tid&)
+  $F%
+  head_nbline&(tid&)=0
+  IF head%(tid&)>0
+    @mxfree(head%(tid&))
+    head%(tid&)=0
+    RETURN TRUE
+  ELSE
+    head%(tid&)=0
+  ENDIF
+  RETURN FALSE
+ENDFUNC
+> FUNCTION head_resize(tid&,n&)
+  $F%
+  IF n&>head_maxline&(tid&)
+    new_head%=@mxalloc(ADD(MUL(ADD(n&,20),6),4),3)
+    IF new_head%>0
+      BMOVE head%(tid&),new_head%,MUL(head_nbline&(tid&),6)
+      @mxfree(head%(tid&))
+      head%(tid&)=new_head%
+      head_maxline&(tid&)=ADD(n&,20)
+      RETURN TRUE
+    ELSE
+      ~FORM_ALERT(1,"[1][|CS Builder's GXALLOC: can't resize the|memory block for lines.|][ Ok ]")
+    ENDIF
+    RETURN FALSE
+  ENDIF
+  RETURN TRUE
+ENDFUNC
+> PROCEDURE head_fix(tid&,line&,head_ptr%)
+  IF line&>-1 AND line&<head_nbline&(tid&)
+    LONG{ADD(head%(tid&),MUL(line&,6))}=head_ptr%
+  ENDIF
+RETURN
+> FUNCTION px(tid&,line&)
+  $F%
+  RETURN LONG{ADD(head%(tid&),MUL(line&,6))}
+ENDFUNC
+'
+> PROCEDURE gxalloc_main_init(n&)
+  '
+  gxblk_max&=128
+  gxblk_size%=8192
+  '
+  DIM gxblk%(n&,PRED(gxblk_max&)),sgxblk%(n&,PRED(gxblk_max&))
+  DIM gxblk_count&(n&),sgxblk_count&(n&)
+  DIM last_gxadr%(n&),last_gxlen%(n&)
+  DIM gxalloc!(n&)
+  '
+RETURN
+> PROCEDURE gxalloc_main_exit(n&)
+  LOCAL in&
+  '
+  FOR in&=0 TO n&
+    ~@gxalloc_exit(in&)
+  NEXT in&
+  ERASE gxblk%(),sgxblk%()
+  ERASE gxblk_count&(),sgxblk_count&()
+  ERASE last_gxadr%(),last_gxlen%()
+  ERASE gxalloc!()
+  '
+RETURN
+> FUNCTION gxalloc_init(tid&)
+  $F%
+  LOCAL ig&
+  '
+  IF NOT gxalloc!(tid&)
+    FOR ig&=0 TO PRED(gxblk_max&)
+      gxblk%(tid&,ig&)=0
+      sgxblk%(tid&,ig&)=0
+    NEXT ig&
+    '
+    gxblk_count&(tid&)=0
+    sgxblk_count&(tid&)=0
+    last_gxadr%(tid&)=0
+    last_gxlen%(tid&)=0
+    '
+    gxblk%(tid&,0)=@mxalloc(ADD(gxblk_size%,4),3)
+    IF gxblk%(tid&,0)>0
+      last_gxadr%(tid&)=gxblk%(tid&,0)
+      last_gxlen%(tid&)=gxblk_size%
+      gxalloc!(tid&)=TRUE
+      RETURN 0
+    ENDIF
+    RETURN gxblk%(tid&,0)
+  ENDIF
+  RETURN -1
+ENDFUNC
+> FUNCTION gxalloc_exit(tid&)
+  $F%
+  LOCAL ig&
+  '
+  IF gxalloc!(tid&)
+    gxalloc!(tid&)=FALSE
+    FOR ig&=0 TO gxblk_count&(tid&)
+      IF gxblk%(tid&,ig&)>0
+        IF GEMDOS(73,L:gxblk%(tid&,ig&))=0
+          gxblk%(tid&,ig&)=0
+        ELSE
+          ~FORM_ALERT(1,"[1][|CS Builder's GXALLOC: can't free|text block memory.|][ Ok ]")
+        ENDIF
+      ENDIF
+    NEXT ig&
+    FOR ig&=0 TO sgxblk_count&(tid&)
+      IF sgxblk%(tid&,ig&)>0
+        IF GEMDOS(73,L:sgxblk%(tid&,ig&))=0
+          sgxblk%(tid&,ig&)=0
+        ELSE
+          ~FORM_ALERT(1,"[1][|CS Builder's GXALLOC: can't free|text (big) block memory.|][ Ok ]")
+        ENDIF
+      ENDIF
+    NEXT ig&
+    RETURN 0
+  ENDIF
+  RETURN -1
+ENDFUNC
+> FUNCTION gxalloc(tid&,wanted_size%)
+  $F%
+  '
+  wanted_size%=ADD(wanted_size%,3) AND -4
+  wanted_size%=MAX(4,wanted_size%)
+  '
+  IF wanted_size%>0
+    IF wanted_size%<gxblk_size%
+      IF SUB(last_gxlen%(tid&),wanted_size%)<0
+        temp_adr%=@new_gxblk(tid&)
+        IF temp_adr%=0
+          new_gxadr%=last_gxadr%(tid&)
+          ADD last_gxadr%(tid&),wanted_size%
+          SUB last_gxlen%(tid&),wanted_size%
+          RETURN new_gxadr%
+        ENDIF
+        RETURN temp_adr%
+      ELSE
+        new_gxadr%=last_gxadr%(tid&)
+        ADD last_gxadr%(tid&),wanted_size%
+        SUB last_gxlen%(tid&),wanted_size%
+        RETURN new_gxadr%
+      ENDIF
+    ELSE IF wanted_size%=>gxblk_size%
+      IF sgxblk_count&(tid&)<gxblk_max&
+        temp_adr%=@mxalloc(ADD(wanted_size%,32),3)
+        IF temp_adr%>0
+          sgxblk%(sgxblk_count&(tid&))=temp_adr%
+          INC sgxblk_count&(tid&)
+          RETURN temp_adr%
+        ENDIF
+        ~FORM_ALERT(1,"[1][|CS Builder's GXALLOC: can't allocate|a large memory block.][ Ok ]")
+        RETURN temp_adr%
+      ENDIF
+      ~FORM_ALERT(1,"[1][|CS Builder's GXALLOC: all available (big) memory|blocks are allocated.][ Ok ]")
+      RETURN -74
+    ENDIF
+  ENDIF
+  ~FORM_ALERT(1,"[1][|CS Builder's GXALLOC: negative|length for a memory block.][ Ok ]")
+  RETURN -70
+ENDFUNC
+> FUNCTION new_gxblk(tid&)
+  $F%
+  INC gxblk_count&(tid&)
+  IF gxblk_count&(tid&)<gxblk_max&
+    gxblk%(tid&,gxblk_count&(tid&))=@mxalloc(ADD(gxblk_size%,32),3)
+    IF gxblk%(tid&,gxblk_count&(tid&))>0
+      last_gxadr%(tid&)=gxblk%(tid&,gxblk_count&(tid&))
+      last_gxlen%(tid&)=gxblk_size%
+      RETURN 0
+    ELSE
+      ~FORM_ALERT(1,"[1][|Meg's GXALLOC: can't allocate|a text block.][ Ok ]")
+    ENDIF
+    DEC gxblk_count&(tid&)
+    RETURN gxblk%(tid&,SUCC(gxblk_count&(tid&)))
+  ENDIF
+  ~FORM_ALERT(1,"[1][|Meg's GXALLOC: all available text|blocks are allocated.][ Ok ]")
+  RETURN -74
+ENDFUNC
+'
+> FUNCTION mx_mask
+  $F%
+  IF GEMDOS(68,L:-1,0)=-32
+    RETURN 0
+  ELSE IF GEMDOS(290,-1)=-32
+    RETURN 3
+  ENDIF
+  RETURN -1
+ENDFUNC
+> FUNCTION mxalloc(mxlen%,mxmode&)
+  $F%
+  IF mxalloc!
+    RETURN GEMDOS(68,L:mxlen%,W:mxmode&)
+  ENDIF
+  RETURN GEMDOS(72,L:mxlen%)
+ENDFUNC
+> FUNCTION mxalloc_global(mx_len%,mx_mode&)
+  $F%
+  '
+  IF mx_mask%<>0
+    mx_mode&=OR(mx_mode&,&X100000)
+    RETURN GEMDOS(68,L:mx_len%,W:mx_mode& AND mx_mask%)
+  ENDIF
+  RETURN GEMDOS(72,L:mx_len%)
+ENDFUNC
+> PROCEDURE mxfree(mx_adr%)
+  IF mx_adr%>0
+    ~GEMDOS(73,L:mx_adr%)
+  ENDIF
+RETURN
+'
