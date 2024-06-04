@@ -1,5 +1,6 @@
+include ../configvars
 
-CFLAGS  =  -Wall -O2 -fomit-frame-pointer -I../mbedtls-1.3.22/include
+LOCAL_CFLAGS  = $(CFLAGS) -I../mbedtls/include $(WARNING_CFLAGS)
 LDFLAGS = -s
 LDLIBS  = -lldg -lgem -lz
 
@@ -16,48 +17,38 @@ SOBJS =
 
 SRCFILES = $(HEADER) $(COBJS) $(SOBJS)
 
-#############################
-CROSSPREFIX=m68k-atari-mint-
-
-CC = $(CROSSPREFIX)gcc
-AS = $(CC)
-AR = $(CROSSPREFIX)ar
-RANLIB = $(CROSSPREFIX)ranlib
-STRIP = $(CROSSPREFIX)strip
-FLAGS = $(CROSSPREFIX)flags
-STACK = -Wl,--stack,2k
-
 OBJS = $(COBJS:.c=.o)
 
-all: $(TARGET)
-	rm -f ./build/68000/*.o
-	rm -f ./build/68020/*.o
-	rm -f ./build/coldfire/*.o
-	@echo All done
+all: build/68000/$(TARGET) build/68020/$(TARGET) build/coldfire/$(TARGET)
+
+define CC_TEMPLATE
+build/68000/$(1).o: .dirs $(1).c
+	$(CC) $(LOCAL_CFLAGS) $(CFLAGS_m68000) -c $(1).c -o $$@
+build/68020/$(1).o: .dirs $(1).c
+	$(CC) $(LOCAL_CFLAGS) $(CFLAGS_m68020) -c $(1).c -o $$@
+build/coldfire/$(1).o: .dirs $(1).c
+	$(CC) $(LOCAL_CFLAGS) $(CFLAGS_coldire) -c $(1).c -o $$@
+endef
+$(foreach f,$(OBJS:.o=),$(eval $(call CC_TEMPLATE,$(f))))
+
+#############################
+
+STACK = -Wl,--stack,2k
 
 clean:
-	-@rm -f ./build/68000/$(OBJS)
-	-@rm -f ./build/68000/$(TARGET)
-	-@rm -f ./build/68020/$(OBJS)
-	-@rm -f ./build/68020/$(TARGET)
-	-@rm -f ./build/coldfire/$(OBJS)
-	-@rm -f ./build/coldfire/$(TARGET)
-	@echo Cleaned
+	rm -rf build .dirs
 
-new: clean
-	-@rm -f $(TARGET)
-	$(MAKE) all
+.dirs:
+	@mkdir -p build/68000
+	@mkdir -p build/68020
+	@mkdir -p build/coldfire
+	@touch $@
 
+build/68000/$(TARGET): $(addprefix build/68000/,$(OBJS)) ../mbedtls/library/libpolarssl_000.a
+	$(CC) $(addprefix build/68000/,$(OBJS)) $(CFLAGS) $(CFLAGS_m68000) ../mbedtls/library/libpolarssl_000.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
 
-.SUFFIXES:
-.SUFFIXES: .c .S .o
+build/68020/$(TARGET): $(addprefix build/68020/,$(OBJS)) ../mbedtls/library/libpolarssl_020.a
+	$(CC) $(addprefix build/68020/,$(OBJS)) $(CFLAGS) $(CFLAGS_m68020) ../mbedtls/library/libpolarssl_020.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
 
-.c.o:
-	$(CC) $(CFLAGS) -m68000 -c $*.c -o ./build/68000/$*.o
-	$(CC) $(CFLAGS) -m68020-60 -c $*.c -o ./build/68020/$*.o
-	$(CC) $(CFLAGS) -mcpu=5475 -c $*.c -o ./build/coldfire/$*.o
-
-$(TARGET): $(OBJS)
-	$(CC) ./build/68000/*.o $(CFLAGS) -m68000 ../mbedtls-1.3.22/library/libpolarssl_000.a $(LDLIBS) $(LDFLAGS) $(STACK) -o ./build/68000/$(TARGET)
-	$(CC) ./build/68020/*.o $(CFLAGS) -m68020-60 ../mbedtls-1.3.22/library/libpolarssl_020.a $(LDLIBS) $(LDFLAGS) $(STACK) -o ./build/68020/$(TARGET)
-	$(CC) ./build/coldfire/*.o $(CFLAGS) -mcpu=5475 ../mbedtls-1.3.22/library/libpolarssl_v4e.a $(LDLIBS) $(LDFLAGS) $(STACK) -o ./build/coldfire/$(TARGET)
+build/coldfire/$(TARGET): $(addprefix build/coldfire/,$(OBJS)) ../mbedtls/library/libpolarssl_v4e.a
+	$(CC) $(addprefix build/coldfire/,$(OBJS)) $(CFLAGS) $(CFLAGS_coldfire) ../mbedtls/library/libpolarssl_v4e.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
