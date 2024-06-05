@@ -10,6 +10,8 @@
 #include <unistd.h>
 
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
 #include <sys/time.h>
 #include <errno.h>
 #include <mint/sysbind.h>
@@ -34,10 +36,10 @@ void timing_set_system(int value);
 TPL *tpl;
 DRV_LIST *drivers;
 
-static int used_tcp_layer = 0;
-const int TCP_LAYER_DEFAULT = 0;
-const int TCP_LAYER_MINTNET = 1;
-const int TCP_LAYER_STIK = 2;
+#define TCP_LAYER_DEFAULT 0
+#define TCP_LAYER_MINTNET 1
+#define TCP_LAYER_STIK 2
+static int used_tcp_layer = TCP_LAYER_DEFAULT;
 
 static const int16_t STIK_RECV_MAXSIZE = 19200;
 static const uint16_t STIK_SEND_MAXSIZE = 1920;
@@ -519,6 +521,72 @@ static void CDECL force_tcp_layer(int value)
 	}
 }
 
+
+static int netdb_errno(int h_errno)
+{
+	switch (h_errno)
+	{
+	case NETDB_INTERNAL:
+	case NETDB_SUCCESS:
+		return -EERROR;
+	case TRY_AGAIN:
+		return -EAGAIN;
+	case NO_RECOVERY:
+		return -ECONNREFUSED;
+	case NO_DATA:
+		return -ENODATA;
+	case HOST_NOT_FOUND:
+		return -EHOSTUNREACH;
+	}
+	return -h_errno;
+}
+
+
+static int CDECL ldg_gethostbyname(const char *hostname, char **realname, uint32_t *alist, size_t lsize)
+{
+	struct hostent *hp;
+
+	if (realname)
+		*realname = 0;
+	switch (used_tcp_layer)
+	{
+	case TCP_LAYER_MINTNET:
+		hp = gethostbyname(hostname);
+		if (hp)
+		{
+			if (realname && hp->h_aliases && hp->h_aliases[0])
+				*realname = strdup(hp->h_aliases[0]);
+			if (lsize > 0)
+				memcpy(alist, hp->h_addr, hp->h_length);
+			return 0;
+		}
+		return netdb_errno(h_errno);
+	case TCP_LAYER_STIK:
+		if (tpl)
+			return resolve(hostname, realname, alist, lsize);
+		break;
+	}
+	return -ENOSYS;
+}
+
+
+static void CDECL ldg_freehostname(char *hostname)
+{
+	if (hostname)
+	{
+		switch (used_tcp_layer)
+		{
+		case TCP_LAYER_MINTNET:
+			free(hostname);
+			break;
+		case TCP_LAYER_STIK:
+			if (tpl)
+				KRfree(hostname);
+			break;
+		}
+	}
+}
+
 /* ldg functions table */
 
 static PROC const LibFunc[] = {
@@ -556,8 +624,11 @@ static PROC const LibFunc[] = {
 	{ "ldg_ssl_read", "int ldg_ssl_read( ssl_context *ssl, unsigned char *buf, size_t len);", ldg_ssl_read },
 	{ "ldg_ssl_write", "int ldg_ssl_write(ssl_context *ssl, const unsigned char *buf, size_t len);", ldg_ssl_write },
 	{ "ldg_ssl_close_notify", "int ldg_ssl_close_notify(ssl_context *ssl);", ldg_ssl_close_notify },
-	{ "ldg_ssl_free", "void ldg_ssl_free(ssl_context *ssl);", ldg_ssl_free }
+	{ "ldg_ssl_free", "void ldg_ssl_free(ssl_context *ssl);", ldg_ssl_free },
 
+    /* new in Release 9 */
+	{ "ldg_gethostbyname", "int ldg_gethostbyname(const char *hostname, char **realname, uint32_t *alist, size_t lsize);", ldg_gethostbyname },
+	{ "ldg_freehostname", "void ldg_freehostname(char *hostname);", ldg_freehostname },
 };
 
 /* main function: init and memory configuration */
@@ -625,13 +696,15 @@ static short stick_init(void)
 	return 0;
 }
 
-static LDGLIB LibLdg = { 0x0008, sizeof(LibFunc) / sizeof(LibFunc[0]), LibFunc, "SSL/TLS functions from mbebTLS", LDG_NOT_SHARED, 0, 0 };
+static LDGLIB LibLdg = { 9, sizeof(LibFunc) / sizeof(LibFunc[0]), LibFunc, "SSL/TLS functions from mbebTLS", LDG_NOT_SHARED, 0, 0 };
 
 int main(void)
 {
 	ldg_init(&LibLdg);
 
+#if 0
 	platform_set_malloc_free((void *) ldg_Malloc, (void *) ldg_Free);
+#endif
 
 #if defined(POLARSSL_DEBUG_C)
 	(void) Cconws("Polarssl.ldg (");

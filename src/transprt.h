@@ -663,7 +663,7 @@ extern TPL *tpl;
 /* int                                                                      */
 /*--------------------------------------------------------------------------*/
 #ifndef AND_MEMORY		/* because 'osbind.h' uses similar methods... */
-#if		((__GNUC__ > 2) && (__GNUC_MINOR__ > 5))
+#if __GNUC_PREREQ(2, 6)
 #define AND_MEMORY , "memory"
 #else						/* else for ancient compiler versions */
 #define AND_MEMORY
