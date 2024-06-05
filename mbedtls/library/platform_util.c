@@ -218,6 +218,7 @@ void (*mbedtls_test_hook_test_fail)(const char *, int, const char *);
 #if defined(MBEDTLS_HAVE_TIME) && !defined(MBEDTLS_PLATFORM_MS_TIME_ALT)
 
 #include <time.h>
+#include <sys/time.h>
 #if !defined(_WIN32) && \
     (defined(unix) || defined(__unix) || defined(__unix__) || \
     (defined(__APPLE__) && defined(__MACH__)) || defined(__HAIKU__) || defined(__midipix__))
@@ -227,6 +228,16 @@ void (*mbedtls_test_hook_test_fail)(const char *, int, const char *);
 #if (defined(_POSIX_VERSION) && _POSIX_VERSION >= 199309L) || defined(__HAIKU__)
 mbedtls_ms_time_t mbedtls_ms_time(void)
 {
+#ifndef CLOCK_MONOTONIC
+    struct timeval tv;
+    mbedtls_ms_time_t current_ms;
+
+    if (gettimeofday(&tv, NULL))
+        return time(NULL) * 1000;
+    current_ms = tv.tv_sec;
+
+    return current_ms*1000 + tv.tv_usec / 1000;
+#else
     int ret;
     struct timespec tv;
     mbedtls_ms_time_t current_ms;
@@ -243,6 +254,7 @@ mbedtls_ms_time_t mbedtls_ms_time(void)
     current_ms = tv.tv_sec;
 
     return current_ms*1000 + tv.tv_nsec / 1000000;
+#endif
 }
 #elif defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || \
     defined(__MINGW32__) || defined(_WIN64)
