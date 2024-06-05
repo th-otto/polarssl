@@ -704,9 +704,9 @@ int dep_check( char *str )
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_SHA512_C" ) == 0 )
+    if( strcmp( str, "POLARSSL_SHA1_C" ) == 0 )
     {
-#if defined(POLARSSL_SHA512_C)
+#if defined(POLARSSL_SHA1_C)
         return( 0 );
 #else
         return( 1 );
@@ -720,9 +720,9 @@ int dep_check( char *str )
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_SHA1_C" ) == 0 )
+    if( strcmp( str, "POLARSSL_SHA512_C" ) == 0 )
     {
-#if defined(POLARSSL_SHA1_C)
+#if defined(POLARSSL_SHA512_C)
         return( 0 );
 #else
         return( 1 );

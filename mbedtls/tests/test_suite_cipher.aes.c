@@ -426,29 +426,9 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 
-    if( strcmp( str, "POLARSSL_ENCRYPT" ) == 0 )
+    if( strcmp( str, "-1" ) == 0 )
     {
-        *value = ( POLARSSL_ENCRYPT );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_PADDING_ZEROS" ) == 0 )
-    {
-        *value = ( POLARSSL_PADDING_ZEROS );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_CIPHER_AES_128_CTR" ) == 0 )
-    {
-        *value = ( POLARSSL_CIPHER_AES_128_CTR );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_DECRYPT" ) == 0 )
-    {
-        *value = ( POLARSSL_DECRYPT );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ERR_CIPHER_INVALID_PADDING" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_CIPHER_INVALID_PADDING );
+        *value = ( -1 );
         return( 0 );
     }
     if( strcmp( str, "POLARSSL_CIPHER_AES_128_CBC" ) == 0 )
@@ -456,24 +436,14 @@ int verify_int( char *str, int *value )
         *value = ( POLARSSL_CIPHER_AES_128_CBC );
         return( 0 );
     }
-    if( strcmp( str, "POLARSSL_CIPHER_AES_192_ECB" ) == 0 )
+    if( strcmp( str, "POLARSSL_CIPHER_AES_128_CFB128" ) == 0 )
     {
-        *value = ( POLARSSL_CIPHER_AES_192_ECB );
+        *value = ( POLARSSL_CIPHER_AES_128_CFB128 );
         return( 0 );
     }
-    if( strcmp( str, "POLARSSL_CIPHER_AES_256_ECB" ) == 0 )
+    if( strcmp( str, "POLARSSL_CIPHER_AES_128_CTR" ) == 0 )
     {
-        *value = ( POLARSSL_CIPHER_AES_256_ECB );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_CIPHER_AES_192_CBC" ) == 0 )
-    {
-        *value = ( POLARSSL_CIPHER_AES_192_CBC );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_PADDING_NONE" ) == 0 )
-    {
-        *value = ( POLARSSL_PADDING_NONE );
+        *value = ( POLARSSL_CIPHER_AES_128_CTR );
         return( 0 );
     }
     if( strcmp( str, "POLARSSL_CIPHER_AES_128_ECB" ) == 0 )
@@ -481,24 +451,9 @@ int verify_int( char *str, int *value )
         *value = ( POLARSSL_CIPHER_AES_128_ECB );
         return( 0 );
     }
-    if( strcmp( str, "POLARSSL_CIPHER_AES_256_CFB128" ) == 0 )
+    if( strcmp( str, "POLARSSL_CIPHER_AES_192_CBC" ) == 0 )
     {
-        *value = ( POLARSSL_CIPHER_AES_256_CFB128 );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_PADDING_ZEROS_AND_LEN" ) == 0 )
-    {
-        *value = ( POLARSSL_PADDING_ZEROS_AND_LEN );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_CIPHER_AES_256_CBC" ) == 0 )
-    {
-        *value = ( POLARSSL_CIPHER_AES_256_CBC );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_PADDING_PKCS7" ) == 0 )
-    {
-        *value = ( POLARSSL_PADDING_PKCS7 );
+        *value = ( POLARSSL_CIPHER_AES_192_CBC );
         return( 0 );
     }
     if( strcmp( str, "POLARSSL_CIPHER_AES_192_CFB128" ) == 0 )
@@ -506,9 +461,34 @@ int verify_int( char *str, int *value )
         *value = ( POLARSSL_CIPHER_AES_192_CFB128 );
         return( 0 );
     }
-    if( strcmp( str, "POLARSSL_CIPHER_AES_128_CFB128" ) == 0 )
+    if( strcmp( str, "POLARSSL_CIPHER_AES_192_ECB" ) == 0 )
     {
-        *value = ( POLARSSL_CIPHER_AES_128_CFB128 );
+        *value = ( POLARSSL_CIPHER_AES_192_ECB );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_CIPHER_AES_256_CBC" ) == 0 )
+    {
+        *value = ( POLARSSL_CIPHER_AES_256_CBC );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_CIPHER_AES_256_CFB128" ) == 0 )
+    {
+        *value = ( POLARSSL_CIPHER_AES_256_CFB128 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_CIPHER_AES_256_ECB" ) == 0 )
+    {
+        *value = ( POLARSSL_CIPHER_AES_256_ECB );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_DECRYPT" ) == 0 )
+    {
+        *value = ( POLARSSL_DECRYPT );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ENCRYPT" ) == 0 )
+    {
+        *value = ( POLARSSL_ENCRYPT );
         return( 0 );
     }
     if( strcmp( str, "POLARSSL_ERR_CIPHER_FULL_BLOCK_EXPECTED" ) == 0 )
@@ -516,14 +496,34 @@ int verify_int( char *str, int *value )
         *value = ( POLARSSL_ERR_CIPHER_FULL_BLOCK_EXPECTED );
         return( 0 );
     }
+    if( strcmp( str, "POLARSSL_ERR_CIPHER_INVALID_PADDING" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_CIPHER_INVALID_PADDING );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_PADDING_NONE" ) == 0 )
+    {
+        *value = ( POLARSSL_PADDING_NONE );
+        return( 0 );
+    }
     if( strcmp( str, "POLARSSL_PADDING_ONE_AND_ZEROS" ) == 0 )
     {
         *value = ( POLARSSL_PADDING_ONE_AND_ZEROS );
         return( 0 );
     }
-    if( strcmp( str, "-1" ) == 0 )
+    if( strcmp( str, "POLARSSL_PADDING_PKCS7" ) == 0 )
     {
-        *value = ( -1 );
+        *value = ( POLARSSL_PADDING_PKCS7 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_PADDING_ZEROS" ) == 0 )
+    {
+        *value = ( POLARSSL_PADDING_ZEROS );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_PADDING_ZEROS_AND_LEN" ) == 0 )
+    {
+        *value = ( POLARSSL_PADDING_ZEROS_AND_LEN );
         return( 0 );
     }
 
@@ -1201,9 +1201,49 @@ int dep_check( char *str )
     if( str == NULL )
         return( 1 );
 
+    if( strcmp( str, "POLARSSL_AES_C" ) == 0 )
+    {
+#if defined(POLARSSL_AES_C)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_CIPHER_MODE_CBC" ) == 0 )
+    {
+#if defined(POLARSSL_CIPHER_MODE_CBC)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
     if( strcmp( str, "POLARSSL_CIPHER_MODE_CFB" ) == 0 )
     {
 #if defined(POLARSSL_CIPHER_MODE_CFB)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_CIPHER_MODE_CTR" ) == 0 )
+    {
+#if defined(POLARSSL_CIPHER_MODE_CTR)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_CIPHER_PADDING_ONE_AND_ZEROS" ) == 0 )
+    {
+#if defined(POLARSSL_CIPHER_PADDING_ONE_AND_ZEROS)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_CIPHER_PADDING_PKCS7" ) == 0 )
+    {
+#if defined(POLARSSL_CIPHER_PADDING_PKCS7)
         return( 0 );
 #else
         return( 1 );
@@ -1220,46 +1260,6 @@ int dep_check( char *str )
     if( strcmp( str, "POLARSSL_CIPHER_PADDING_ZEROS_AND_LEN" ) == 0 )
     {
 #if defined(POLARSSL_CIPHER_PADDING_ZEROS_AND_LEN)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_AES_C" ) == 0 )
-    {
-#if defined(POLARSSL_AES_C)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_CIPHER_PADDING_ONE_AND_ZEROS" ) == 0 )
-    {
-#if defined(POLARSSL_CIPHER_PADDING_ONE_AND_ZEROS)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_CIPHER_MODE_CTR" ) == 0 )
-    {
-#if defined(POLARSSL_CIPHER_MODE_CTR)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_CIPHER_PADDING_PKCS7" ) == 0 )
-    {
-#if defined(POLARSSL_CIPHER_PADDING_PKCS7)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_CIPHER_MODE_CBC" ) == 0 )
-    {
-#if defined(POLARSSL_CIPHER_MODE_CBC)
         return( 0 );
 #else
         return( 1 );

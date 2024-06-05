@@ -447,14 +447,14 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 
-    if( strcmp( str, "-0xFFFF" ) == 0 )
-    {
-        *value = ( -0xFFFF );
-        return( 0 );
-    }
     if( strcmp( str, "-0x1000" ) == 0 )
     {
         *value = ( -0x1000 );
+        return( 0 );
+    }
+    if( strcmp( str, "-0xFFFF" ) == 0 )
+    {
+        *value = ( -0xFFFF );
         return( 0 );
     }
     if( strcmp( str, "POLARSSL_DEBUG_LOG_FULL" ) == 0 )
@@ -609,17 +609,17 @@ int dep_check( char *str )
     if( str == NULL )
         return( 1 );
 
-    if( strcmp( str, "POLARSSL_PEM_PARSE_C" ) == 0 )
+    if( strcmp( str, "POLARSSL_BASE64_C" ) == 0 )
     {
-#if defined(POLARSSL_PEM_PARSE_C)
+#if defined(POLARSSL_BASE64_C)
         return( 0 );
 #else
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_RSA_C" ) == 0 )
+    if( strcmp( str, "POLARSSL_ECP_C" ) == 0 )
     {
-#if defined(POLARSSL_RSA_C)
+#if defined(POLARSSL_ECP_C)
         return( 0 );
 #else
         return( 1 );
@@ -633,17 +633,17 @@ int dep_check( char *str )
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_BASE64_C" ) == 0 )
+    if( strcmp( str, "POLARSSL_PEM_PARSE_C" ) == 0 )
     {
-#if defined(POLARSSL_BASE64_C)
+#if defined(POLARSSL_PEM_PARSE_C)
         return( 0 );
 #else
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_ECP_C" ) == 0 )
+    if( strcmp( str, "POLARSSL_RSA_C" ) == 0 )
     {
-#if defined(POLARSSL_ECP_C)
+#if defined(POLARSSL_RSA_C)
         return( 0 );
 #else
         return( 1 );

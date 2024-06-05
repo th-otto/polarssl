@@ -422,15 +422,40 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP192R1" ) == 0 )
+    {
+        *value = ( POLARSSL_ECP_DP_SECP192R1 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP224R1" ) == 0 )
+    {
+        *value = ( POLARSSL_ECP_DP_SECP224R1 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP256R1" ) == 0 )
+    {
+        *value = ( POLARSSL_ECP_DP_SECP256R1 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP384R1" ) == 0 )
+    {
+        *value = ( POLARSSL_ECP_DP_SECP384R1 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP521R1" ) == 0 )
+    {
+        *value = ( POLARSSL_ECP_DP_SECP521R1 );
+        return( 0 );
+    }
     if( strcmp( str, "POLARSSL_ERR_ECP_INVALID_KEY" ) == 0 )
     {
         *value = ( POLARSSL_ERR_ECP_INVALID_KEY );
         return( 0 );
     }
 #ifdef POLARSSL_ECDSA_DETERMINISTIC
-    if( strcmp( str, "POLARSSL_MD_SHA512" ) == 0 )
+    if( strcmp( str, "POLARSSL_MD_SHA1" ) == 0 )
     {
-        *value = ( POLARSSL_MD_SHA512 );
+        *value = ( POLARSSL_MD_SHA1 );
         return( 0 );
     }
 #endif // POLARSSL_ECDSA_DETERMINISTIC
@@ -455,38 +480,13 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 #endif // POLARSSL_ECDSA_DETERMINISTIC
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP256R1" ) == 0 )
-    {
-        *value = ( POLARSSL_ECP_DP_SECP256R1 );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP521R1" ) == 0 )
-    {
-        *value = ( POLARSSL_ECP_DP_SECP521R1 );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP224R1" ) == 0 )
-    {
-        *value = ( POLARSSL_ECP_DP_SECP224R1 );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP192R1" ) == 0 )
-    {
-        *value = ( POLARSSL_ECP_DP_SECP192R1 );
-        return( 0 );
-    }
 #ifdef POLARSSL_ECDSA_DETERMINISTIC
-    if( strcmp( str, "POLARSSL_MD_SHA1" ) == 0 )
+    if( strcmp( str, "POLARSSL_MD_SHA512" ) == 0 )
     {
-        *value = ( POLARSSL_MD_SHA1 );
+        *value = ( POLARSSL_MD_SHA512 );
         return( 0 );
     }
 #endif // POLARSSL_ECDSA_DETERMINISTIC
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP384R1" ) == 0 )
-    {
-        *value = ( POLARSSL_ECP_DP_SECP384R1 );
-        return( 0 );
-    }
 
 
     polarssl_printf( "Expected integer for parameter and got: %s\n", str );
@@ -716,9 +716,9 @@ int dep_check( char *str )
     if( str == NULL )
         return( 1 );
 
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP256R1_ENABLED" ) == 0 )
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP192R1_ENABLED" ) == 0 )
     {
-#if defined(POLARSSL_ECP_DP_SECP256R1_ENABLED)
+#if defined(POLARSSL_ECP_DP_SECP192R1_ENABLED)
         return( 0 );
 #else
         return( 1 );
@@ -732,25 +732,25 @@ int dep_check( char *str )
         return( 1 );
 #endif
     }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP256R1_ENABLED" ) == 0 )
+    {
+#if defined(POLARSSL_ECP_DP_SECP256R1_ENABLED)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP384R1_ENABLED" ) == 0 )
+    {
+#if defined(POLARSSL_ECP_DP_SECP384R1_ENABLED)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
     if( strcmp( str, "POLARSSL_ECP_DP_SECP521R1_ENABLED" ) == 0 )
     {
 #if defined(POLARSSL_ECP_DP_SECP521R1_ENABLED)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_SHA256_C" ) == 0 )
-    {
-#if defined(POLARSSL_SHA256_C)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP192R1_ENABLED" ) == 0 )
-    {
-#if defined(POLARSSL_ECP_DP_SECP192R1_ENABLED)
         return( 0 );
 #else
         return( 1 );
@@ -764,9 +764,9 @@ int dep_check( char *str )
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP384R1_ENABLED" ) == 0 )
+    if( strcmp( str, "POLARSSL_SHA256_C" ) == 0 )
     {
-#if defined(POLARSSL_ECP_DP_SECP384R1_ENABLED)
+#if defined(POLARSSL_SHA256_C)
         return( 0 );
 #else
         return( 1 );

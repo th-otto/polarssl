@@ -426,14 +426,14 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 
-    if( strcmp( str, "POLARSSL_CIPHER_NULL" ) == 0 )
-    {
-        *value = ( POLARSSL_CIPHER_NULL );
-        return( 0 );
-    }
     if( strcmp( str, "-1" ) == 0 )
     {
         *value = ( -1 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_CIPHER_NULL" ) == 0 )
+    {
+        *value = ( POLARSSL_CIPHER_NULL );
         return( 0 );
     }
 

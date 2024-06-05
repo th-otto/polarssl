@@ -422,9 +422,9 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 
-    if( strcmp( str, "POLARSSL_ERR_PKCS5_INVALID_FORMAT + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
+    if( strcmp( str, "ASN1_CONSTRUCTED | ASN1_SEQUENCE" ) == 0 )
     {
-        *value = ( POLARSSL_ERR_PKCS5_INVALID_FORMAT + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
+        *value = ( ASN1_CONSTRUCTED | ASN1_SEQUENCE );
         return( 0 );
     }
     if( strcmp( str, "ASN1_SEQUENCE" ) == 0 )
@@ -432,24 +432,19 @@ int verify_int( char *str, int *value )
         *value = ( ASN1_SEQUENCE );
         return( 0 );
     }
-    if( strcmp( str, "POLARSSL_ERR_PKCS5_INVALID_FORMAT + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_PKCS5_INVALID_FORMAT + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ERR_PKCS5_PASSWORD_MISMATCH" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_PKCS5_PASSWORD_MISMATCH );
-        return( 0 );
-    }
     if( strcmp( str, "POLARSSL_ERR_PKCS5_FEATURE_UNAVAILABLE" ) == 0 )
     {
         *value = ( POLARSSL_ERR_PKCS5_FEATURE_UNAVAILABLE );
         return( 0 );
     }
-    if( strcmp( str, "POLARSSL_MD_SHA1" ) == 0 )
+    if( strcmp( str, "POLARSSL_ERR_PKCS5_INVALID_FORMAT" ) == 0 )
     {
-        *value = ( POLARSSL_MD_SHA1 );
+        *value = ( POLARSSL_ERR_PKCS5_INVALID_FORMAT );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ERR_PKCS5_INVALID_FORMAT + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_PKCS5_INVALID_FORMAT + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
         return( 0 );
     }
     if( strcmp( str, "POLARSSL_ERR_PKCS5_INVALID_FORMAT + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
@@ -457,14 +452,19 @@ int verify_int( char *str, int *value )
         *value = ( POLARSSL_ERR_PKCS5_INVALID_FORMAT + POLARSSL_ERR_ASN1_OUT_OF_DATA );
         return( 0 );
     }
-    if( strcmp( str, "ASN1_CONSTRUCTED | ASN1_SEQUENCE" ) == 0 )
+    if( strcmp( str, "POLARSSL_ERR_PKCS5_INVALID_FORMAT + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
     {
-        *value = ( ASN1_CONSTRUCTED | ASN1_SEQUENCE );
+        *value = ( POLARSSL_ERR_PKCS5_INVALID_FORMAT + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
         return( 0 );
     }
-    if( strcmp( str, "POLARSSL_ERR_PKCS5_INVALID_FORMAT" ) == 0 )
+    if( strcmp( str, "POLARSSL_ERR_PKCS5_PASSWORD_MISMATCH" ) == 0 )
     {
-        *value = ( POLARSSL_ERR_PKCS5_INVALID_FORMAT );
+        *value = ( POLARSSL_ERR_PKCS5_PASSWORD_MISMATCH );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_MD_SHA1" ) == 0 )
+    {
+        *value = ( POLARSSL_MD_SHA1 );
         return( 0 );
     }
 

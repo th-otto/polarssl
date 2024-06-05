@@ -429,14 +429,9 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 
-    if( strcmp( str, "RSA_SALT_LEN_ANY" ) == 0 )
+    if( strcmp( str, "POLARSSL_ERR_RSA_BAD_INPUT_DATA" ) == 0 )
     {
-        *value = ( RSA_SALT_LEN_ANY );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_MD_SHA1" ) == 0 )
-    {
-        *value = ( POLARSSL_MD_SHA1 );
+        *value = ( POLARSSL_ERR_RSA_BAD_INPUT_DATA );
         return( 0 );
     }
     if( strcmp( str, "POLARSSL_ERR_RSA_INVALID_PADDING" ) == 0 )
@@ -454,9 +449,9 @@ int verify_int( char *str, int *value )
         *value = ( POLARSSL_MD_NONE );
         return( 0 );
     }
-    if( strcmp( str, "POLARSSL_MD_SHA512" ) == 0 )
+    if( strcmp( str, "POLARSSL_MD_SHA1" ) == 0 )
     {
-        *value = ( POLARSSL_MD_SHA512 );
+        *value = ( POLARSSL_MD_SHA1 );
         return( 0 );
     }
     if( strcmp( str, "POLARSSL_MD_SHA256" ) == 0 )
@@ -464,9 +459,14 @@ int verify_int( char *str, int *value )
         *value = ( POLARSSL_MD_SHA256 );
         return( 0 );
     }
-    if( strcmp( str, "POLARSSL_ERR_RSA_BAD_INPUT_DATA" ) == 0 )
+    if( strcmp( str, "POLARSSL_MD_SHA512" ) == 0 )
     {
-        *value = ( POLARSSL_ERR_RSA_BAD_INPUT_DATA );
+        *value = ( POLARSSL_MD_SHA512 );
+        return( 0 );
+    }
+    if( strcmp( str, "RSA_SALT_LEN_ANY" ) == 0 )
+    {
+        *value = ( RSA_SALT_LEN_ANY );
         return( 0 );
     }
 
@@ -734,17 +734,17 @@ int dep_check( char *str )
     if( str == NULL )
         return( 1 );
 
-    if( strcmp( str, "POLARSSL_SHA512_C" ) == 0 )
+    if( strcmp( str, "POLARSSL_SHA256_C" ) == 0 )
     {
-#if defined(POLARSSL_SHA512_C)
+#if defined(POLARSSL_SHA256_C)
         return( 0 );
 #else
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_SHA256_C" ) == 0 )
+    if( strcmp( str, "POLARSSL_SHA512_C" ) == 0 )
     {
-#if defined(POLARSSL_SHA256_C)
+#if defined(POLARSSL_SHA512_C)
         return( 0 );
 #else
         return( 1 );

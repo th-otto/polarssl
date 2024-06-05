@@ -427,9 +427,9 @@ int verify_int( char *str, int *value )
 #ifdef POLARSSL_DES_C
 #ifdef POLARSSL_MD5_C
 #ifdef POLARSSL_CIPHER_MODE_CBC
-    if( strcmp( str, "POLARSSL_ERR_PEM_UNKNOWN_ENC_ALG" ) == 0 )
+    if( strcmp( str, "POLARSSL_ERR_AES_INVALID_INPUT_LENGTH" ) == 0 )
     {
-        *value = ( POLARSSL_ERR_PEM_UNKNOWN_ENC_ALG );
+        *value = ( POLARSSL_ERR_AES_INVALID_INPUT_LENGTH );
         return( 0 );
     }
 #endif // POLARSSL_PEM_PARSE_C
@@ -472,9 +472,9 @@ int verify_int( char *str, int *value )
 #ifdef POLARSSL_DES_C
 #ifdef POLARSSL_MD5_C
 #ifdef POLARSSL_CIPHER_MODE_CBC
-    if( strcmp( str, "POLARSSL_ERR_AES_INVALID_INPUT_LENGTH" ) == 0 )
+    if( strcmp( str, "POLARSSL_ERR_PEM_UNKNOWN_ENC_ALG" ) == 0 )
     {
-        *value = ( POLARSSL_ERR_AES_INVALID_INPUT_LENGTH );
+        *value = ( POLARSSL_ERR_PEM_UNKNOWN_ENC_ALG );
         return( 0 );
     }
 #endif // POLARSSL_PEM_PARSE_C
@@ -555,17 +555,17 @@ int dep_check( char *str )
     if( str == NULL )
         return( 1 );
 
-    if( strcmp( str, "POLARSSL_CIPHER_MODE_CBC" ) == 0 )
+    if( strcmp( str, "POLARSSL_AES_C" ) == 0 )
     {
-#if defined(POLARSSL_CIPHER_MODE_CBC)
+#if defined(POLARSSL_AES_C)
         return( 0 );
 #else
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_AES_C" ) == 0 )
+    if( strcmp( str, "POLARSSL_CIPHER_MODE_CBC" ) == 0 )
     {
-#if defined(POLARSSL_AES_C)
+#if defined(POLARSSL_CIPHER_MODE_CBC)
         return( 0 );
 #else
         return( 1 );

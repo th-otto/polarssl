@@ -422,6 +422,11 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 
+    if( strcmp( str, "POLARSSL_CIPHER_ID_AES" ) == 0 )
+    {
+        *value = ( POLARSSL_CIPHER_ID_AES );
+        return( 0 );
+    }
     if( strcmp( str, "POLARSSL_CIPHER_ID_BLOWFISH" ) == 0 )
     {
         *value = ( POLARSSL_CIPHER_ID_BLOWFISH );
@@ -435,11 +440,6 @@ int verify_int( char *str, int *value )
     if( strcmp( str, "POLARSSL_ERR_CCM_BAD_INPUT" ) == 0 )
     {
         *value = ( POLARSSL_ERR_CCM_BAD_INPUT );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_CIPHER_ID_AES" ) == 0 )
-    {
-        *value = ( POLARSSL_CIPHER_ID_AES );
         return( 0 );
     }
 
@@ -629,6 +629,14 @@ int dep_check( char *str )
     if( str == NULL )
         return( 1 );
 
+    if( strcmp( str, "POLARSSL_AES_C" ) == 0 )
+    {
+#if defined(POLARSSL_AES_C)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
     if( strcmp( str, "POLARSSL_BLOWFISH_C" ) == 0 )
     {
 #if defined(POLARSSL_BLOWFISH_C)
@@ -640,14 +648,6 @@ int dep_check( char *str )
     if( strcmp( str, "POLARSSL_CAMELLIA_C" ) == 0 )
     {
 #if defined(POLARSSL_CAMELLIA_C)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_AES_C" ) == 0 )
-    {
-#if defined(POLARSSL_AES_C)
         return( 0 );
 #else
         return( 1 );

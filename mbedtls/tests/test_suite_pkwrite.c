@@ -519,17 +519,9 @@ int dep_check( char *str )
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP521R1_ENABLED" ) == 0 )
+    if( strcmp( str, "POLARSSL_ECP_C" ) == 0 )
     {
-#if defined(POLARSSL_ECP_DP_SECP521R1_ENABLED)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_RSA_C" ) == 0 )
-    {
-#if defined(POLARSSL_RSA_C)
+#if defined(POLARSSL_ECP_C)
         return( 0 );
 #else
         return( 1 );
@@ -551,9 +543,17 @@ int dep_check( char *str )
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_ECP_C" ) == 0 )
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP521R1_ENABLED" ) == 0 )
     {
-#if defined(POLARSSL_ECP_C)
+#if defined(POLARSSL_ECP_DP_SECP521R1_ENABLED)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_RSA_C" ) == 0 )
+    {
+#if defined(POLARSSL_RSA_C)
         return( 0 );
 #else
         return( 1 );

@@ -669,17 +669,17 @@ int dep_check( char *str )
     if( str == NULL )
         return( 1 );
 
-    if( strcmp( str, "POLARSSL_SELF_TEST" ) == 0 )
+    if( strcmp( str, "POLARSSL_CIPHER_MODE_CFB" ) == 0 )
     {
-#if defined(POLARSSL_SELF_TEST)
+#if defined(POLARSSL_CIPHER_MODE_CFB)
         return( 0 );
 #else
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_CIPHER_MODE_CFB" ) == 0 )
+    if( strcmp( str, "POLARSSL_SELF_TEST" ) == 0 )
     {
-#if defined(POLARSSL_CIPHER_MODE_CFB)
+#if defined(POLARSSL_SELF_TEST)
         return( 0 );
 #else
         return( 1 );

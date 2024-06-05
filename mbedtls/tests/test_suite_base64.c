@@ -422,14 +422,14 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 
-    if( strcmp( str, "POLARSSL_ERR_BASE64_INVALID_CHARACTER" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_BASE64_INVALID_CHARACTER );
-        return( 0 );
-    }
     if( strcmp( str, "POLARSSL_ERR_BASE64_BUFFER_TOO_SMALL" ) == 0 )
     {
         *value = ( POLARSSL_ERR_BASE64_BUFFER_TOO_SMALL );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ERR_BASE64_INVALID_CHARACTER" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_BASE64_INVALID_CHARACTER );
         return( 0 );
     }
 

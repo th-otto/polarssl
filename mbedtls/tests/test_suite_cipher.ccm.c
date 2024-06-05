@@ -434,13 +434,6 @@ int verify_int( char *str, int *value )
     }
 #endif // POLARSSL_CIPHER_MODE_AEAD
 #ifdef POLARSSL_CIPHER_MODE_AEAD
-    if( strcmp( str, "POLARSSL_CIPHER_CAMELLIA_128_CCM" ) == 0 )
-    {
-        *value = ( POLARSSL_CIPHER_CAMELLIA_128_CCM );
-        return( 0 );
-    }
-#endif // POLARSSL_CIPHER_MODE_AEAD
-#ifdef POLARSSL_CIPHER_MODE_AEAD
     if( strcmp( str, "POLARSSL_CIPHER_AES_192_CCM" ) == 0 )
     {
         *value = ( POLARSSL_CIPHER_AES_192_CCM );
@@ -451,6 +444,13 @@ int verify_int( char *str, int *value )
     if( strcmp( str, "POLARSSL_CIPHER_AES_256_CCM" ) == 0 )
     {
         *value = ( POLARSSL_CIPHER_AES_256_CCM );
+        return( 0 );
+    }
+#endif // POLARSSL_CIPHER_MODE_AEAD
+#ifdef POLARSSL_CIPHER_MODE_AEAD
+    if( strcmp( str, "POLARSSL_CIPHER_CAMELLIA_128_CCM" ) == 0 )
+    {
+        *value = ( POLARSSL_CIPHER_CAMELLIA_128_CCM );
         return( 0 );
     }
 #endif // POLARSSL_CIPHER_MODE_AEAD

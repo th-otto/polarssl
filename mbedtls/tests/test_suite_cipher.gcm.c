@@ -426,14 +426,24 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 
-    if( strcmp( str, "POLARSSL_CIPHER_AES_192_GCM" ) == 0 )
+    if( strcmp( str, "-1" ) == 0 )
     {
-        *value = ( POLARSSL_CIPHER_AES_192_GCM );
+        *value = ( -1 );
         return( 0 );
     }
     if( strcmp( str, "POLARSSL_CIPHER_AES_128_GCM" ) == 0 )
     {
         *value = ( POLARSSL_CIPHER_AES_128_GCM );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_CIPHER_AES_192_GCM" ) == 0 )
+    {
+        *value = ( POLARSSL_CIPHER_AES_192_GCM );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_CIPHER_AES_256_GCM" ) == 0 )
+    {
+        *value = ( POLARSSL_CIPHER_AES_256_GCM );
         return( 0 );
     }
     if( strcmp( str, "POLARSSL_CIPHER_CAMELLIA_128_GCM" ) == 0 )
@@ -446,24 +456,14 @@ int verify_int( char *str, int *value )
         *value = ( POLARSSL_CIPHER_CAMELLIA_192_GCM );
         return( 0 );
     }
-    if( strcmp( str, "POLARSSL_CIPHER_AES_256_GCM" ) == 0 )
+    if( strcmp( str, "POLARSSL_CIPHER_CAMELLIA_256_GCM" ) == 0 )
     {
-        *value = ( POLARSSL_CIPHER_AES_256_GCM );
-        return( 0 );
-    }
-    if( strcmp( str, "-1" ) == 0 )
-    {
-        *value = ( -1 );
+        *value = ( POLARSSL_CIPHER_CAMELLIA_256_GCM );
         return( 0 );
     }
     if( strcmp( str, "POLARSSL_ERR_CIPHER_AUTH_FAILED" ) == 0 )
     {
         *value = ( POLARSSL_ERR_CIPHER_AUTH_FAILED );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_CIPHER_CAMELLIA_256_GCM" ) == 0 )
-    {
-        *value = ( POLARSSL_CIPHER_CAMELLIA_256_GCM );
         return( 0 );
     }
 
@@ -1141,6 +1141,14 @@ int dep_check( char *str )
     if( str == NULL )
         return( 1 );
 
+    if( strcmp( str, "POLARSSL_AES_C" ) == 0 )
+    {
+#if defined(POLARSSL_AES_C)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
     if( strcmp( str, "POLARSSL_CAMELLIA_C" ) == 0 )
     {
 #if defined(POLARSSL_CAMELLIA_C)
@@ -1152,14 +1160,6 @@ int dep_check( char *str )
     if( strcmp( str, "POLARSSL_GCM_C" ) == 0 )
     {
 #if defined(POLARSSL_GCM_C)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_AES_C" ) == 0 )
-    {
-#if defined(POLARSSL_AES_C)
         return( 0 );
 #else
         return( 1 );

@@ -424,59 +424,9 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 
-    if( strcmp( str, "POLARSSL_ECP_DP_M255" ) == 0 )
-    {
-        *value = ( POLARSSL_ECP_DP_M255 );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP224R1" ) == 0 )
-    {
-        *value = ( POLARSSL_ECP_DP_SECP224R1 );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP192K1" ) == 0 )
-    {
-        *value = ( POLARSSL_ECP_DP_SECP192K1 );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP224K1" ) == 0 )
-    {
-        *value = ( POLARSSL_ECP_DP_SECP224K1 );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ECP_PF_COMPRESSED" ) == 0 )
-    {
-        *value = ( POLARSSL_ECP_PF_COMPRESSED );
-        return( 0 );
-    }
     if( strcmp( str, "-1" ) == 0 )
     {
         *value = ( -1 );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP192R1" ) == 0 )
-    {
-        *value = ( POLARSSL_ECP_DP_SECP192R1 );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ERR_ECP_BUFFER_TOO_SMALL" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_ECP_BUFFER_TOO_SMALL );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP256K1" ) == 0 )
-    {
-        *value = ( POLARSSL_ECP_DP_SECP256K1 );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_NONE" ) == 0 )
-    {
-        *value = ( POLARSSL_ECP_DP_NONE );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP256R1" ) == 0 )
-    {
-        *value = ( POLARSSL_ECP_DP_SECP256R1 );
         return( 0 );
     }
     if( strcmp( str, "POLARSSL_ECP_DP_BP256R1" ) == 0 )
@@ -484,19 +434,9 @@ int verify_int( char *str, int *value )
         *value = ( POLARSSL_ECP_DP_BP256R1 );
         return( 0 );
     }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP384R1" ) == 0 )
+    if( strcmp( str, "POLARSSL_ECP_DP_BP384R1" ) == 0 )
     {
-        *value = ( POLARSSL_ECP_DP_SECP384R1 );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ERR_ECP_BAD_INPUT_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_ECP_BAD_INPUT_DATA );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP521R1" ) == 0 )
-    {
-        *value = ( POLARSSL_ECP_DP_SECP521R1 );
+        *value = ( POLARSSL_ECP_DP_BP384R1 );
         return( 0 );
     }
     if( strcmp( str, "POLARSSL_ECP_DP_BP512R1" ) == 0 )
@@ -504,14 +444,64 @@ int verify_int( char *str, int *value )
         *value = ( POLARSSL_ECP_DP_BP512R1 );
         return( 0 );
     }
+    if( strcmp( str, "POLARSSL_ECP_DP_M255" ) == 0 )
+    {
+        *value = ( POLARSSL_ECP_DP_M255 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_NONE" ) == 0 )
+    {
+        *value = ( POLARSSL_ECP_DP_NONE );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP192K1" ) == 0 )
+    {
+        *value = ( POLARSSL_ECP_DP_SECP192K1 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP192R1" ) == 0 )
+    {
+        *value = ( POLARSSL_ECP_DP_SECP192R1 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP224K1" ) == 0 )
+    {
+        *value = ( POLARSSL_ECP_DP_SECP224K1 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP224R1" ) == 0 )
+    {
+        *value = ( POLARSSL_ECP_DP_SECP224R1 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP256K1" ) == 0 )
+    {
+        *value = ( POLARSSL_ECP_DP_SECP256K1 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP256R1" ) == 0 )
+    {
+        *value = ( POLARSSL_ECP_DP_SECP256R1 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP384R1" ) == 0 )
+    {
+        *value = ( POLARSSL_ECP_DP_SECP384R1 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP521R1" ) == 0 )
+    {
+        *value = ( POLARSSL_ECP_DP_SECP521R1 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ECP_PF_COMPRESSED" ) == 0 )
+    {
+        *value = ( POLARSSL_ECP_PF_COMPRESSED );
+        return( 0 );
+    }
     if( strcmp( str, "POLARSSL_ECP_PF_UNCOMPRESSED" ) == 0 )
     {
         *value = ( POLARSSL_ECP_PF_UNCOMPRESSED );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ERR_ECP_INVALID_KEY" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_ECP_INVALID_KEY );
         return( 0 );
     }
     if( strcmp( str, "POLARSSL_ECP_PF_UNKNOWN" ) == 0 )
@@ -519,14 +509,24 @@ int verify_int( char *str, int *value )
         *value = ( POLARSSL_ECP_PF_UNKNOWN );
         return( 0 );
     }
+    if( strcmp( str, "POLARSSL_ERR_ECP_BAD_INPUT_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_ECP_BAD_INPUT_DATA );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ERR_ECP_BUFFER_TOO_SMALL" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_ECP_BUFFER_TOO_SMALL );
+        return( 0 );
+    }
     if( strcmp( str, "POLARSSL_ERR_ECP_FEATURE_UNAVAILABLE" ) == 0 )
     {
         *value = ( POLARSSL_ERR_ECP_FEATURE_UNAVAILABLE );
         return( 0 );
     }
-    if( strcmp( str, "POLARSSL_ECP_DP_BP384R1" ) == 0 )
+    if( strcmp( str, "POLARSSL_ERR_ECP_INVALID_KEY" ) == 0 )
     {
-        *value = ( POLARSSL_ECP_DP_BP384R1 );
+        *value = ( POLARSSL_ERR_ECP_INVALID_KEY );
         return( 0 );
     }
 
@@ -1182,49 +1182,9 @@ int dep_check( char *str )
     if( str == NULL )
         return( 1 );
 
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP384R1_ENABLED" ) == 0 )
+    if( strcmp( str, "POLARSSL_ECP_DP_BP256R1_ENABLED" ) == 0 )
     {
-#if defined(POLARSSL_ECP_DP_SECP384R1_ENABLED)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_M255_ENABLED" ) == 0 )
-    {
-#if defined(POLARSSL_ECP_DP_M255_ENABLED)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP192R1_ENABLED" ) == 0 )
-    {
-#if defined(POLARSSL_ECP_DP_SECP192R1_ENABLED)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP256K1_ENABLED" ) == 0 )
-    {
-#if defined(POLARSSL_ECP_DP_SECP256K1_ENABLED)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP192K1_ENABLED" ) == 0 )
-    {
-#if defined(POLARSSL_ECP_DP_SECP192K1_ENABLED)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP224R1_ENABLED" ) == 0 )
-    {
-#if defined(POLARSSL_ECP_DP_SECP224R1_ENABLED)
+#if defined(POLARSSL_ECP_DP_BP256R1_ENABLED)
         return( 0 );
 #else
         return( 1 );
@@ -1238,9 +1198,33 @@ int dep_check( char *str )
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP521R1_ENABLED" ) == 0 )
+    if( strcmp( str, "POLARSSL_ECP_DP_BP512R1_ENABLED" ) == 0 )
     {
-#if defined(POLARSSL_ECP_DP_SECP521R1_ENABLED)
+#if defined(POLARSSL_ECP_DP_BP512R1_ENABLED)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_M255_ENABLED" ) == 0 )
+    {
+#if defined(POLARSSL_ECP_DP_M255_ENABLED)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP192K1_ENABLED" ) == 0 )
+    {
+#if defined(POLARSSL_ECP_DP_SECP192K1_ENABLED)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP192R1_ENABLED" ) == 0 )
+    {
+#if defined(POLARSSL_ECP_DP_SECP192R1_ENABLED)
         return( 0 );
 #else
         return( 1 );
@@ -1254,9 +1238,17 @@ int dep_check( char *str )
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_ECP_DP_BP256R1_ENABLED" ) == 0 )
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP224R1_ENABLED" ) == 0 )
     {
-#if defined(POLARSSL_ECP_DP_BP256R1_ENABLED)
+#if defined(POLARSSL_ECP_DP_SECP224R1_ENABLED)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP256K1_ENABLED" ) == 0 )
+    {
+#if defined(POLARSSL_ECP_DP_SECP256K1_ENABLED)
         return( 0 );
 #else
         return( 1 );
@@ -1270,9 +1262,17 @@ int dep_check( char *str )
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_ECP_DP_BP512R1_ENABLED" ) == 0 )
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP384R1_ENABLED" ) == 0 )
     {
-#if defined(POLARSSL_ECP_DP_BP512R1_ENABLED)
+#if defined(POLARSSL_ECP_DP_SECP384R1_ENABLED)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP521R1_ENABLED" ) == 0 )
+    {
+#if defined(POLARSSL_ECP_DP_SECP521R1_ENABLED)
         return( 0 );
 #else
         return( 1 );

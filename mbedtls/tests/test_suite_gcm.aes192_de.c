@@ -422,9 +422,9 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 
-    if( strcmp( str, "POLARSSL_ERR_GCM_BAD_INPUT" ) == 0 )
+    if( strcmp( str, "GCM_DECRYPT" ) == 0 )
     {
-        *value = ( POLARSSL_ERR_GCM_BAD_INPUT );
+        *value = ( GCM_DECRYPT );
         return( 0 );
     }
     if( strcmp( str, "POLARSSL_CIPHER_ID_AES" ) == 0 )
@@ -432,9 +432,9 @@ int verify_int( char *str, int *value )
         *value = ( POLARSSL_CIPHER_ID_AES );
         return( 0 );
     }
-    if( strcmp( str, "GCM_DECRYPT" ) == 0 )
+    if( strcmp( str, "POLARSSL_ERR_GCM_BAD_INPUT" ) == 0 )
     {
-        *value = ( GCM_DECRYPT );
+        *value = ( POLARSSL_ERR_GCM_BAD_INPUT );
         return( 0 );
     }
 

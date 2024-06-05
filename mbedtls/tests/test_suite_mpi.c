@@ -422,29 +422,9 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 
-    if( strcmp( str, "-9871232" ) == 0 )
-    {
-        *value = ( -9871232 );
-        return( 0 );
-    }
-    if( strcmp( str, "-34" ) == 0 )
-    {
-        *value = ( -34 );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ERR_MPI_BAD_INPUT_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_MPI_BAD_INPUT_DATA );
-        return( 0 );
-    }
     if( strcmp( str, "+1" ) == 0 )
     {
         *value = ( +1 );
-        return( 0 );
-    }
-    if( strcmp( str, "POLARSSL_ERR_MPI_NOT_ACCEPTABLE" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_MPI_NOT_ACCEPTABLE );
         return( 0 );
     }
     if( strcmp( str, "-1" ) == 0 )
@@ -452,9 +432,9 @@ int verify_int( char *str, int *value )
         *value = ( -1 );
         return( 0 );
     }
-    if( strcmp( str, "POLARSSL_ERR_MPI_NEGATIVE_VALUE" ) == 0 )
+    if( strcmp( str, "-13" ) == 0 )
     {
-        *value = ( POLARSSL_ERR_MPI_NEGATIVE_VALUE );
+        *value = ( -13 );
         return( 0 );
     }
     if( strcmp( str, "-2" ) == 0 )
@@ -467,13 +447,21 @@ int verify_int( char *str, int *value )
         *value = ( -3 );
         return( 0 );
     }
-#ifdef POLARSSL_FS_IO
-    if( strcmp( str, "POLARSSL_ERR_MPI_FILE_IO_ERROR" ) == 0 )
+    if( strcmp( str, "-34" ) == 0 )
     {
-        *value = ( POLARSSL_ERR_MPI_FILE_IO_ERROR );
+        *value = ( -34 );
         return( 0 );
     }
-#endif // POLARSSL_FS_IO
+    if( strcmp( str, "-9871232" ) == 0 )
+    {
+        *value = ( -9871232 );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ERR_MPI_BAD_INPUT_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_MPI_BAD_INPUT_DATA );
+        return( 0 );
+    }
     if( strcmp( str, "POLARSSL_ERR_MPI_BUFFER_TOO_SMALL" ) == 0 )
     {
         *value = ( POLARSSL_ERR_MPI_BUFFER_TOO_SMALL );
@@ -484,14 +472,26 @@ int verify_int( char *str, int *value )
         *value = ( POLARSSL_ERR_MPI_DIVISION_BY_ZERO );
         return( 0 );
     }
-    if( strcmp( str, "-13" ) == 0 )
+#ifdef POLARSSL_FS_IO
+    if( strcmp( str, "POLARSSL_ERR_MPI_FILE_IO_ERROR" ) == 0 )
     {
-        *value = ( -13 );
+        *value = ( POLARSSL_ERR_MPI_FILE_IO_ERROR );
         return( 0 );
     }
+#endif // POLARSSL_FS_IO
     if( strcmp( str, "POLARSSL_ERR_MPI_INVALID_CHARACTER" ) == 0 )
     {
         *value = ( POLARSSL_ERR_MPI_INVALID_CHARACTER );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ERR_MPI_NEGATIVE_VALUE" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_MPI_NEGATIVE_VALUE );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ERR_MPI_NOT_ACCEPTABLE" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_MPI_NOT_ACCEPTABLE );
         return( 0 );
     }
 
@@ -1305,17 +1305,17 @@ int dep_check( char *str )
     if( str == NULL )
         return( 1 );
 
-    if( strcmp( str, "POLARSSL_SELF_TEST" ) == 0 )
+    if( strcmp( str, "POLARSSL_GENPRIME" ) == 0 )
     {
-#if defined(POLARSSL_SELF_TEST)
+#if defined(POLARSSL_GENPRIME)
         return( 0 );
 #else
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_GENPRIME" ) == 0 )
+    if( strcmp( str, "POLARSSL_SELF_TEST" ) == 0 )
     {
-#if defined(POLARSSL_GENPRIME)
+#if defined(POLARSSL_SELF_TEST)
         return( 0 );
 #else
         return( 1 );

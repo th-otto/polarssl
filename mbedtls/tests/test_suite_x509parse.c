@@ -542,88 +542,44 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_INVALID_LENGTH" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_INVALID_LENGTH );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CSR_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CSR_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_PK_INVALID_PUBKEY + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_PK_INVALID_PUBKEY + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_USE_C
-    if( strcmp( str, "POLARSSL_ERR_OID_BUF_TOO_SMALL" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_OID_BUF_TOO_SMALL );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_USE_C
 #ifdef POLARSSL_FS_IO
 #ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CHECK_KEY_USAGE
-    if( strcmp( str, "KU_KEY_CERT_SIGN|KU_CRL_SIGN" ) == 0 )
+    if( strcmp( str, "-1" ) == 0 )
     {
-        *value = ( KU_KEY_CERT_SIGN|KU_CRL_SIGN );
+        *value = ( -1 );
         return( 0 );
     }
 #endif // POLARSSL_FS_IO
 #endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_CHECK_KEY_USAGE
-#ifdef POLARSSL_FS_IO
 #ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "BADCERT_EXPIRED" ) == 0 )
+#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
+    if( strcmp( str, "ASN1_CONSTRUCTED | ASN1_SEQUENCE" ) == 0 )
     {
-        *value = ( BADCERT_EXPIRED );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
+        *value = ( ASN1_CONSTRUCTED | ASN1_SEQUENCE );
         return( 0 );
     }
 #endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CSR_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CSR_PARSE_C
+#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
 #ifdef POLARSSL_X509_USE_C
     if( strcmp( str, "ASN1_GENERALIZED_TIME" ) == 0 )
     {
         *value = ( ASN1_GENERALIZED_TIME );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_USE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
+    if( strcmp( str, "ASN1_SEQUENCE" ) == 0 )
+    {
+        *value = ( ASN1_SEQUENCE );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
+#ifdef POLARSSL_X509_USE_C
+    if( strcmp( str, "ASN1_UTC_TIME" ) == 0 )
+    {
+        *value = ( ASN1_UTC_TIME );
         return( 0 );
     }
 #endif // POLARSSL_X509_USE_C
@@ -641,208 +597,69 @@ int verify_int( char *str, int *value )
 #ifdef POLARSSL_FS_IO
 #ifdef POLARSSL_X509_CRT_PARSE_C
 #ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "BADCERT_REVOKED | BADCRL_FUTURE | BADCERT_CN_MISMATCH" ) == 0 )
+    if( strcmp( str, "BADCERT_CN_MISMATCH + BADCERT_NOT_TRUSTED" ) == 0 )
     {
-        *value = ( BADCERT_REVOKED | BADCRL_FUTURE | BADCERT_CN_MISMATCH );
+        *value = ( BADCERT_CN_MISMATCH + BADCERT_NOT_TRUSTED );
         return( 0 );
     }
 #endif // POLARSSL_FS_IO
 #endif // POLARSSL_X509_CRT_PARSE_C
 #endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
-    if( strcmp( str, "POLARSSL_MD_SHA1" ) == 0 )
-    {
-        *value = ( POLARSSL_MD_SHA1 );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CHECK_KEY_USAGE
-    if( strcmp( str, "KU_KEY_CERT_SIGN" ) == 0 )
-    {
-        *value = ( KU_KEY_CERT_SIGN );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_CHECK_KEY_USAGE
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_UNKNOWN_SIG_ALG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_UNKNOWN_SIG_ALG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CSR_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_UNKNOWN_SIG_ALG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_UNKNOWN_SIG_ALG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CSR_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CSR_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CSR_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_NAME+POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_NAME+POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CSR_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CSR_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_X509_MAX_INTERMEDIATE_CA" ) == 0 )
-    {
-        *value = ( POLARSSL_X509_MAX_INTERMEDIATE_CA );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_FATAL_ERROR" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_FATAL_ERROR );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_X509_MAX_INTERMEDIATE_CA-1" ) == 0 )
-    {
-        *value = ( POLARSSL_X509_MAX_INTERMEDIATE_CA-1 );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
 #ifdef POLARSSL_FS_IO
 #ifdef POLARSSL_X509_CRT_PARSE_C
 #ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "BADCERT_REVOKED | BADCERT_CN_MISMATCH" ) == 0 )
+    if( strcmp( str, "BADCERT_EXPIRED" ) == 0 )
     {
-        *value = ( BADCERT_REVOKED | BADCERT_CN_MISMATCH );
+        *value = ( BADCERT_EXPIRED );
         return( 0 );
     }
 #endif // POLARSSL_FS_IO
 #endif // POLARSSL_X509_CRT_PARSE_C
 #endif // POLARSSL_X509_CRL_PARSE_C
 #ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
-    if( strcmp( str, "POLARSSL_ERR_X509_FEATURE_UNAVAILABLE + POLARSSL_ERR_OID_NOT_FOUND" ) == 0 )
+    if( strcmp( str, "BADCERT_EXPIRED | BADCRL_EXPIRED" ) == 0 )
     {
-        *value = ( POLARSSL_ERR_X509_FEATURE_UNAVAILABLE + POLARSSL_ERR_OID_NOT_FOUND );
+        *value = ( BADCERT_EXPIRED | BADCRL_EXPIRED );
         return( 0 );
     }
 #endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CHECK_EXTENDED_KEY_USAGE
-    if( strcmp( str, "POLARSSL_ERR_X509_BAD_INPUT_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_BAD_INPUT_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_CHECK_EXTENDED_KEY_USAGE
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CHECK_KEY_USAGE
-    if( strcmp( str, "POLARSSL_ERR_X509_BAD_INPUT_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_BAD_INPUT_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_CHECK_KEY_USAGE
 #ifdef POLARSSL_FS_IO
 #ifdef POLARSSL_X509_CRT_PARSE_C
 #ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "BADCERT_REVOKED | BADCRL_EXPIRED | BADCERT_CN_MISMATCH" ) == 0 )
+    if( strcmp( str, "BADCERT_FUTURE" ) == 0 )
     {
-        *value = ( BADCERT_REVOKED | BADCRL_EXPIRED | BADCERT_CN_MISMATCH );
+        *value = ( BADCERT_FUTURE );
         return( 0 );
     }
 #endif // POLARSSL_FS_IO
 #endif // POLARSSL_X509_CRT_PARSE_C
 #endif // POLARSSL_X509_CRL_PARSE_C
 #ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_PK_INVALID_PUBKEY + POLARSSL_ERR_ASN1_INVALID_DATA" ) == 0 )
+    if( strcmp( str, "BADCERT_MISSING" ) == 0 )
     {
-        *value = ( POLARSSL_ERR_PK_INVALID_PUBKEY + POLARSSL_ERR_ASN1_INVALID_DATA );
+        *value = ( BADCERT_MISSING );
         return( 0 );
     }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "BADCERT_NOT_TRUSTED" ) == 0 )
+    {
+        *value = ( BADCERT_NOT_TRUSTED );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "BADCERT_NOT_TRUSTED" ) == 0 )
+    {
+        *value = ( BADCERT_NOT_TRUSTED );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
 #endif // POLARSSL_X509_CRT_PARSE_C
 #ifdef POLARSSL_FS_IO
 #ifdef POLARSSL_X509_CRT_PARSE_C
@@ -855,112 +672,13 @@ int verify_int( char *str, int *value )
 #endif // POLARSSL_FS_IO
 #endif // POLARSSL_X509_CRT_PARSE_C
 #endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CSR_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_SIGNATURE + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_SIGNATURE + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CSR_PARSE_C
 #ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_SIGNATURE + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    if( strcmp( str, "BADCERT_OTHER | 0x8000" ) == 0 )
     {
-        *value = ( POLARSSL_ERR_X509_INVALID_SIGNATURE + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        *value = ( BADCERT_OTHER | 0x8000 );
         return( 0 );
     }
 #endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "-1" ) == 0 )
-    {
-        *value = ( -1 );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_UNKNOWN_VERSION" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_UNKNOWN_VERSION );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CSR_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_UNKNOWN_VERSION" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_UNKNOWN_VERSION );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CSR_PARSE_C
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_UNKNOWN_VERSION" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_UNKNOWN_VERSION );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_PK_INVALID_PUBKEY" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_PK_INVALID_PUBKEY );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CSR_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CSR_PARSE_C
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_OID_NOT_FOUND" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_OID_NOT_FOUND );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
-#ifdef POLARSSL_X509_CSR_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_PK_KEY_INVALID_FORMAT + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_PK_KEY_INVALID_FORMAT + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CSR_PARSE_C
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "BADCRL_NOT_TRUSTED" ) == 0 )
-    {
-        *value = ( BADCRL_NOT_TRUSTED );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_CRL_PARSE_C
 #ifdef POLARSSL_FS_IO
 #ifdef POLARSSL_X509_CRT_PARSE_C
 #ifdef POLARSSL_X509_CRL_PARSE_C
@@ -975,23 +693,14 @@ int verify_int( char *str, int *value )
 #ifdef POLARSSL_FS_IO
 #ifdef POLARSSL_X509_CRT_PARSE_C
 #ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "BADCERT_CN_MISMATCH + BADCERT_NOT_TRUSTED" ) == 0 )
+    if( strcmp( str, "BADCERT_REVOKED | BADCERT_CN_MISMATCH" ) == 0 )
     {
-        *value = ( BADCERT_CN_MISMATCH + BADCERT_NOT_TRUSTED );
+        *value = ( BADCERT_REVOKED | BADCERT_CN_MISMATCH );
         return( 0 );
     }
 #endif // POLARSSL_FS_IO
 #endif // POLARSSL_X509_CRT_PARSE_C
 #endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_ALG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
 #ifdef POLARSSL_FS_IO
 #ifdef POLARSSL_X509_CRT_PARSE_C
 #ifdef POLARSSL_X509_CRL_PARSE_C
@@ -1006,222 +715,9 @@ int verify_int( char *str, int *value )
 #ifdef POLARSSL_FS_IO
 #ifdef POLARSSL_X509_CRT_PARSE_C
 #ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_CERT_VERIFY_FAILED" ) == 0 )
+    if( strcmp( str, "BADCERT_REVOKED | BADCRL_EXPIRED | BADCERT_CN_MISMATCH" ) == 0 )
     {
-        *value = ( POLARSSL_ERR_X509_CERT_VERIFY_FAILED );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_CERT_VERIFY_FAILED" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_CERT_VERIFY_FAILED );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CHECK_KEY_USAGE
-    if( strcmp( str, "KU_KEY_ENCIPHERMENT|KU_KEY_AGREEMENT" ) == 0 )
-    {
-        *value = ( KU_KEY_ENCIPHERMENT|KU_KEY_AGREEMENT );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_CHECK_KEY_USAGE
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "BADCRL_FUTURE" ) == 0 )
-    {
-        *value = ( BADCRL_FUTURE );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
-    if( strcmp( str, "ASN1_SEQUENCE" ) == 0 )
-    {
-        *value = ( ASN1_SEQUENCE );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
-    if( strcmp( str, "ASN1_CONSTRUCTED | ASN1_SEQUENCE" ) == 0 )
-    {
-        *value = ( ASN1_CONSTRUCTED | ASN1_SEQUENCE );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_SIGNATURE + POLARSSL_ERR_ASN1_INVALID_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_SIGNATURE + POLARSSL_ERR_ASN1_INVALID_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_DATE + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_DATE + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_DATE + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_DATE + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_SERIAL + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_SERIAL + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_EXTENSIONS + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_EXTENSIONS + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_PK_INVALID_PUBKEY + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_PK_INVALID_PUBKEY + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_PK_UNKNOWN_PK_ALG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_PK_UNKNOWN_PK_ALG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CSR_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CSR_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_SERIAL + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_SERIAL + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "BADCERT_EXPIRED | BADCRL_EXPIRED" ) == 0 )
-    {
-        *value = ( BADCERT_EXPIRED | BADCRL_EXPIRED );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_ASN1_INVALID_LENGTH" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_ASN1_INVALID_LENGTH );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CHECK_KEY_USAGE
-    if( strcmp( str, "KU_DIGITAL_SIGNATURE" ) == 0 )
-    {
-        *value = ( KU_DIGITAL_SIGNATURE );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_CHECK_KEY_USAGE
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_INVALID_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_INVALID_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_PK_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_PK_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_EXTENSIONS + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_EXTENSIONS + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "BADCERT_MISSING" ) == 0 )
-    {
-        *value = ( BADCERT_MISSING );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_DATE + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_DATE + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_UNKNOWN_SIG_ALG + POLARSSL_ERR_OID_NOT_FOUND" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_UNKNOWN_SIG_ALG + POLARSSL_ERR_OID_NOT_FOUND );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "BADCERT_FUTURE" ) == 0 )
-    {
-        *value = ( BADCERT_FUTURE );
+        *value = ( BADCERT_REVOKED | BADCRL_EXPIRED | BADCERT_CN_MISMATCH );
         return( 0 );
     }
 #endif // POLARSSL_FS_IO
@@ -1238,132 +734,16 @@ int verify_int( char *str, int *value )
 #endif // POLARSSL_FS_IO
 #endif // POLARSSL_X509_CRT_PARSE_C
 #endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_DATE" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_DATE );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_USE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_DATE" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_DATE );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_USE_C
 #ifdef POLARSSL_FS_IO
 #ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_X509_MAX_INTERMEDIATE_CA+1" ) == 0 )
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "BADCERT_REVOKED | BADCRL_FUTURE | BADCERT_CN_MISMATCH" ) == 0 )
     {
-        *value = ( POLARSSL_X509_MAX_INTERMEDIATE_CA+1 );
+        *value = ( BADCERT_REVOKED | BADCRL_FUTURE | BADCERT_CN_MISMATCH );
         return( 0 );
     }
 #endif // POLARSSL_FS_IO
 #endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_SERIAL + POLARSSL_ERR_ASN1_OUT_OF_DATA " ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_SERIAL + POLARSSL_ERR_ASN1_OUT_OF_DATA  );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_PK_INVALID_PUBKEY + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_PK_INVALID_PUBKEY + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_DATE + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_DATE + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_USE_C
-    if( strcmp( str, "ASN1_UTC_TIME" ) == 0 )
-    {
-        *value = ( ASN1_UTC_TIME );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_USE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "BADCERT_OTHER | 0x8000" ) == 0 )
-    {
-        *value = ( BADCERT_OTHER | 0x8000 );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_EXTENSIONS + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_EXTENSIONS + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
-#ifdef POLARSSL_X509_CSR_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CSR_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CHECK_KEY_USAGE
-    if( strcmp( str, "KU_DIGITAL_SIGNATURE|KU_KEY_ENCIPHERMENT" ) == 0 )
-    {
-        *value = ( KU_DIGITAL_SIGNATURE|KU_KEY_ENCIPHERMENT );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_CHECK_KEY_USAGE
-#ifdef POLARSSL_X509_CSR_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CSR_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT );
-        return( 0 );
-    }
 #endif // POLARSSL_X509_CRL_PARSE_C
 #ifdef POLARSSL_FS_IO
 #ifdef POLARSSL_X509_CRT_PARSE_C
@@ -1376,63 +756,6 @@ int verify_int( char *str, int *value )
 #endif // POLARSSL_FS_IO
 #endif // POLARSSL_X509_CRT_PARSE_C
 #endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_SIG_MISMATCH" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_SIG_MISMATCH );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_SIG_MISMATCH" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_X509_SIG_MISMATCH );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "BADCERT_NOT_TRUSTED" ) == 0 )
-    {
-        *value = ( BADCERT_NOT_TRUSTED );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "BADCERT_NOT_TRUSTED" ) == 0 )
-    {
-        *value = ( BADCERT_NOT_TRUSTED );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_FS_IO
-#ifdef POLARSSL_X509_CRL_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_PEM_NO_HEADER_FOOTER_PRESENT" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_PEM_NO_HEADER_FOOTER_PRESENT );
-        return( 0 );
-    }
-#endif // POLARSSL_FS_IO
-#endif // POLARSSL_X509_CRL_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_PK_KEY_INVALID_FORMAT + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_PK_KEY_INVALID_FORMAT + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_X509_CSR_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_PK_KEY_INVALID_FORMAT + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_PK_KEY_INVALID_FORMAT + POLARSSL_ERR_ASN1_OUT_OF_DATA );
-        return( 0 );
-    }
-#endif // POLARSSL_X509_CSR_PARSE_C
 #ifdef POLARSSL_FS_IO
 #ifdef POLARSSL_X509_CRT_PARSE_C
 #ifdef POLARSSL_X509_CRL_PARSE_C
@@ -1444,22 +767,474 @@ int verify_int( char *str, int *value )
 #endif // POLARSSL_FS_IO
 #endif // POLARSSL_X509_CRT_PARSE_C
 #endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_FS_IO
 #ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_INVALID_LENGTH" ) == 0 )
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "BADCRL_FUTURE" ) == 0 )
     {
-        *value = ( POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_INVALID_LENGTH );
+        *value = ( BADCRL_FUTURE );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "BADCRL_NOT_TRUSTED" ) == 0 )
+    {
+        *value = ( BADCRL_NOT_TRUSTED );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CHECK_KEY_USAGE
+    if( strcmp( str, "KU_DIGITAL_SIGNATURE" ) == 0 )
+    {
+        *value = ( KU_DIGITAL_SIGNATURE );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_CHECK_KEY_USAGE
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CHECK_KEY_USAGE
+    if( strcmp( str, "KU_DIGITAL_SIGNATURE|KU_KEY_ENCIPHERMENT" ) == 0 )
+    {
+        *value = ( KU_DIGITAL_SIGNATURE|KU_KEY_ENCIPHERMENT );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_CHECK_KEY_USAGE
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CHECK_KEY_USAGE
+    if( strcmp( str, "KU_KEY_CERT_SIGN" ) == 0 )
+    {
+        *value = ( KU_KEY_CERT_SIGN );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_CHECK_KEY_USAGE
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CHECK_KEY_USAGE
+    if( strcmp( str, "KU_KEY_CERT_SIGN|KU_CRL_SIGN" ) == 0 )
+    {
+        *value = ( KU_KEY_CERT_SIGN|KU_CRL_SIGN );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_CHECK_KEY_USAGE
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CHECK_KEY_USAGE
+    if( strcmp( str, "KU_KEY_ENCIPHERMENT|KU_KEY_AGREEMENT" ) == 0 )
+    {
+        *value = ( KU_KEY_ENCIPHERMENT|KU_KEY_AGREEMENT );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_CHECK_KEY_USAGE
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_ASN1_INVALID_LENGTH" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_ASN1_INVALID_LENGTH );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_X509_USE_C
+    if( strcmp( str, "POLARSSL_ERR_OID_BUF_TOO_SMALL" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_OID_BUF_TOO_SMALL );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_USE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_FS_IO
+    if( strcmp( str, "POLARSSL_ERR_PEM_INVALID_DATA + POLARSSL_ERR_BASE64_INVALID_CHARACTER" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_PEM_INVALID_DATA + POLARSSL_ERR_BASE64_INVALID_CHARACTER );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_FS_IO
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_PEM_NO_HEADER_FOOTER_PRESENT" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_PEM_NO_HEADER_FOOTER_PRESENT );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_PK_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_PK_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_PK_INVALID_PUBKEY" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_PK_INVALID_PUBKEY );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_PK_INVALID_PUBKEY + POLARSSL_ERR_ASN1_INVALID_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_PK_INVALID_PUBKEY + POLARSSL_ERR_ASN1_INVALID_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_PK_INVALID_PUBKEY + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_PK_INVALID_PUBKEY + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_PK_INVALID_PUBKEY + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_PK_INVALID_PUBKEY + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_PK_INVALID_PUBKEY + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_PK_INVALID_PUBKEY + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_PK_KEY_INVALID_FORMAT + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_PK_KEY_INVALID_FORMAT + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CSR_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_PK_KEY_INVALID_FORMAT + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_PK_KEY_INVALID_FORMAT + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CSR_PARSE_C
+#ifdef POLARSSL_X509_CSR_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_PK_KEY_INVALID_FORMAT + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_PK_KEY_INVALID_FORMAT + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CSR_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_PK_UNKNOWN_PK_ALG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_PK_UNKNOWN_PK_ALG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CHECK_KEY_USAGE
+    if( strcmp( str, "POLARSSL_ERR_X509_BAD_INPUT_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_BAD_INPUT_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_CHECK_KEY_USAGE
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CHECK_EXTENDED_KEY_USAGE
+    if( strcmp( str, "POLARSSL_ERR_X509_BAD_INPUT_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_BAD_INPUT_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_CHECK_EXTENDED_KEY_USAGE
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_CERT_VERIFY_FAILED" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_CERT_VERIFY_FAILED );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_CERT_VERIFY_FAILED" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_CERT_VERIFY_FAILED );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_FATAL_ERROR" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_FATAL_ERROR );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
+    if( strcmp( str, "POLARSSL_ERR_X509_FEATURE_UNAVAILABLE + POLARSSL_ERR_OID_NOT_FOUND" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_FEATURE_UNAVAILABLE + POLARSSL_ERR_OID_NOT_FOUND );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_ALG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_INVALID_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_INVALID_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
         return( 0 );
     }
 #endif // POLARSSL_X509_CRT_PARSE_C
 #ifdef POLARSSL_X509_CRT_PARSE_C
 #ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
-    if( strcmp( str, "POLARSSL_MD_SHA256" ) == 0 )
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
     {
-        *value = ( POLARSSL_MD_SHA256 );
+        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
         return( 0 );
     }
 #endif // POLARSSL_X509_CRT_PARSE_C
 #endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
+#ifdef POLARSSL_X509_CSR_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CSR_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_X509_CSR_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CSR_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_OID_NOT_FOUND" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_ALG + POLARSSL_ERR_OID_NOT_FOUND );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_DATE" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_DATE );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_USE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_DATE" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_DATE );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_USE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_DATE + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_DATE + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_DATE + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_DATE + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_DATE + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_DATE + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_DATE + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_DATE + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_EXTENSIONS" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_EXTENSIONS );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_EXTENSIONS + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_EXTENSIONS + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_EXTENSIONS + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_EXTENSIONS + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_EXTENSIONS + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_EXTENSIONS + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CSR_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CSR_PARSE_C
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_INVALID_LENGTH" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_INVALID_LENGTH );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CSR_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CSR_PARSE_C
 #ifdef POLARSSL_X509_CRL_PARSE_C
     if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
     {
@@ -1481,10 +1256,101 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 #endif // POLARSSL_X509_CSR_PARSE_C
-#ifdef POLARSSL_X509_CRT_PARSE_C
-    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_EXTENSIONS" ) == 0 )
+#ifdef POLARSSL_X509_CSR_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
     {
-        *value = ( POLARSSL_ERR_X509_INVALID_EXTENSIONS );
+        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CSR_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_FORMAT + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CSR_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CSR_PARSE_C
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CSR_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_NAME + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CSR_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_NAME+POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_NAME+POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_SERIAL + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_SERIAL + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_SERIAL + POLARSSL_ERR_ASN1_OUT_OF_DATA " ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_SERIAL + POLARSSL_ERR_ASN1_OUT_OF_DATA  );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_SERIAL + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_SERIAL + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_SIGNATURE + POLARSSL_ERR_ASN1_INVALID_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_SIGNATURE + POLARSSL_ERR_ASN1_INVALID_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CSR_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_SIGNATURE + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_SIGNATURE + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CSR_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_SIGNATURE + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_SIGNATURE + POLARSSL_ERR_ASN1_OUT_OF_DATA );
         return( 0 );
     }
 #endif // POLARSSL_X509_CRT_PARSE_C
@@ -1496,14 +1362,148 @@ int verify_int( char *str, int *value )
     }
 #endif // POLARSSL_X509_CSR_PARSE_C
 #ifdef POLARSSL_X509_CRT_PARSE_C
-#ifdef POLARSSL_FS_IO
-    if( strcmp( str, "POLARSSL_ERR_PEM_INVALID_DATA + POLARSSL_ERR_BASE64_INVALID_CHARACTER" ) == 0 )
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_INVALID_LENGTH" ) == 0 )
     {
-        *value = ( POLARSSL_ERR_PEM_INVALID_DATA + POLARSSL_ERR_BASE64_INVALID_CHARACTER );
+        *value = ( POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_INVALID_LENGTH );
         return( 0 );
     }
 #endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_LENGTH_MISMATCH" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_LENGTH_MISMATCH );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CSR_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_OUT_OF_DATA" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_OUT_OF_DATA );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CSR_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_UNEXPECTED_TAG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_INVALID_VERSION + POLARSSL_ERR_ASN1_UNEXPECTED_TAG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_SIG_MISMATCH" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_SIG_MISMATCH );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_SIG_MISMATCH" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_SIG_MISMATCH );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_X509_CSR_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_UNKNOWN_SIG_ALG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_UNKNOWN_SIG_ALG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CSR_PARSE_C
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_UNKNOWN_SIG_ALG" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_UNKNOWN_SIG_ALG );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_UNKNOWN_SIG_ALG + POLARSSL_ERR_OID_NOT_FOUND" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_UNKNOWN_SIG_ALG + POLARSSL_ERR_OID_NOT_FOUND );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CSR_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_UNKNOWN_VERSION" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_UNKNOWN_VERSION );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CSR_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_UNKNOWN_VERSION" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_UNKNOWN_VERSION );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_CRL_PARSE_C
+    if( strcmp( str, "POLARSSL_ERR_X509_UNKNOWN_VERSION" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_X509_UNKNOWN_VERSION );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRL_PARSE_C
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
+    if( strcmp( str, "POLARSSL_MD_SHA1" ) == 0 )
+    {
+        *value = ( POLARSSL_MD_SHA1 );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
+#ifdef POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_X509_RSASSA_PSS_SUPPORT
+    if( strcmp( str, "POLARSSL_MD_SHA256" ) == 0 )
+    {
+        *value = ( POLARSSL_MD_SHA256 );
+        return( 0 );
+    }
+#endif // POLARSSL_X509_CRT_PARSE_C
+#endif // POLARSSL_X509_RSASSA_PSS_SUPPORT
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_X509_MAX_INTERMEDIATE_CA" ) == 0 )
+    {
+        *value = ( POLARSSL_X509_MAX_INTERMEDIATE_CA );
+        return( 0 );
+    }
 #endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_X509_MAX_INTERMEDIATE_CA+1" ) == 0 )
+    {
+        *value = ( POLARSSL_X509_MAX_INTERMEDIATE_CA+1 );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRT_PARSE_C
+#ifdef POLARSSL_FS_IO
+#ifdef POLARSSL_X509_CRT_PARSE_C
+    if( strcmp( str, "POLARSSL_X509_MAX_INTERMEDIATE_CA-1" ) == 0 )
+    {
+        *value = ( POLARSSL_X509_MAX_INTERMEDIATE_CA-1 );
+        return( 0 );
+    }
+#endif // POLARSSL_FS_IO
+#endif // POLARSSL_X509_CRT_PARSE_C
 
 
     polarssl_printf( "Expected integer for parameter and got: %s\n", str );
@@ -2173,6 +2173,30 @@ int dep_check( char *str )
     if( str == NULL )
         return( 1 );
 
+    if( strcmp( str, "POLARSSL_CERTS_C" ) == 0 )
+    {
+#if defined(POLARSSL_CERTS_C)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_ECDSA_C" ) == 0 )
+    {
+#if defined(POLARSSL_ECDSA_C)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_ECP_C" ) == 0 )
+    {
+#if defined(POLARSSL_ECP_C)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
     if( strcmp( str, "POLARSSL_ECP_DP_SECP192R1_ENABLED" ) == 0 )
     {
 #if defined(POLARSSL_ECP_DP_SECP192R1_ENABLED)
@@ -2189,9 +2213,49 @@ int dep_check( char *str )
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_X509_CHECK_KEY_USAGE" ) == 0 )
+    if( strcmp( str, "POLARSSL_ECP_DP_SECP384R1_ENABLED" ) == 0 )
     {
-#if defined(POLARSSL_X509_CHECK_KEY_USAGE)
+#if defined(POLARSSL_ECP_DP_SECP384R1_ENABLED)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_HAVE_TIME" ) == 0 )
+    {
+#if defined(POLARSSL_HAVE_TIME)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_MD4_C" ) == 0 )
+    {
+#if defined(POLARSSL_MD4_C)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_MD5_C" ) == 0 )
+    {
+#if defined(POLARSSL_MD5_C)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_PEM_PARSE_C" ) == 0 )
+    {
+#if defined(POLARSSL_PEM_PARSE_C)
+        return( 0 );
+#else
+        return( 1 );
+#endif
+    }
+    if( strcmp( str, "POLARSSL_PKCS1_V15" ) == 0 )
+    {
+#if defined(POLARSSL_PKCS1_V15)
         return( 0 );
 #else
         return( 1 );
@@ -2213,25 +2277,9 @@ int dep_check( char *str )
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_X509_USE_C" ) == 0 )
+    if( strcmp( str, "POLARSSL_SHA256_C" ) == 0 )
     {
-#if defined(POLARSSL_X509_USE_C)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_ECDSA_C" ) == 0 )
-    {
-#if defined(POLARSSL_ECDSA_C)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_ECP_DP_SECP384R1_ENABLED" ) == 0 )
-    {
-#if defined(POLARSSL_ECP_DP_SECP384R1_ENABLED)
+#if defined(POLARSSL_SHA256_C)
         return( 0 );
 #else
         return( 1 );
@@ -2245,30 +2293,6 @@ int dep_check( char *str )
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_ECP_C" ) == 0 )
-    {
-#if defined(POLARSSL_ECP_C)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_CERTS_C" ) == 0 )
-    {
-#if defined(POLARSSL_CERTS_C)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_SHA256_C" ) == 0 )
-    {
-#if defined(POLARSSL_SHA256_C)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
     if( strcmp( str, "POLARSSL_X509_ALLOW_EXTENSIONS_NON_V3" ) == 0 )
     {
 #if defined(POLARSSL_X509_ALLOW_EXTENSIONS_NON_V3)
@@ -2277,17 +2301,9 @@ int dep_check( char *str )
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_MD5_C" ) == 0 )
+    if( strcmp( str, "POLARSSL_X509_CHECK_KEY_USAGE" ) == 0 )
     {
-#if defined(POLARSSL_MD5_C)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_PKCS1_V15" ) == 0 )
-    {
-#if defined(POLARSSL_PKCS1_V15)
+#if defined(POLARSSL_X509_CHECK_KEY_USAGE)
         return( 0 );
 #else
         return( 1 );
@@ -2301,25 +2317,9 @@ int dep_check( char *str )
         return( 1 );
 #endif
     }
-    if( strcmp( str, "POLARSSL_MD4_C" ) == 0 )
+    if( strcmp( str, "POLARSSL_X509_USE_C" ) == 0 )
     {
-#if defined(POLARSSL_MD4_C)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_HAVE_TIME" ) == 0 )
-    {
-#if defined(POLARSSL_HAVE_TIME)
-        return( 0 );
-#else
-        return( 1 );
-#endif
-    }
-    if( strcmp( str, "POLARSSL_PEM_PARSE_C" ) == 0 )
-    {
-#if defined(POLARSSL_PEM_PARSE_C)
+#if defined(POLARSSL_X509_USE_C)
         return( 0 );
 #else
         return( 1 );

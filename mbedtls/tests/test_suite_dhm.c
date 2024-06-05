@@ -425,14 +425,14 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 
-    if( strcmp( str, "POLARSSL_ERR_DHM_MAKE_PARAMS_FAILED" ) == 0 )
-    {
-        *value = ( POLARSSL_ERR_DHM_MAKE_PARAMS_FAILED );
-        return( 0 );
-    }
     if( strcmp( str, "POLARSSL_ERR_DHM_BAD_INPUT_DATA" ) == 0 )
     {
         *value = ( POLARSSL_ERR_DHM_BAD_INPUT_DATA );
+        return( 0 );
+    }
+    if( strcmp( str, "POLARSSL_ERR_DHM_MAKE_PARAMS_FAILED" ) == 0 )
+    {
+        *value = ( POLARSSL_ERR_DHM_MAKE_PARAMS_FAILED );
         return( 0 );
     }
 

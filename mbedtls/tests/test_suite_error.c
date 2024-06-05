@@ -422,24 +422,14 @@ int verify_int( char *str, int *value )
         return( 0 );
     }
 
-    if( strcmp( str, "-0x007F" ) == 0 )
-    {
-        *value = ( -0x007F );
-        return( 0 );
-    }
-    if( strcmp( str, "-0x88FF" ) == 0 )
-    {
-        *value = ( -0x88FF );
-        return( 0 );
-    }
-    if( strcmp( str, "-0x40A0" ) == 0 )
-    {
-        *value = ( -0x40A0 );
-        return( 0 );
-    }
     if( strcmp( str, "-0x0020" ) == 0 )
     {
         *value = ( -0x0020 );
+        return( 0 );
+    }
+    if( strcmp( str, "-0x007F" ) == 0 )
+    {
+        *value = ( -0x007F );
         return( 0 );
     }
     if( strcmp( str, "-0x4080" ) == 0 )
@@ -447,9 +437,19 @@ int verify_int( char *str, int *value )
         *value = ( -0x4080 );
         return( 0 );
     }
+    if( strcmp( str, "-0x40A0" ) == 0 )
+    {
+        *value = ( -0x40A0 );
+        return( 0 );
+    }
     if( strcmp( str, "-0x8880" ) == 0 )
     {
         *value = ( -0x8880 );
+        return( 0 );
+    }
+    if( strcmp( str, "-0x88FF" ) == 0 )
+    {
+        *value = ( -0x88FF );
         return( 0 );
     }
 
