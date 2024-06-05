@@ -1,4 +1,4 @@
-SUBDIRS = mbedtls/library mbedtls/programs mbedtls/tests src
+SUBDIRS = polarssl/library polarssl/programs polarssl/tests src
 
 all clean:
 	@for i in $(SUBDIRS); do \

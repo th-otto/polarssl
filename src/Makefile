@@ -1,6 +1,6 @@
 include ../configvars
 
-LOCAL_CFLAGS  = $(CFLAGS) -I../mbedtls/include $(WARNING_CFLAGS)
+LOCAL_CFLAGS  = $(CFLAGS) -I../polarssl/include $(WARNING_CFLAGS)
 LDFLAGS = -s
 LDLIBS  = -lldg -lgem -lz
 
@@ -44,11 +44,11 @@ clean:
 	@mkdir -p build/coldfire
 	@touch $@
 
-build/68000/$(TARGET): $(addprefix build/68000/,$(OBJS)) ../mbedtls/library/libpolarssl_000.a
-	$(CC) $(addprefix build/68000/,$(OBJS)) $(CFLAGS) $(CFLAGS_m68000) ../mbedtls/library/libpolarssl_000.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
+build/68000/$(TARGET): $(addprefix build/68000/,$(OBJS)) ../polarssl/library/libpolarssl_000.a
+	$(CC) $(addprefix build/68000/,$(OBJS)) $(CFLAGS) $(CFLAGS_m68000) ../polarssl/library/libpolarssl_000.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
 
-build/68020/$(TARGET): $(addprefix build/68020/,$(OBJS)) ../mbedtls/library/libpolarssl_020.a
-	$(CC) $(addprefix build/68020/,$(OBJS)) $(CFLAGS) $(CFLAGS_m68020) ../mbedtls/library/libpolarssl_020.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
+build/68020/$(TARGET): $(addprefix build/68020/,$(OBJS)) ../polarssl/library/libpolarssl_020.a
+	$(CC) $(addprefix build/68020/,$(OBJS)) $(CFLAGS) $(CFLAGS_m68020) ../polarssl/library/libpolarssl_020.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
 
-build/coldfire/$(TARGET): $(addprefix build/coldfire/,$(OBJS)) ../mbedtls/library/libpolarssl_v4e.a
-	$(CC) $(addprefix build/coldfire/,$(OBJS)) $(CFLAGS) $(CFLAGS_coldfire) ../mbedtls/library/libpolarssl_v4e.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
+build/coldfire/$(TARGET): $(addprefix build/coldfire/,$(OBJS)) ../polarssl/library/libpolarssl_v4e.a
+	$(CC) $(addprefix build/coldfire/,$(OBJS)) $(CFLAGS) $(CFLAGS_coldfire) ../polarssl/library/libpolarssl_v4e.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
