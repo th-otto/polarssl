@@ -1036,7 +1036,7 @@ cleanup:
     int t_ret;
     struct stat sb;
     struct dirent *entry;
-    char entry_name[255];
+    char entry_name[512];
     DIR *dir = opendir( path );
 
     if( dir == NULL )

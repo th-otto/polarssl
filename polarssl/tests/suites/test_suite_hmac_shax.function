@@ -69,8 +69,8 @@ void sha224_hmac( int trunc_size, char *hex_key_string, char *hex_src_string,
 {
     unsigned char src_str[10000];
     unsigned char key_str[10000];
-    unsigned char hash_str[57];
-    unsigned char output[28];
+    unsigned char hash_str[65];
+    unsigned char output[32];
     int key_len, src_len;
     sha256_context ctx;
 
@@ -187,8 +187,8 @@ void sha384_hmac( int trunc_size, char *hex_key_string, char *hex_src_string,
 {
     unsigned char src_str[10000];
     unsigned char key_str[10000];
-    unsigned char hash_str[97];
-    unsigned char output[48];
+    unsigned char hash_str[129];
+    unsigned char output[64];
     int key_len, src_len;
     sha512_context ctx;
 

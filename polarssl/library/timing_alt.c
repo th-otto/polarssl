@@ -4,6 +4,8 @@
 #include POLARSSL_CONFIG_FILE
 #endif
 
+#ifdef __MINT__ /* whole file */
+
 #include "polarssl/timing_alt.h"
 
 #include <unistd.h>
@@ -123,3 +125,5 @@ void m_sleep( int milliseconds )
   (void) milliseconds;
 #endif
 }
+
+#endif /* __MINT__ */
