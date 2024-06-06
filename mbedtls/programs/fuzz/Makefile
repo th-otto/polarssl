@@ -1,6 +1,8 @@
 MBEDTLS_TEST_PATH:=../../tests
 
 MBEDTLS_PATH := ../..
+include ../../../configvars
+include ../../../silent.mak
 include ../../scripts/common.make
 
 DEP=${MBEDLIBS}
@@ -31,18 +33,11 @@ C_FILES := $(addsuffix .c,$(APPS))
 
 ifdef FUZZINGENGINE
 $(BINARIES): %$(EXEXT): %.o common.o $(DEP)
-	echo " $(CC) common.o $< $(LOCAL_LDFLAGS) $(LDFLAGS) -o $@"
-	$(CXX) common.o $<	$(LOCAL_LDFLAGS) $(LDFLAGS) -o $@
+	$(AM_V_CXXLD)$(CXX) common.o $<	$(LOCAL_LDFLAGS) $(LDFLAGS) -o $@
 else
 $(BINARIES): %$(EXEXT): %.o common.o onefile.o $(DEP)
-	echo " $(CC) common.o onefile.o $< $(LOCAL_LDFLAGS) $(LDFLAGS) -o $@"
-	$(CC) common.o onefile.o $<	$(LOCAL_LDFLAGS) $(LDFLAGS) -o $@
+	$(AM_V_CCLD)$(CC) common.o onefile.o $<	$(LOCAL_LDFLAGS) $(LDFLAGS) -o $@
 endif
 
 clean:
-ifndef WINDOWS
 	rm -rf $(BINARIES) *.o
-else
-	if exist *.o del /Q /F *.o
-	if exist *.exe del /Q /F *.exe
-endif

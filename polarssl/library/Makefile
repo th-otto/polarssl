@@ -1,4 +1,5 @@
 include ../../configvars
+include ../../silent.mak
 
 LOCAL_CFLAGS = $(CFLAGS) -I../include $(WARNING_CFLAGS)
 
@@ -9,31 +10,46 @@ OBJS = aes.o aesni.o arc4.o asn1parse.o asn1write.o base64.o bignum.o blowfish.o
       x509.o x509_create.o x509_crl.o x509_crt.o x509_csr.o x509write_crt.o x509write_csr.o xtea.o \
       timing_alt.o
 
-LIBS = libpolarssl_000.a libpolarssl_020.a libpolarssl_v4e.a libpolarssl.a libmbedtls.a
+LIBS = libpolarssl.a libmbedtls.a
+ifneq ($(CROSSPREFIX),)
+LIBS += libpolarssl_000.a libpolarssl_020.a libpolarssl_v4e.a
+endif
 
 all: $(LIBS)
 
+ifneq ($(CROSSPREFIX),)
 define CC_TEMPLATE
 build/68000/$(1).o: .dirs $(1).c
-	$(CC) $(LOCAL_CFLAGS) $(CFLAGS_m68000) -c $(1).c -o $$@
+	$(AM_V_CC)$(CC) $(LOCAL_CFLAGS) $(CFLAGS_m68000) -c $(1).c -o $$@
 build/68020/$(1).o: .dirs $(1).c
-	$(CC) $(LOCAL_CFLAGS) $(CFLAGS_m68020) -c $(1).c -o $$@
+	$(AM_V_CC)$(CC) $(LOCAL_CFLAGS) $(CFLAGS_m68020) -c $(1).c -o $$@
 build/coldfire/$(1).o: .dirs $(1).c
-	$(CC) $(LOCAL_CFLAGS) $(CFLAGS_coldire) -c $(1).c -o $$@
+	$(AM_V_CC)$(CC) $(LOCAL_CFLAGS) $(CFLAGS_coldire) -c $(1).c -o $$@
 endef
+else
+define CC_TEMPLATE
+build/host/$(1).o: .dirs $(1).c
+	$(AM_V_CC)$(CC) $(LOCAL_CFLAGS) -c $(1).c -o $$@
+endef
+endif
 $(foreach f,$(OBJS:.o=),$(eval $(call CC_TEMPLATE,$(f))))
 
+ifneq ($(CROSSPREFIX),)
 libpolarssl_000.a: $(addprefix build/68000/,$(OBJS))
-	$(AR) -rcs $@ $^
+	$(AM_V_AR)$(AR) -rcs $@ $^
 
 libpolarssl_020.a: $(addprefix build/68020/,$(OBJS))
-	$(AR) -rcs $@ $^
+	$(AM_V_AR)$(AR) -rcs $@ $^
 
 libpolarssl_v4e.a: $(addprefix build/coldfire/,$(OBJS))
-	$(AR) -rcs $@ $^
+	$(AM_V_AR)$(AR) -rcs $@ $^
 
 libpolarssl.a: libpolarssl_000.a
 	ln -s $< $@
+else
+libpolarssl.a: $(addprefix build/host/,$(OBJS))
+	$(AM_V_AR)$(AR) -rcs $@ $^
+endif
 
 libmbedtls.a: libpolarssl.a
 	ln -s $< $@
@@ -42,6 +58,7 @@ libmbedtls.a: libpolarssl.a
 	@mkdir -p build/68000
 	@mkdir -p build/68020
 	@mkdir -p build/coldfire
+	@mkdir -p build/host
 	@touch $@
 
 install: $(LIBS)

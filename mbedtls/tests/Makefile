@@ -1,11 +1,13 @@
 MBEDTLS_TEST_PATH = .
+include ../../configvars
+include ../../silent.mak
 include ../scripts/common.make
 
 # Set this to -v to see the details of failing test cases
 TEST_FLAGS ?= $(if $(filter-out 0 OFF Off off NO No no FALSE False false N n,$(CTEST_OUTPUT_ON_FAILURE)),-v,)
 
 # Also include library headers, for the sake of invasive tests.
-LOCAL_CFLAGS += -I../library
+LOCAL_CFLAGS = $(CFLAGS) $(WARNING_CFLAGS) -I../library -I$(MBEDTLS_TEST_PATH)/include -I$(MBEDTLS_PATH)/include
 
 # Enable definition of various functions used throughout the testsuite
 # (gethostname, strdup, fileno...) even when compiling with -std=c99. Harmless
@@ -13,7 +15,7 @@ LOCAL_CFLAGS += -I../library
 LOCAL_CFLAGS += -D_POSIX_C_SOURCE=200809L
 
 ifdef RECORD_PSA_STATUS_COVERAGE_LOG
-LOCAL_CFLAGS += -Werror -DRECORD_PSA_STATUS_COVERAGE_LOG
+LOCAL_CFLAGS += -DRECORD_PSA_STATUS_COVERAGE_LOG
 endif
 
 .PHONY: generated_files
@@ -57,8 +59,7 @@ generated_bignum_test_data: ../scripts/mbedtls_dev/bignum_mod.py
 generated_bignum_test_data: ../scripts/mbedtls_dev/test_case.py
 generated_bignum_test_data: ../scripts/mbedtls_dev/test_data_generation.py
 generated_bignum_test_data:
-	echo "  Gen   $(GENERATED_BIGNUM_DATA_FILES)"
-	$(PYTHON) scripts/generate_bignum_tests.py
+	$(AM_V_GEN)$(PYTHON) scripts/generate_bignum_tests.py
 
 $(GENERATED_ECP_DATA_FILES): $(gen_file_dep) generated_ecp_test_data
 generated_ecp_test_data: scripts/generate_ecp_tests.py
@@ -67,8 +68,7 @@ generated_ecp_test_data: ../scripts/mbedtls_dev/ecp.py
 generated_ecp_test_data: ../scripts/mbedtls_dev/test_case.py
 generated_ecp_test_data: ../scripts/mbedtls_dev/test_data_generation.py
 generated_ecp_test_data:
-	echo "  Gen   $(GENERATED_ECP_DATA_FILES)"
-	$(PYTHON) scripts/generate_ecp_tests.py
+	$(AM_V_GEN)$(PYTHON) scripts/generate_ecp_tests.py
 
 $(GENERATED_PSA_DATA_FILES): $(gen_file_dep) generated_psa_test_data
 generated_psa_test_data: scripts/generate_psa_tests.py
@@ -89,8 +89,7 @@ generated_psa_test_data: ../include/psa/crypto_values.h
 generated_psa_test_data: ../include/psa/crypto_extra.h
 generated_psa_test_data: suites/test_suite_psa_crypto_metadata.data
 generated_psa_test_data:
-	echo "  Gen   $(GENERATED_PSA_DATA_FILES) ..."
-	$(PYTHON) scripts/generate_psa_tests.py
+	$(AM_V_GEN)$(PYTHON) scripts/generate_psa_tests.py
 
 # A test application is built for each suites/test_suite_*.data file.
 # Application name is same as .data file's base name and can be
@@ -103,8 +102,6 @@ APPS = $(basename $(subst suites/,,$(DATA_FILES)))
 
 # Construct executable name by adding OS specific suffix $(EXEXT).
 BINARIES := $(addsuffix $(EXEXT),$(APPS))
-
-.SILENT:
 
 .PHONY: all check test clean
 
@@ -121,17 +118,11 @@ TEST_OBJS_DEPS += include/test/instrument_record_status.h
 endif
 
 # Rule to compile common test C files in src folder
-src/%.o : src/%.c $(TEST_OBJS_DEPS)
-	echo "  CC    $<"
-	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -o $@ -c $<
-
-src/drivers/%.o : src/drivers/%.c
-	echo "  CC    $<"
-	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -o $@ -c $<
-
-src/test_helpers/%.o : src/test_helpers/%.c
-	echo "  CC    $<"
-	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -o $@ -c $<
+define CC_TEMPLATE
+$$(basename $(1)).o: $(1) $(TEST_OBJS_DEPS)
+	$(AM_V_CC)$(CC) $(LOCAL_CFLAGS) -o $$@ -c $(1)
+endef
+$(foreach f,$(wildcard src/*.c) $(wildcard src/drivers/*.c) $(wildcard src/test_helpers/*.c),$(eval $(call CC_TEMPLATE,$(f))))
 
 C_FILES := $(addsuffix .c,$(APPS))
 c: $(C_FILES)
@@ -152,8 +143,7 @@ c: $(C_FILES)
 #
 .SECONDEXPANSION:
 %.c: suites/$$(firstword $$(subst ., ,$$*)).function suites/%.data scripts/generate_test_code.py suites/helpers.function suites/main_test.function suites/host_test.function
-	echo "  Gen   $@"
-	$(PYTHON) scripts/generate_test_code.py -f suites/$(firstword $(subst ., ,$*)).function \
+	$(AM_V_GEN)$(PYTHON) scripts/generate_test_code.py -f suites/$(firstword $(subst ., ,$*)).function \
 		-d suites/$*.data \
 		-t suites/main_test.function \
 		-p suites/host_test.function \
@@ -163,27 +153,15 @@ c: $(C_FILES)
 
 
 $(BINARIES): %$(EXEXT): %.c $(MBEDLIBS) $(TEST_OBJS_DEPS) $(MBEDTLS_TEST_OBJS)
-	echo "  CC    $<"
-	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) $< $(LOCAL_LDFLAGS) $(LDFLAGS) -o $@
+	$(AM_V_CCLD)$(CC) $(LOCAL_CFLAGS) $< $(LOCAL_LDFLAGS) $(LDFLAGS) -o $@
 
 clean:
-ifndef WINDOWS
 	rm -rf $(BINARIES) *.c *.datax
 	rm -f src/*.o src/drivers/*.o src/test_helpers/*.o src/libmbed*
 	rm -f include/test/instrument_record_status.h
 	rm -f include/alt-extra/*/*_alt.h
 	rm -rf libtestdriver1
 	rm -f ../library/libtestdriver1.a
-else
-	if exist *.c del /Q /F *.c
-	if exist *.exe del /Q /F *.exe
-	if exist *.datax del /Q /F *.datax
-	if exist src/*.o del /Q /F src/*.o
-	if exist src/drivers/*.o del /Q /F src/drivers/*.o
-	if exist src/test_helpers/*.o del /Q /F src/test_helpers/*.o
-	if exist src/libmbed* del /Q /F src/libmed*
-	if exist include/test/instrument_record_status.h del /Q /F include/test/instrument_record_status.h
-endif
 
 # Test suites caught by SKIP_TEST_SUITES are built but not executed.
 check: $(BINARIES)

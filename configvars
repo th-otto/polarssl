@@ -5,6 +5,7 @@ CFLAGS_m68020   = -m68020-60
 CFLAGS_coldfire = -mcpu=5475
 
 CC = $(CROSSPREFIX)gcc
+CXX = $(CROSSPREFIX)g++
 AS = $(CC)
 AR = $(CROSSPREFIX)ar
 RANLIB = $(CROSSPREFIX)ranlib
@@ -13,4 +14,6 @@ FLAGS = $(CROSSPREFIX)flags
 ARFLAGS = rcs
 
 WARNING_CFLAGS = -Wall -W -Wdeclaration-after-statement -Werror
+WARNING_CXXFLAGS = -Wall -W -Werror
 CFLAGS = -O2 -fomit-frame-pointer
+CXXFLAGS = -O2 -fomit-frame-pointer
