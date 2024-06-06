@@ -37,10 +37,6 @@ static psa_status_t mbedtls_psa_ffdh_set_prime_generator(size_t key_size,
     size_t dhm_size_G = 0;
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
 
-    if (P == NULL && G == NULL) {
-        return PSA_ERROR_INVALID_ARGUMENT;
-    }
-
 #if defined(MBEDTLS_PSA_BUILTIN_DH_RFC7919_2048)
     static const unsigned char dhm_P_2048[] =
         MBEDTLS_DHM_RFC7919_FFDHE2048_P_BIN;
@@ -71,6 +67,10 @@ static psa_status_t mbedtls_psa_ffdh_set_prime_generator(size_t key_size,
     static const unsigned char dhm_G_8192[] =
         MBEDTLS_DHM_RFC7919_FFDHE8192_G_BIN;
 #endif /* MBEDTLS_PSA_BUILTIN_DH_RFC7919_8192 */
+
+    if (P == NULL && G == NULL) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
 
     switch (key_size) {
 #if defined(MBEDTLS_PSA_BUILTIN_DH_RFC7919_2048)
@@ -152,6 +152,7 @@ psa_status_t mbedtls_psa_ffdh_export_public_key(
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     mbedtls_mpi GX, G, X, P;
     psa_key_type_t type = attributes->type;
+	size_t key_len;
 
     if (PSA_KEY_TYPE_IS_PUBLIC_KEY(type)) {
         if (key_buffer_size > data_size) {
@@ -167,7 +168,7 @@ psa_status_t mbedtls_psa_ffdh_export_public_key(
     mbedtls_mpi_init(&GX); mbedtls_mpi_init(&G);
     mbedtls_mpi_init(&X); mbedtls_mpi_init(&P);
 
-    size_t key_len = PSA_BITS_TO_BYTES(attributes->bits);
+    key_len = PSA_BITS_TO_BYTES(attributes->bits);
 
     status = mbedtls_psa_ffdh_set_prime_generator(key_len, &P, &G);
 

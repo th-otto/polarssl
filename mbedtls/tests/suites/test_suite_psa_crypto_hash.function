@@ -48,6 +48,9 @@ void hmac(int alg_arg, char *input, data_t *expected_mac)
         0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa
     };
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    uint8_t mac[PSA_MAC_MAX_SIZE + 10] = { 0 };
+    size_t mac_length = 0;
+    size_t input_len;
 
     PSA_ASSERT(psa_crypto_init());
 
@@ -56,10 +59,7 @@ void hmac(int alg_arg, char *input, data_t *expected_mac)
     psa_set_key_type(&attributes, key_type);
     PSA_ASSERT(psa_import_key(&attributes, key_data, sizeof(key_data), &key));
 
-    uint8_t mac[PSA_MAC_MAX_SIZE + 10] = { 0 };
-    size_t mac_length = 0;
-
-    size_t input_len = strlen(input);
+    input_len = strlen(input);
     PSA_ASSERT(psa_mac_compute(key, alg, (uint8_t const *) input, input_len, mac, sizeof(mac),
                                &mac_length));
 

@@ -492,11 +492,11 @@ int mbedtls_pk_can_do_ext(const mbedtls_pk_context *ctx, psa_algorithm_t alg,
  * ```
  * psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
  * int ret = mbedtls_pk_get_psa_attributes(pk, &attributes);
- * if (ret != 0) ...; // error handling omitted
- * // Tweak attributes if desired
+ * if (ret != 0) ...; / / error handling omitted
+ * / / Tweak attributes if desired
  * psa_key_id_t key_id = 0;
  * ret = mbedtls_pk_import_into_psa(pk, &attributes, &key_id);
- * if (ret != 0) ...; // error handling omitted
+ * if (ret != 0) ...; / / error handling omitted
  * ```
  *
  * \note            This function does not support RSA-alt contexts

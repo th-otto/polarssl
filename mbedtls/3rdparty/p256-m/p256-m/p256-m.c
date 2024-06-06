@@ -34,17 +34,17 @@
 
 #include <sanitizer/msan_interface.h>
 #define CT_POISON   __msan_allocated_memory
-// void __msan_allocated_memory(const volatile void* data, size_t size);
+/* void __msan_allocated_memory(const volatile void* data, size_t size); */
 #define CT_UNPOISON __msan_unpoison
-// void __msan_unpoison(const volatile void *a, size_t size);
+/* void __msan_unpoison(const volatile void *a, size_t size); */
 
 #elif defined(CT_VALGRIND)
 
 #include <valgrind/memcheck.h>
 #define CT_POISON   VALGRIND_MAKE_MEM_UNDEFINED
-// VALGRIND_MAKE_MEM_UNDEFINED(_qzz_addr,_qzz_len)
+/* VALGRIND_MAKE_MEM_UNDEFINED(_qzz_addr,_qzz_len) */
 #define CT_UNPOISON VALGRIND_MAKE_MEM_DEFINED
-// VALGRIND_MAKE_MEM_DEFINED(_qzz_addr,_qzz_len)
+/* VALGRIND_MAKE_MEM_DEFINED(_qzz_addr,_qzz_len) */
 
 #else
 #define CT_POISON(p, sz)
@@ -607,9 +607,9 @@ static void m256_mul(uint32_t z[8],
     }
 
     /* a = a > m ? a - m : a */
-    uint32_t carry_add = a[8];  // 0 or 1 since a < 2m, see HAC Note 14.37
+    uint32_t carry_add = a[8];  /* 0 or 1 since a < 2m, see HAC Note 14.37 */
     uint32_t carry_sub = u256_sub(z, a, mod->m);
-    uint32_t use_sub = carry_add | (1 - carry_sub);     // see m256_add()
+    uint32_t use_sub = carry_add | (1 - carry_sub);     /* see m256_add() */
     u256_cmov(z, a, 1 - use_sub);
 }
 
@@ -985,16 +985,16 @@ static void point_add_or_double_leaky(
     m256_set32(z3, 1, &p256_p);
 
     if (u256_diff(x1, x2) != 0) {
-        // P != +- Q -> generic addition
+        /* P != +- Q -> generic addition */
         point_add(x3, y3, z3, x2, y2);
         point_to_affine(x3, y3, z3);
     }
     else if (u256_diff(y1, y2) == 0) {
-        // P == Q -> double
+        /* P == Q -> double */
         point_double(x3, y3, z3);
         point_to_affine(x3, y3, z3);
     } else {
-        // P == -Q -> zero
+        /* P == -Q -> zero */
         m256_set32(x3, 0, &p256_p);
         m256_set32(y3, 0, &p256_p);
     }

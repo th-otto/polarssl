@@ -497,6 +497,7 @@ void ecdsa_verify(int grp_id, char *x, char *y, char *r, char *s, data_t *conten
 {
     mbedtls_ecdsa_context ctx;
     mbedtls_mpi sig_r, sig_s;
+    int result;
 
     mbedtls_ecdsa_init(&ctx);
     mbedtls_mpi_init(&sig_r);
@@ -519,7 +520,7 @@ void ecdsa_verify(int grp_id, char *x, char *y, char *r, char *s, data_t *conten
                expected == MBEDTLS_ERR_ECP_INVALID_KEY ? MBEDTLS_ERR_ECP_INVALID_KEY : 0);
 
     /* Verification */
-    int result = mbedtls_ecdsa_verify(&ctx.grp, content->x, content->len, &ctx.Q, &sig_r, &sig_s);
+    result = mbedtls_ecdsa_verify(&ctx.grp, content->x, content->len, &ctx.Q, &sig_r, &sig_s);
 
     TEST_EQUAL(result, expected);
 exit:

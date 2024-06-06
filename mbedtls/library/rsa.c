@@ -1114,7 +1114,7 @@ int mbedtls_rsa_gen_key(mbedtls_rsa_context *ctx,
         MBEDTLS_MPI_CHK(mbedtls_mpi_div_mpi(&L, NULL, &H, &G));
         MBEDTLS_MPI_CHK(mbedtls_mpi_inv_mod(&ctx->D, &ctx->E, &L));
 
-        if (mbedtls_mpi_bitlen(&ctx->D) <= ((nbits + 1) / 2)) {      // (FIPS 186-4 §B.3.1 criterion 3(a))
+        if (mbedtls_mpi_bitlen(&ctx->D) <= ((nbits + 1) / 2)) {      /* (FIPS 186-4 §B.3.1 criterion 3(a)) */
             continue;
         }
 
@@ -1947,7 +1947,7 @@ int mbedtls_rsa_rsaes_oaep_decrypt(mbedtls_rsa_context *ctx,
         return MBEDTLS_ERR_RSA_BAD_INPUT_DATA;
     }
 
-    // checking for integer underflow
+    /* checking for integer underflow */
     if (2 * hlen + 2 > ilen) {
         return MBEDTLS_ERR_RSA_BAD_INPUT_DATA;
     }

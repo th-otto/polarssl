@@ -63,7 +63,8 @@ static int calloc_self_test(int verbose)
     unsigned int buffer_4_size = 4097; /* Allocate more than the usual page size */
     unsigned char *buffer3 = mbedtls_calloc(buffer_3_size, 1);
     unsigned char *buffer4 = mbedtls_calloc(buffer_4_size, 1);
-
+    unsigned int i;
+    
     if (empty1 == NULL && empty2 == NULL) {
         if (verbose) {
             mbedtls_printf("  CALLOC(0,1): passed (NULL)\n");
@@ -139,7 +140,7 @@ static int calloc_self_test(int verbose)
         }
     }
 
-    for (unsigned int i = 0; i < buffer_3_size; i++) {
+    for (i = 0; i < buffer_3_size; i++) {
         if (buffer3[i] != 0) {
             ++failures;
             if (verbose) {
@@ -150,7 +151,7 @@ static int calloc_self_test(int verbose)
         }
     }
 
-    for (unsigned int i = 0; i < buffer_4_size; i++) {
+    for (i = 0; i < buffer_4_size; i++) {
         if (buffer4[i] != 0) {
             ++failures;
             if (verbose) {
@@ -380,6 +381,8 @@ int main(int argc, char *argv[])
     unsigned char buf[1000000];
 #endif
     void *pointer;
+    uint32_t endian_test = 0x12345678;
+    char *p;
 
     /*
      * Check some basic platform requirements as specified in README.md
@@ -399,8 +402,7 @@ int main(int argc, char *argv[])
         mbedtls_exit(MBEDTLS_EXIT_FAILURE);
     }
 
-    uint32_t endian_test = 0x12345678;
-    char *p = (char *) &endian_test;
+    p = (char *) &endian_test;
     if (!(p[0] == 0x12 && p[1] == 0x34 && p[2] == 0x56 && p[3] == 0x78) &&
         !(p[3] == 0x12 && p[2] == 0x34 && p[1] == 0x56 && p[0] == 0x78)) {
         mbedtls_printf("Mixed-endian platforms are not supported\n");

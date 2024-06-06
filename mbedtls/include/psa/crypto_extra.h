@@ -629,57 +629,57 @@ psa_status_t mbedtls_psa_platform_get_builtin_key(
  * The key exchange flow for J-PAKE is as follows:
  * -# To get the first round data that needs to be sent to the peer, call
  *    \code
- *    // Get g1
+ *    / / Get g1
  *    psa_pake_output(operation, #PSA_PAKE_STEP_KEY_SHARE, ...);
- *    // Get the ZKP public key for x1
+ *    / / Get the ZKP public key for x1
  *    psa_pake_output(operation, #PSA_PAKE_STEP_ZK_PUBLIC, ...);
- *    // Get the ZKP proof for x1
+ *    / / Get the ZKP proof for x1
  *    psa_pake_output(operation, #PSA_PAKE_STEP_ZK_PROOF, ...);
- *    // Get g2
+ *    / / Get g2
  *    psa_pake_output(operation, #PSA_PAKE_STEP_KEY_SHARE, ...);
- *    // Get the ZKP public key for x2
+ *    / / Get the ZKP public key for x2
  *    psa_pake_output(operation, #PSA_PAKE_STEP_ZK_PUBLIC, ...);
- *    // Get the ZKP proof for x2
+ *    / / Get the ZKP proof for x2
  *    psa_pake_output(operation, #PSA_PAKE_STEP_ZK_PROOF, ...);
  *    \endcode
  * -# To provide the first round data received from the peer to the operation,
  *    call
  *    \code
- *    // Set g3
+ *    / / Set g3
  *    psa_pake_input(operation, #PSA_PAKE_STEP_KEY_SHARE, ...);
- *    // Set the ZKP public key for x3
+ *    / / Set the ZKP public key for x3
  *    psa_pake_input(operation, #PSA_PAKE_STEP_ZK_PUBLIC, ...);
- *    // Set the ZKP proof for x3
+ *    / / Set the ZKP proof for x3
  *    psa_pake_input(operation, #PSA_PAKE_STEP_ZK_PROOF, ...);
- *    // Set g4
+ *    / / Set g4
  *    psa_pake_input(operation, #PSA_PAKE_STEP_KEY_SHARE, ...);
- *    // Set the ZKP public key for x4
+ *    / / Set the ZKP public key for x4
  *    psa_pake_input(operation, #PSA_PAKE_STEP_ZK_PUBLIC, ...);
- *    // Set the ZKP proof for x4
+ *    / / Set the ZKP proof for x4
  *    psa_pake_input(operation, #PSA_PAKE_STEP_ZK_PROOF, ...);
  *    \endcode
  * -# To get the second round data that needs to be sent to the peer, call
  *    \code
- *    // Get A
+ *    / / Get A
  *    psa_pake_output(operation, #PSA_PAKE_STEP_KEY_SHARE, ...);
- *    // Get ZKP public key for x2*s
+ *    / / Get ZKP public key for x2*s
  *    psa_pake_output(operation, #PSA_PAKE_STEP_ZK_PUBLIC, ...);
- *    // Get ZKP proof for x2*s
+ *    / / Get ZKP proof for x2*s
  *    psa_pake_output(operation, #PSA_PAKE_STEP_ZK_PROOF, ...);
  *    \endcode
  * -# To provide the second round data received from the peer to the operation,
  *    call
  *    \code
- *    // Set B
+ *    / / Set B
  *    psa_pake_input(operation, #PSA_PAKE_STEP_KEY_SHARE, ...);
- *    // Set ZKP public key for x4*s
+ *    / / Set ZKP public key for x4*s
  *    psa_pake_input(operation, #PSA_PAKE_STEP_ZK_PUBLIC, ...);
- *    // Set ZKP proof for x4*s
+ *    / / Set ZKP proof for x4*s
  *    psa_pake_input(operation, #PSA_PAKE_STEP_ZK_PROOF, ...);
  *    \endcode
  * -# To access the shared secret call
  *    \code
- *    // Get Ka=Kb=K
+ *    / / Get Ka=Kb=K
  *    psa_pake_get_implicit_key()
  *    \endcode
  *

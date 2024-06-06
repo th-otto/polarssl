@@ -1209,6 +1209,7 @@ int main(int argc, char *argv[])
             mbedtls_snprintf(title, sizeof(title), "ECDHE-%s", curve_info->name);
             TIME_PUBLIC(title,
                         "ephemeral handshake",
+                        {
                         const unsigned char *p_srv = buf_srv;
                         mbedtls_ecdh_init(&ecdh_cli);
 
@@ -1220,6 +1221,7 @@ int main(int argc, char *argv[])
                         CHECK_AND_CONTINUE(mbedtls_ecdh_calc_secret(&ecdh_cli, &seclen, buf_cli,
                                                                     sizeof(buf_cli), myrand, NULL));
                         mbedtls_ecdh_free(&ecdh_cli);
+                        }
                         );
 
             mbedtls_ecdh_free(&ecdh_srv);
@@ -1228,6 +1230,8 @@ int main(int argc, char *argv[])
         for (curve_info = curve_list;
              curve_info->grp_id != MBEDTLS_ECP_DP_NONE;
              curve_info++) {
+            const unsigned char *p_srv;
+
             if (!mbedtls_ecdh_can_do(curve_info->grp_id)) {
                 continue;
             }
@@ -1239,7 +1243,7 @@ int main(int argc, char *argv[])
             CHECK_AND_CONTINUE(mbedtls_ecdh_make_params(&ecdh_srv, &params_len, buf_srv,
                                                         sizeof(buf_srv), myrand, NULL));
 
-            const unsigned char *p_srv = buf_srv;
+            p_srv = buf_srv;
             CHECK_AND_CONTINUE(mbedtls_ecdh_read_params(&ecdh_cli, &p_srv,
                                                         p_srv + params_len));
             CHECK_AND_CONTINUE(mbedtls_ecdh_make_public(&ecdh_cli, &publen, buf_cli,

@@ -27,7 +27,7 @@ const unsigned char psk[] = {
 };
 const char psk_id[] = "Client_identity";
 #endif
-#endif // MBEDTLS_SSL_SRV_C && MBEDTLS_ENTROPY_C && MBEDTLS_CTR_DRBG_C
+#endif /* MBEDTLS_SSL_SRV_C && MBEDTLS_ENTROPY_C && MBEDTLS_CTR_DRBG_C */
 
 
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
@@ -48,7 +48,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
     fuzzBufferOffset_t biomemfuzz;
     uint8_t options;
 
-    //we take 1 byte as options input
+    /*we take 1 byte as options input */
     if (Size < 1) {
         return 0;
     }
@@ -178,7 +178,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
     mbedtls_ssl_session_reset(&ssl);
     ret = mbedtls_ssl_handshake(&ssl);
     if (ret == 0) {
-        //keep reading data from server until the end
+        /*keep reading data from server until the end */
         do {
             len = sizeof(buf) - 1;
             ret = mbedtls_ssl_read(&ssl, buf, len);
@@ -186,7 +186,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
             if (ret == MBEDTLS_ERR_SSL_WANT_READ) {
                 continue;
             } else if (ret <= 0) {
-                //EOF or error
+                /*EOF or error */
                 break;
             }
         } while (1);

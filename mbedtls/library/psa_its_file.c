@@ -177,15 +177,15 @@ psa_status_t psa_its_set(psa_storage_uid_t uid,
                          const void *p_data,
                          psa_storage_create_flags_t create_flags)
 {
-    if (uid == 0) {
-        return PSA_ERROR_INVALID_HANDLE;
-    }
-
     psa_status_t status = PSA_ERROR_STORAGE_FAILURE;
     char filename[PSA_ITS_STORAGE_FILENAME_LENGTH];
     FILE *stream = NULL;
     psa_its_file_header_t header;
     size_t n;
+
+    if (uid == 0) {
+        return PSA_ERROR_INVALID_HANDLE;
+    }
 
     memcpy(header.magic, PSA_ITS_MAGIC_STRING, PSA_ITS_MAGIC_LENGTH);
     MBEDTLS_PUT_UINT32_LE(data_length, header.size, 0);

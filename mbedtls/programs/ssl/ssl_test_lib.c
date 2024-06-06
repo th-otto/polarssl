@@ -54,7 +54,7 @@ static int dummy_entropy(void *data, unsigned char *output, size_t len)
 
     ret = mbedtls_entropy_func(data, output, len);
     for (i = 0; i < len; i++) {
-        //replace result with pseudo random
+        /*replace result with pseudo random */
         output[i] = (unsigned char) rand();
     }
     return ret;
@@ -107,8 +107,10 @@ int rng_seed(rng_context_t *rng, int reproducible, const char *pers)
         srand(1);
     }
 
+    {
+    int ret;
 #if defined(MBEDTLS_CTR_DRBG_C)
-    int ret = mbedtls_ctr_drbg_seed(&rng->drbg,
+    ret = mbedtls_ctr_drbg_seed(&rng->drbg,
                                     f_entropy, &rng->entropy,
                                     (const unsigned char *) pers,
                                     strlen(pers));
@@ -120,7 +122,7 @@ int rng_seed(rng_context_t *rng, int reproducible, const char *pers)
 #else
 #error "No message digest available for HMAC_DRBG"
 #endif
-    int ret = mbedtls_hmac_drbg_seed(&rng->drbg,
+    ret = mbedtls_hmac_drbg_seed(&rng->drbg,
                                      mbedtls_md_info_from_type(md_type),
                                      f_entropy, &rng->entropy,
                                      (const unsigned char *) pers,
@@ -133,6 +135,7 @@ int rng_seed(rng_context_t *rng, int reproducible, const char *pers)
         mbedtls_printf(" failed\n  ! mbedtls_ctr_drbg_seed returned -0x%x\n",
                        (unsigned int) -ret);
         return ret;
+    }
     }
 #endif /* !MBEDTLS_TEST_USE_PSA_CRYPTO_RNG */
 
@@ -576,11 +579,12 @@ static const struct {
 
 static uint16_t mbedtls_ssl_get_curve_tls_id_from_name(const char *name)
 {
+	int i;
     if (name == NULL) {
         return 0;
     }
 
-    for (int i = 0; tls_id_group_name_table[i].tls_id != 0; i++) {
+    for (i = 0; tls_id_group_name_table[i].tls_id != 0; i++) {
         if (strcmp(tls_id_group_name_table[i].name, name) == 0) {
             return tls_id_group_name_table[i].tls_id;
         }
@@ -591,7 +595,8 @@ static uint16_t mbedtls_ssl_get_curve_tls_id_from_name(const char *name)
 
 static void mbedtls_ssl_print_supported_groups_list(void)
 {
-    for (int i = 0; tls_id_group_name_table[i].tls_id != 0; i++) {
+	int i;
+    for (i = 0; tls_id_group_name_table[i].tls_id != 0; i++) {
         if (tls_id_group_name_table[i].is_supported == 1) {
             mbedtls_printf("%s ", tls_id_group_name_table[i].name);
         }

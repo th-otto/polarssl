@@ -224,8 +224,8 @@ static void *buffer_alloc_calloc(size_t n, size_t size)
         len += MBEDTLS_MEMORY_ALIGN_MULTIPLE;
     }
 
-    // Find block that fits
-    //
+    /* Find block that fits */
+    /* */
     while (cur != NULL) {
         if (cur->size >= len) {
             break;
@@ -250,14 +250,14 @@ static void *buffer_alloc_calloc(size_t n, size_t size)
     heap.alloc_count++;
 #endif
 
-    // Found location, split block if > memory_header + 4 room left
-    //
+    /* Found location, split block if > memory_header + 4 room left */
+    /* */
     if (cur->size - len < sizeof(memory_header) +
         MBEDTLS_MEMORY_ALIGN_MULTIPLE) {
         cur->alloc = 1;
 
-        // Remove from free_list
-        //
+        /* Remove from free_list */
+        /* */
         if (cur->prev_free != NULL) {
             cur->prev_free->next_free = cur->next_free;
         } else {
@@ -311,8 +311,8 @@ static void *buffer_alloc_calloc(size_t n, size_t size)
         new->next->prev = new;
     }
 
-    // Replace cur with new in free_list
-    //
+    /* Replace cur with new in free_list */
+    /* */
     new->prev_free = cur->prev_free;
     new->next_free = cur->next_free;
     if (new->prev_free != NULL) {
@@ -402,8 +402,8 @@ static void buffer_alloc_free(void *ptr)
     hdr->trace_count = 0;
 #endif
 
-    // Regroup with block before
-    //
+    /* Regroup with block before */
+    /* */
     if (hdr->prev != NULL && hdr->prev->alloc == 0) {
 #if defined(MBEDTLS_MEMORY_DEBUG)
         heap.header_count--;
@@ -420,8 +420,8 @@ static void buffer_alloc_free(void *ptr)
         memset(old, 0, sizeof(memory_header));
     }
 
-    // Regroup with block after
-    //
+    /* Regroup with block after */
+    /* */
     if (hdr->next != NULL && hdr->next->alloc == 0) {
 #if defined(MBEDTLS_MEMORY_DEBUG)
         heap.header_count--;
@@ -462,9 +462,9 @@ static void buffer_alloc_free(void *ptr)
         memset(old, 0, sizeof(memory_header));
     }
 
-    // Prepend to free_list if we have not merged
-    // (Does not have to stay in same order as prev / next list)
-    //
+    /* Prepend to free_list if we have not merged */
+    /* (Does not have to stay in same order as prev / next list) */
+    /* */
     if (old == NULL) {
         hdr->next_free = heap.first_free;
         if (heap.first_free != NULL) {

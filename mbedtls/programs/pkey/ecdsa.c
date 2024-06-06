@@ -80,7 +80,6 @@ int main(int argc, char *argv[])
     int exit_code = MBEDTLS_EXIT_FAILURE;
     mbedtls_ecdsa_context ctx_sign, ctx_verify;
     mbedtls_ecp_point Q;
-    mbedtls_ecp_point_init(&Q);
     mbedtls_entropy_context entropy;
     mbedtls_ctr_drbg_context ctr_drbg;
     unsigned char message[100];
@@ -88,8 +87,12 @@ int main(int argc, char *argv[])
     unsigned char sig[MBEDTLS_ECDSA_MAX_LEN];
     size_t sig_len;
     const char *pers = "ecdsa";
+    mbedtls_ecp_group_id grp_id;
+    const mbedtls_ecp_curve_info *curve_info;
+
     ((void) argv);
 
+    mbedtls_ecp_point_init(&Q);
     mbedtls_ecdsa_init(&ctx_sign);
     mbedtls_ecdsa_init(&ctx_verify);
     mbedtls_ctr_drbg_init(&ctr_drbg);
@@ -130,8 +133,8 @@ int main(int argc, char *argv[])
         goto exit;
     }
 
-    mbedtls_ecp_group_id grp_id = mbedtls_ecp_keypair_get_group_id(&ctx_sign);
-    const mbedtls_ecp_curve_info *curve_info =
+    grp_id = mbedtls_ecp_keypair_get_group_id(&ctx_sign);
+    curve_info =
         mbedtls_ecp_curve_info_from_grp_id(grp_id);
     mbedtls_printf(" ok (key size: %d bits)\n", (int) curve_info->bit_size);
 

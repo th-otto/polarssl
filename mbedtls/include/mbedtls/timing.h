@@ -20,8 +20,8 @@ extern "C" {
 #endif
 
 #if !defined(MBEDTLS_TIMING_ALT)
-// Regular implementation
-//
+/* Regular implementation */
+
 
 /**
  * \brief          timer structure

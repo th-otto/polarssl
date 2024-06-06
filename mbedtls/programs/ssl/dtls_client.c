@@ -37,7 +37,9 @@ int main(void)
 #include "test/certs.h"
 
 /* Uncomment out the following line to default to IPv4 and disable IPv6 */
-//#define FORCE_IPV4
+#ifdef __MINT__
+#define FORCE_IPV4
+#endif
 
 #define SERVER_PORT "4433"
 #define SERVER_NAME "localhost"

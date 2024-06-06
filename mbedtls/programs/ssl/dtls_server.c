@@ -10,7 +10,9 @@
 #include "mbedtls/platform.h"
 
 /* Uncomment out the following line to default to IPv4 and disable IPv6 */
-//#define FORCE_IPV4
+#ifdef __MINT__
+#define FORCE_IPV4
+#endif
 
 #ifdef FORCE_IPV4
 #define BIND_IP     "0.0.0.0"     /* Forces IPv4 */

@@ -554,10 +554,22 @@ static int CDECL ldg_gethostbyname(const char *hostname, char **realname, uint32
 		hp = gethostbyname(hostname);
 		if (hp)
 		{
+			if (alist)
+			{
+				size_t i;
+
+				for (i = 0; i < lsize && hp->h_addr_list[i]; i++)
+				{
+					if (hp->h_length == sizeof(*alist) && hp->h_addrtype == AF_INET)
+						memcpy(&alist[i], hp->h_addr_list[i], hp->h_length);
+					else
+						alist[i] = 0;
+				}
+				for (; i < lsize; i++)
+					alist[i] = 0;
+			}
 			if (realname && hp->h_aliases && hp->h_aliases[0])
 				*realname = strdup(hp->h_aliases[0]);
-			if (lsize > 0)
-				memcpy(alist, hp->h_addr, hp->h_length);
 			return 0;
 		}
 		return netdb_errno(h_errno);

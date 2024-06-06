@@ -444,7 +444,9 @@ void mbedtls_asn1_free_named_data_list(mbedtls_asn1_named_data **head)
 
 void mbedtls_asn1_free_named_data_list_shallow(mbedtls_asn1_named_data *name)
 {
-    for (mbedtls_asn1_named_data *next; name != NULL; name = next) {
+	mbedtls_asn1_named_data *next;
+
+    for (; name != NULL; name = next) {
         next = name->next;
         mbedtls_free(name);
     }

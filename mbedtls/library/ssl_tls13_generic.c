@@ -808,6 +808,7 @@ int mbedtls_ssl_tls13_process_certificate(mbedtls_ssl_context *ssl)
     MBEDTLS_SSL_DEBUG_MSG(2, ("=> parse certificate"));
 
 #if defined(MBEDTLS_SSL_TLS1_3_KEY_EXCHANGE_MODE_EPHEMERAL_ENABLED)
+	{
     unsigned char *buf;
     size_t buf_len;
 
@@ -823,6 +824,7 @@ int mbedtls_ssl_tls13_process_certificate(mbedtls_ssl_context *ssl)
 
     MBEDTLS_SSL_PROC_CHK(mbedtls_ssl_add_hs_msg_to_checksum(
                              ssl, MBEDTLS_SSL_HS_CERTIFICATE, buf, buf_len));
+	}
 
 cleanup:
 #else /* MBEDTLS_SSL_TLS1_3_KEY_EXCHANGE_MODE_EPHEMERAL_ENABLED */
@@ -843,7 +845,7 @@ cleanup:
  *    struct {
  *        select (certificate_type) {
  *            case RawPublicKey:
- *              // From RFC 7250 ASN.1_subjectPublicKeyInfo
+ *              / / From RFC 7250 ASN.1_subjectPublicKeyInfo
  *              opaque ASN1_subjectPublicKeyInfo<1..2^24-1>;
  *
  *            case X509:
@@ -1568,10 +1570,11 @@ int mbedtls_ssl_tls13_read_public_xxdhe_share(mbedtls_ssl_context *ssl,
     uint8_t *p = (uint8_t *) buf;
     const uint8_t *end = buf + buf_len;
     mbedtls_ssl_handshake_params *handshake = ssl->handshake;
+	uint16_t peerkey_len;
 
     /* Get size of the TLS opaque key_exchange field of the KeyShareEntry struct. */
     MBEDTLS_SSL_CHK_BUF_READ_PTR(p, end, 2);
-    uint16_t peerkey_len = MBEDTLS_GET_UINT16_BE(p, 0);
+    peerkey_len = MBEDTLS_GET_UINT16_BE(p, 0);
     p += 2;
 
     /* Check if key size is consistent with given buffer length. */

@@ -95,6 +95,8 @@ void aes_ctr(data_t *key, data_t *ictr, data_t *pt, data_t *ct, int expected)
     unsigned char ctr[16];
     unsigned char stream_block[16];
     mbedtls_aes_context ctx;
+    size_t len;
+    int i;
 
     // sanity checks on test input
     TEST_ASSERT(pt->len == ct->len);
@@ -103,16 +105,16 @@ void aes_ctr(data_t *key, data_t *ictr, data_t *pt, data_t *ct, int expected)
     TEST_CALLOC(output, pt->len);
 
     // expected result is always success on zero-length input, so skip len == 0 if expecting failure
-    for (size_t len = (expected == 0 ? 0 : 1); len <= pt->len; len++) {
-        for (int i = 0; i < 2; i++) {
+    for (len = (expected == 0 ? 0 : 1); len <= pt->len; len++) {
+        for (i = 0; i < 2; i++) {
+            size_t nc_off = 0;
+
             mbedtls_aes_init(&ctx);
             TEST_ASSERT(mbedtls_aes_setkey_enc(&ctx, key->x, key->len * 8) == 0);
 
             memcpy(ctr, ictr->x, 16);
             memset(stream_block, 0, 16);
             memset(output, 0, pt->len);
-
-            size_t nc_off = 0;
 
             if (i == 0) {
                 // encrypt
@@ -147,6 +149,8 @@ void aes_encrypt_ctr_multipart(int length, int step_size)
     unsigned char *output_b = NULL;
     mbedtls_aes_context ctx;
     size_t nc_off_a, nc_off_b;
+    size_t remaining;
+    unsigned char *ip, *op;
 
     TEST_ASSERT(length >= 0);
     TEST_ASSERT(step_size > 0);
@@ -179,8 +183,9 @@ void aes_encrypt_ctr_multipart(int length, int step_size)
     memset(ctr_b, 0, sizeof(ctr_b));
     memset(stream_block_b, 0, sizeof(stream_block_b));
     nc_off_b = 0;
-    size_t remaining = length;
-    unsigned char *ip = input, *op = output_b;
+    remaining = length;
+    ip = input;
+    op = output_b;
     while (remaining != 0) {
         size_t l = MIN(remaining, (size_t) step_size);
         step_size *= 2;
@@ -555,14 +560,17 @@ void aes_invalid_mode()
 #endif /* MBEDTLS_CIPHER_MODE_CBC */
 
 #if defined(MBEDTLS_CIPHER_MODE_XTS)
+    {
     mbedtls_aes_xts_context xts_ctx;
 
     TEST_EQUAL(MBEDTLS_ERR_AES_BAD_INPUT_DATA,
                mbedtls_aes_crypt_xts(&xts_ctx, invalid_mode, 16,
                                      in, in, out));
+    }
 #endif /* MBEDTLS_CIPHER_MODE_XTS */
 
 #if defined(MBEDTLS_CIPHER_MODE_CFB)
+    {
     size_t size;
 
     TEST_EQUAL(MBEDTLS_ERR_AES_BAD_INPUT_DATA,
@@ -571,6 +579,7 @@ void aes_invalid_mode()
     TEST_EQUAL(MBEDTLS_ERR_AES_BAD_INPUT_DATA,
                mbedtls_aes_crypt_cfb8(&aes_ctx, invalid_mode, 16,
                                       out, in, out));
+    }
 #endif /* MBEDTLS_CIPHER_MODE_CFB */
 }
 /* END_CASE */

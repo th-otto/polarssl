@@ -1987,6 +1987,9 @@ static int ssl_get_ecdh_params_from_cert(mbedtls_ssl_context *ssl)
 {
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
     mbedtls_pk_context *peer_pk;
+#if !defined(MBEDTLS_PK_USE_PSA_EC_DATA)
+    const mbedtls_ecp_keypair *peer_key;
+#endif /* !defined(MBEDTLS_PK_USE_PSA_EC_DATA) */
 
 #if !defined(MBEDTLS_SSL_KEEP_PEER_CERTIFICATE)
     peer_pk = &ssl->handshake->peer_pubkey;
@@ -2007,7 +2010,7 @@ static int ssl_get_ecdh_params_from_cert(mbedtls_ssl_context *ssl)
     }
 
 #if !defined(MBEDTLS_PK_USE_PSA_EC_DATA)
-    const mbedtls_ecp_keypair *peer_key = mbedtls_pk_ec_ro(*peer_pk);
+    peer_key = mbedtls_pk_ec_ro(*peer_pk);
 #endif /* !defined(MBEDTLS_PK_USE_PSA_EC_DATA) */
 
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
@@ -2607,10 +2610,13 @@ static int ssl_parse_certificate_request(mbedtls_ssl_context *ssl)
 
 #if defined(MBEDTLS_DEBUG_C)
     sig_alg = buf + mbedtls_ssl_hs_hdr_len(ssl) + 3 + n;
-    for (size_t i = 0; i < sig_alg_len; i += 2) {
+    {
+    size_t i;
+    for (i = 0; i < sig_alg_len; i += 2) {
         MBEDTLS_SSL_DEBUG_MSG(3,
                               ("Supported Signature Algorithm found: %02x %02x",
                                sig_alg[i], sig_alg[i + 1]));
+    }
     }
 #endif
 
@@ -2628,8 +2634,10 @@ static int ssl_parse_certificate_request(mbedtls_ssl_context *ssl)
     }
 
 #if defined(MBEDTLS_DEBUG_C)
+	{
+	size_t i, dni_len;
     dn = buf + mbedtls_ssl_hs_hdr_len(ssl) + 3 + n - dn_len;
-    for (size_t i = 0, dni_len = 0; i < dn_len; i += 2 + dni_len) {
+    for (i = 0, dni_len = 0; i < dn_len; i += 2 + dni_len) {
         unsigned char *p = dn + i + 2;
         mbedtls_x509_name name;
         size_t asn1_len;
@@ -2651,6 +2659,7 @@ static int ssl_parse_certificate_request(mbedtls_ssl_context *ssl)
                               ("DN hint: %.*s",
                                mbedtls_x509_dn_gets(s, sizeof(s), &name), s));
         mbedtls_asn1_free_named_data_list_shallow(name.next);
+    }
     }
 #endif
 

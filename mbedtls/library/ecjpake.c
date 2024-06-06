@@ -587,7 +587,7 @@ int mbedtls_ecjpake_read_round_two(mbedtls_ecjpake_context *ctx,
 
     /*
      * struct {
-     *     ECParameters curve_params;   // only client reading server msg
+     *     ECParameters curve_params;   only client reading server msg
      *     ECJPAKEKeyKP ecjpake_key_kp;
      * } Client/ServerECJPAKEParams;
      */
@@ -683,7 +683,7 @@ int mbedtls_ecjpake_write_round_two(mbedtls_ecjpake_context *ctx,
      * Now write things out
      *
      * struct {
-     *     ECParameters curve_params;   // only server writing its message
+     *     ECParameters curve_params;   only server writing its message
      *     ECJPAKEKeyKP ecjpake_key_kp;
      * } Client/ServerECJPAKEParams;
      */
@@ -987,10 +987,11 @@ static const unsigned char ecjpake_test_pms[] = {
 static int self_test_rng(void *ctx, unsigned char *out, size_t len)
 {
     static uint32_t state = 42;
+	size_t i;
 
     (void) ctx;
 
-    for (size_t i = 0; i < len; i++) {
+    for (i = 0; i < len; i++) {
         state = state * 1664525u + 1013904223u;
         out[i] = (unsigned char) state;
     }

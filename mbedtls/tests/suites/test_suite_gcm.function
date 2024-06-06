@@ -499,9 +499,9 @@ exit:
 void gcm_invalid_iv_len(void)
 {
     mbedtls_gcm_context ctx;
-    mbedtls_gcm_init(&ctx);
     uint8_t b16[16] = { 0 };
 
+    mbedtls_gcm_init(&ctx);
     BLOCK_CIPHER_PSA_INIT();
 
     // Invalid IV length 0
@@ -528,13 +528,15 @@ void gcm_add_len_too_long(void)
     // Only testable on platforms where sizeof(size_t) >= 8.
 #if SIZE_MAX >= UINT64_MAX
     mbedtls_gcm_context ctx;
-    mbedtls_gcm_init(&ctx);
     uint8_t b16[16] = { 0 };
+    uint64_t len_max;
+
+    mbedtls_gcm_init(&ctx);
     BLOCK_CIPHER_PSA_INIT();
 
     /* NISP SP 800-38D, Section 5.2.1.1 requires that bit length of AD should
      * be <= 2^64 - 1, ie < 2^64. This is the minimum invalid length in bytes. */
-    uint64_t len_max = 1ULL << 61;
+    len_max = 1ULL << 61;
 
     gcm_reset_ctx(&ctx, b16, sizeof(b16) * 8, b16, sizeof(b16), 0);
     // Feed AD that just exceeds the length limit
@@ -570,12 +572,14 @@ void gcm_input_len_too_long(void)
     uint8_t b16[16] = { 0 };
     uint8_t out[1];
     size_t out_len;
+    uint64_t len_max;
+
     mbedtls_gcm_init(&ctx);
     BLOCK_CIPHER_PSA_INIT();
 
     /* NISP SP 800-38D, Section 5.2.1.1 requires that bit length of input should
      * be <= 2^39 - 256. This is the maximum valid length in bytes. */
-    uint64_t len_max = (1ULL << 36) - 32;
+    len_max = (1ULL << 36) - 32;
 
     gcm_reset_ctx(&ctx, b16, sizeof(b16) * 8, b16, sizeof(b16), 0);
     // Feed input that just exceeds the length limit

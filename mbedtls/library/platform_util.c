@@ -37,7 +37,7 @@
 #include <windows.h>
 #endif
 
-// Detect platforms known to support explicit_bzero()
+/* Detect platforms known to support explicit_bzero() */
 #if defined(__GLIBC__) && (__GLIBC__ >= 2) && (__GLIBC_MINOR__ >= 25)
 #define MBEDTLS_PLATFORM_HAS_EXPLICIT_BZERO 1
 #elif (defined(__FreeBSD__) && (__FreeBSD_version >= 1100037)) || defined(__OpenBSD__)

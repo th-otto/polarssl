@@ -4927,27 +4927,27 @@ int mbedtls_ecp_mod_p192_raw(mbedtls_mpi_uint *Np, size_t Nn)
     p = Np;
     end = p + Nn;
 
-    ADD(3); ADD(5);         NEXT;   // A0 += A3 + A5
-    ADD(3); ADD(4); ADD(5); NEXT;   // A1 += A3 + A4 + A5
-    ADD(4); ADD(5);                 // A2 += A4 + A5
+    ADD(3); ADD(5);         NEXT;   /* A0 += A3 + A5 */
+    ADD(3); ADD(4); ADD(5); NEXT;   /* A1 += A3 + A4 + A5 */
+    ADD(4); ADD(5);                 /* A2 += A4 + A5 */
 
     RESET;
 
     /* Use the reduction for the carry as well:
      * 2^192 * last_carry = 2^64 * last_carry + last_carry mod P192
      * It can generate a carry. */
-    ADD_LAST; NEXT;                 // A0 += last_carry
-    ADD_LAST; NEXT;                 // A1 += last_carry
-                                    // A2 += carry
+    ADD_LAST; NEXT;                 /* A0 += last_carry */
+    ADD_LAST; NEXT;                 /* A1 += last_carry */
+                                    /* A2 += carry */
 
     RESET;
 
     /* Use the reduction for the carry as well:
      * 2^192 * last_carry = 2^64 * last_carry + last_carry mod P192
      */
-    ADD_LAST; NEXT;                 // A0 += last_carry
-    ADD_LAST; NEXT;                 // A1 += last_carry
-                                    // A2 += carry
+    ADD_LAST; NEXT;                 /* A0 += last_carry */
+    ADD_LAST; NEXT;                 /* A1 += last_carry */
+                                    /* A2 += carry */
 
     LAST;
 
@@ -5082,24 +5082,24 @@ int mbedtls_ecp_mod_p224_raw(mbedtls_mpi_uint *X, size_t X_limbs)
 
     INIT(224);
 
-    SUB(7);  SUB(11);           NEXT;   // A0 += -A7  - A11
-    SUB(8);  SUB(12);           NEXT;   // A1 += -A8  - A12
-    SUB(9);  SUB(13);           NEXT;   // A2 += -A9  - A13
-    SUB(10); ADD(7);  ADD(11);  NEXT;   // A3 += -A10 + A7 + A11
-    SUB(11); ADD(8);  ADD(12);  NEXT;   // A4 += -A11 + A8 + A12
-    SUB(12); ADD(9);  ADD(13);  NEXT;   // A5 += -A12 + A9 + A13
-    SUB(13); ADD(10);                   // A6 += -A13 + A10
+    SUB(7);  SUB(11);           NEXT;   /* A0 += -A7  - A11 */
+    SUB(8);  SUB(12);           NEXT;   /* A1 += -A8  - A12 */
+    SUB(9);  SUB(13);           NEXT;   /* A2 += -A9  - A13 */
+    SUB(10); ADD(7);  ADD(11);  NEXT;   /* A3 += -A10 + A7 + A11 */
+    SUB(11); ADD(8);  ADD(12);  NEXT;   /* A4 += -A11 + A8 + A12 */
+    SUB(12); ADD(9);  ADD(13);  NEXT;   /* A5 += -A12 + A9 + A13 */
+    SUB(13); ADD(10);                   /* A6 += -A13 + A10 */
 
     RESET;
 
     /* Use 2^224 = P + 2^96 - 1 to modulo reduce the final carry */
-    SUB_LAST; NEXT;                     // A0 -= last_c
-    ;         NEXT;                     // A1
-    ;         NEXT;                     // A2
-    ADD_LAST; NEXT;                     // A3 += last_c
-    ;         NEXT;                     // A4
-    ;         NEXT;                     // A5
-                                        // A6
+    SUB_LAST; NEXT;                     /* A0 -= last_c */
+    ;         NEXT;                     /* A1 */
+    ;         NEXT;                     /* A2 */
+    ADD_LAST; NEXT;                     /* A3 += last_c */
+    ;         NEXT;                     /* A4 */
+    ;         NEXT;                     /* A5 */
+                                        /* A6 */
 
     /* The carry reduction cannot generate a carry
      * (see commit 73e8553 for details)*/
@@ -5136,54 +5136,54 @@ int mbedtls_ecp_mod_p256_raw(mbedtls_mpi_uint *X, size_t X_limbs)
     INIT(256);
 
     ADD(8);  ADD(9);
-    SUB(11); SUB(12); SUB(13); SUB(14);                   NEXT; // A0
+    SUB(11); SUB(12); SUB(13); SUB(14);                   NEXT; /* A0 */
 
     ADD(9);  ADD(10);
-    SUB(12); SUB(13); SUB(14); SUB(15);                   NEXT; // A1
+    SUB(12); SUB(13); SUB(14); SUB(15);                   NEXT; /* A1 */
 
     ADD(10); ADD(11);
-    SUB(13); SUB(14); SUB(15);                            NEXT; // A2
+    SUB(13); SUB(14); SUB(15);                            NEXT; /* A2 */
 
     ADD(11); ADD(11); ADD(12); ADD(12); ADD(13);
-    SUB(15); SUB(8);  SUB(9);                             NEXT; // A3
+    SUB(15); SUB(8);  SUB(9);                             NEXT; /* A3 */
 
     ADD(12); ADD(12); ADD(13); ADD(13); ADD(14);
-    SUB(9);  SUB(10);                                     NEXT; // A4
+    SUB(9);  SUB(10);                                     NEXT; /* A4 */
 
     ADD(13); ADD(13); ADD(14); ADD(14); ADD(15);
-    SUB(10); SUB(11);                                     NEXT; // A5
+    SUB(10); SUB(11);                                     NEXT; /* A5 */
 
     ADD(14); ADD(14); ADD(15); ADD(15); ADD(14); ADD(13);
-    SUB(8);  SUB(9);                                      NEXT; // A6
+    SUB(8);  SUB(9);                                      NEXT; /* A6 */
 
     ADD(15); ADD(15); ADD(15); ADD(8);
-    SUB(10); SUB(11); SUB(12); SUB(13);                         // A7
+    SUB(10); SUB(11); SUB(12); SUB(13);                         /* A7 */
 
     RESET;
 
     /* Use 2^224 * (2^32 - 1) + 2^192 + 2^96 - 1
      * to modulo reduce the final carry. */
-    ADD_LAST; NEXT;                                             // A0
-    ;         NEXT;                                             // A1
-    ;         NEXT;                                             // A2
-    SUB_LAST; NEXT;                                             // A3
-    ;         NEXT;                                             // A4
-    ;         NEXT;                                             // A5
-    SUB_LAST; NEXT;                                             // A6
-    ADD_LAST;                                                   // A7
+    ADD_LAST; NEXT;                                             /* A0 */
+    ;         NEXT;                                             /* A1 */
+    ;         NEXT;                                             /* A2 */
+    SUB_LAST; NEXT;                                             /* A3 */
+    ;         NEXT;                                             /* A4 */
+    ;         NEXT;                                             /* A5 */
+    SUB_LAST; NEXT;                                             /* A6 */
+    ADD_LAST;                                                   /* A7 */
 
     RESET;
 
     /* Use 2^224 * (2^32 - 1) + 2^192 + 2^96 - 1
      * to modulo reduce the carry generated by the previous reduction. */
-    ADD_LAST; NEXT;                                             // A0
-    ;         NEXT;                                             // A1
-    ;         NEXT;                                             // A2
-    SUB_LAST; NEXT;                                             // A3
-    ;         NEXT;                                             // A4
-    ;         NEXT;                                             // A5
-    SUB_LAST; NEXT;                                             // A6
-    ADD_LAST;                                                   // A7
+    ADD_LAST; NEXT;                                             /* A0 */
+    ;         NEXT;                                             /* A1 */
+    ;         NEXT;                                             /* A2 */
+    SUB_LAST; NEXT;                                             /* A3 */
+    ;         NEXT;                                             /* A4 */
+    ;         NEXT;                                             /* A5 */
+    SUB_LAST; NEXT;                                             /* A6 */
+    ADD_LAST;                                                   /* A7 */
 
     LAST;
 
@@ -5216,71 +5216,71 @@ int mbedtls_ecp_mod_p384_raw(mbedtls_mpi_uint *X, size_t X_limbs)
     INIT(384);
 
     ADD(12); ADD(21); ADD(20);
-    SUB(23);                                                NEXT; // A0
+    SUB(23);                                                NEXT; /* A0 */
 
     ADD(13); ADD(22); ADD(23);
-    SUB(12); SUB(20);                                       NEXT; // A1
+    SUB(12); SUB(20);                                       NEXT; /* A1 */
 
     ADD(14); ADD(23);
-    SUB(13); SUB(21);                                       NEXT; // A2
+    SUB(13); SUB(21);                                       NEXT; /* A2 */
 
     ADD(15); ADD(12); ADD(20); ADD(21);
-    SUB(14); SUB(22); SUB(23);                              NEXT; // A3
+    SUB(14); SUB(22); SUB(23);                              NEXT; /* A3 */
 
     ADD(21); ADD(21); ADD(16); ADD(13); ADD(12); ADD(20); ADD(22);
-    SUB(15); SUB(23); SUB(23);                              NEXT; // A4
+    SUB(15); SUB(23); SUB(23);                              NEXT; /* A4 */
 
     ADD(22); ADD(22); ADD(17); ADD(14); ADD(13); ADD(21); ADD(23);
-    SUB(16);                                                NEXT; // A5
+    SUB(16);                                                NEXT; /* A5 */
 
     ADD(23); ADD(23); ADD(18); ADD(15); ADD(14); ADD(22);
-    SUB(17);                                                NEXT; // A6
+    SUB(17);                                                NEXT; /* A6 */
 
     ADD(19); ADD(16); ADD(15); ADD(23);
-    SUB(18);                                                NEXT; // A7
+    SUB(18);                                                NEXT; /* A7 */
 
     ADD(20); ADD(17); ADD(16);
-    SUB(19);                                                NEXT; // A8
+    SUB(19);                                                NEXT; /* A8 */
 
     ADD(21); ADD(18); ADD(17);
-    SUB(20);                                                NEXT; // A9
+    SUB(20);                                                NEXT; /* A9 */
 
     ADD(22); ADD(19); ADD(18);
-    SUB(21);                                                NEXT; // A10
+    SUB(21);                                                NEXT; /* A10 */
 
     ADD(23); ADD(20); ADD(19);
-    SUB(22);                                                      // A11
+    SUB(22);                                                      /* A11 */
 
     RESET;
 
     /* Use 2^384 = P + 2^128 + 2^96 - 2^32 + 1 to modulo reduce the final carry */
-    ADD_LAST; NEXT;                                               // A0
-    SUB_LAST; NEXT;                                               // A1
-    ;         NEXT;                                               // A2
-    ADD_LAST; NEXT;                                               // A3
-    ADD_LAST; NEXT;                                               // A4
-    ;         NEXT;                                               // A5
-    ;         NEXT;                                               // A6
-    ;         NEXT;                                               // A7
-    ;         NEXT;                                               // A8
-    ;         NEXT;                                               // A9
-    ;         NEXT;                                               // A10
-                                                                  // A11
+    ADD_LAST; NEXT;                                               /* A0 */
+    SUB_LAST; NEXT;                                               /* A1 */
+    ;         NEXT;                                               /* A2 */
+    ADD_LAST; NEXT;                                               /* A3 */
+    ADD_LAST; NEXT;                                               /* A4 */
+    ;         NEXT;                                               /* A5 */
+    ;         NEXT;                                               /* A6 */
+    ;         NEXT;                                               /* A7 */
+    ;         NEXT;                                               /* A8 */
+    ;         NEXT;                                               /* A9 */
+    ;         NEXT;                                               /* A10 */
+                                                                  /* A11 */
 
     RESET;
 
-    ADD_LAST; NEXT;                                               // A0
-    SUB_LAST; NEXT;                                               // A1
-    ;         NEXT;                                               // A2
-    ADD_LAST; NEXT;                                               // A3
-    ADD_LAST; NEXT;                                               // A4
-    ;         NEXT;                                               // A5
-    ;         NEXT;                                               // A6
-    ;         NEXT;                                               // A7
-    ;         NEXT;                                               // A8
-    ;         NEXT;                                               // A9
-    ;         NEXT;                                               // A10
-                                                                  // A11
+    ADD_LAST; NEXT;                                               /* A0 */
+    SUB_LAST; NEXT;                                               /* A1 */
+    ;         NEXT;                                               /* A2 */
+    ADD_LAST; NEXT;                                               /* A3 */
+    ADD_LAST; NEXT;                                               /* A4 */
+    ;         NEXT;                                               /* A5 */
+    ;         NEXT;                                               /* A6 */
+    ;         NEXT;                                               /* A7 */
+    ;         NEXT;                                               /* A8 */
+    ;         NEXT;                                               /* A9 */
+    ;         NEXT;                                               /* A10 */
+                                                                  /* A11 */
 
     LAST;
 
@@ -5625,7 +5625,7 @@ cleanup:
  *
  * Write X as A0 + 2^224 A1, return A0 + R * A1.
  */
-#define P_KOBLITZ_R     (8 / sizeof(mbedtls_mpi_uint))            // Limbs in R
+#define P_KOBLITZ_R     (8 / sizeof(mbedtls_mpi_uint))            /* Limbs in R */
 
 static inline int ecp_mod_koblitz(mbedtls_mpi_uint *X,
                                   size_t X_limbs,

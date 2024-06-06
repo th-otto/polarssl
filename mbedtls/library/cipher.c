@@ -843,6 +843,7 @@ static int get_pkcs_padding(unsigned char *input, size_t input_len,
 {
     size_t i, pad_idx;
     unsigned char padding_len;
+	mbedtls_ct_condition_t bad;
 
     if (NULL == input || NULL == data_len) {
         return MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA;
@@ -851,7 +852,7 @@ static int get_pkcs_padding(unsigned char *input, size_t input_len,
     padding_len = input[input_len - 1];
     *data_len = input_len - padding_len;
 
-    mbedtls_ct_condition_t bad = mbedtls_ct_uint_gt(padding_len, input_len);
+    bad = mbedtls_ct_uint_gt(padding_len, input_len);
     bad = mbedtls_ct_bool_or(bad, mbedtls_ct_uint_eq(padding_len, 0));
 
     /* The number of bytes checked must be independent of padding_len,
@@ -886,16 +887,20 @@ static void add_one_and_zeros_padding(unsigned char *output,
 static int get_one_and_zeros_padding(unsigned char *input, size_t input_len,
                                      size_t *data_len)
 {
+    mbedtls_ct_condition_t in_padding;
+    mbedtls_ct_condition_t bad;
+	ptrdiff_t i;
+
     if (NULL == input || NULL == data_len) {
         return MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA;
     }
 
-    mbedtls_ct_condition_t in_padding = MBEDTLS_CT_TRUE;
-    mbedtls_ct_condition_t bad = MBEDTLS_CT_TRUE;
+    in_padding = MBEDTLS_CT_TRUE;
+    bad = MBEDTLS_CT_TRUE;
 
     *data_len = 0;
 
-    for (ptrdiff_t i = (ptrdiff_t) (input_len) - 1; i >= 0; i--) {
+    for (i = (ptrdiff_t) (input_len) - 1; i >= 0; i--) {
         mbedtls_ct_condition_t is_nonzero = mbedtls_ct_bool(input[i]);
 
         mbedtls_ct_condition_t hit_first_nonzero = mbedtls_ct_bool_and(is_nonzero, in_padding);
@@ -1612,16 +1617,19 @@ int mbedtls_cipher_auth_encrypt_ext(mbedtls_cipher_context_t *ctx,
 #endif /* MBEDTLS_NIST_KW_C */
 
 #if defined(MBEDTLS_CIPHER_MODE_AEAD)
+	{
+	int ret;
     /* AEAD case: check length before passing on to shared function */
     if (output_len < ilen + tag_len) {
         return MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA;
     }
 
-    int ret = mbedtls_cipher_aead_encrypt(ctx, iv, iv_len, ad, ad_len,
+    ret = mbedtls_cipher_aead_encrypt(ctx, iv, iv_len, ad, ad_len,
                                           input, ilen, output, olen,
                                           output + ilen, tag_len);
     *olen += tag_len;
     return ret;
+    }
 #else
     return MBEDTLS_ERR_CIPHER_FEATURE_UNAVAILABLE;
 #endif /* MBEDTLS_CIPHER_MODE_AEAD */

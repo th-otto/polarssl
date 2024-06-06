@@ -426,6 +426,8 @@ int mbedtls_pem_read_buffer(mbedtls_pem_context *ctx, const char *header, const 
     }
 
     if (enc != 0) {
+        size_t unpadded_len;
+
 #if defined(PEM_RFC1421)
         if (pwd == NULL) {
             mbedtls_zeroize_and_free(buf, len);
@@ -460,7 +462,6 @@ int mbedtls_pem_read_buffer(mbedtls_pem_context *ctx, const char *header, const 
         /* Check PKCS padding and update data length based on padding info.
          * This can be used to detect invalid padding data and password
          * mismatches. */
-        size_t unpadded_len;
         ret = pem_check_pkcs_padding(buf, len, &unpadded_len);
         if (ret != 0) {
             mbedtls_zeroize_and_free(buf, len);

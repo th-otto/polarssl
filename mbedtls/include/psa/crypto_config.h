@@ -41,7 +41,7 @@
 /*
  * CBC-MAC is not yet supported via the PSA API in Mbed TLS.
  */
-//#define PSA_WANT_ALG_CBC_MAC                    1
+/*#define PSA_WANT_ALG_CBC_MAC                    1 */
 #define PSA_WANT_ALG_CBC_NO_PADDING             1
 #define PSA_WANT_ALG_CBC_PKCS7                  1
 #define PSA_WANT_ALG_CCM                        1
@@ -86,7 +86,7 @@
 
 /* XTS is not yet supported via the PSA API in Mbed TLS.
  * Note: when adding support, also adjust include/mbedtls/config_psa.h */
-//#define PSA_WANT_ALG_XTS                        1
+/*#define PSA_WANT_ALG_XTS                        1 */
 
 #define PSA_WANT_ECC_BRAINPOOL_P_R1_256         1
 #define PSA_WANT_ECC_BRAINPOOL_P_R1_384         1
@@ -99,7 +99,7 @@
  * (https://github.com/Mbed-TLS/mbedtls/issues/3541). Thus, do not enable it by
  * default.
  */
-//#define PSA_WANT_ECC_SECP_K1_224                1
+/*#define PSA_WANT_ECC_SECP_K1_224                1 */
 #define PSA_WANT_ECC_SECP_K1_256                1
 #define PSA_WANT_ECC_SECP_R1_192                1
 #define PSA_WANT_ECC_SECP_R1_224                1
@@ -124,11 +124,11 @@
 #define PSA_WANT_KEY_TYPE_CAMELLIA              1
 #define PSA_WANT_KEY_TYPE_CHACHA20              1
 #define PSA_WANT_KEY_TYPE_DES                   1
-//#define PSA_WANT_KEY_TYPE_ECC_KEY_PAIR          1 /* Deprecated */
+/*#define PSA_WANT_KEY_TYPE_ECC_KEY_PAIR          1 */ /* Deprecated */
 #define PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY        1
 #define PSA_WANT_KEY_TYPE_DH_PUBLIC_KEY         1
 #define PSA_WANT_KEY_TYPE_RAW_DATA              1
-//#define PSA_WANT_KEY_TYPE_RSA_KEY_PAIR          1 /* Deprecated */
+/*#define PSA_WANT_KEY_TYPE_RSA_KEY_PAIR          1 */ /* Deprecated */
 #define PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY        1
 
 /*
@@ -148,12 +148,12 @@
 #define PSA_WANT_KEY_TYPE_RSA_KEY_PAIR_IMPORT   1
 #define PSA_WANT_KEY_TYPE_RSA_KEY_PAIR_EXPORT   1
 #define PSA_WANT_KEY_TYPE_RSA_KEY_PAIR_GENERATE 1
-//#define PSA_WANT_KEY_TYPE_RSA_KEY_PAIR_DERIVE   1 /* Not supported */
+/*#define PSA_WANT_KEY_TYPE_RSA_KEY_PAIR_DERIVE   1 */ /* Not supported */
 
 #define PSA_WANT_KEY_TYPE_DH_KEY_PAIR_BASIC       1
 #define PSA_WANT_KEY_TYPE_DH_KEY_PAIR_IMPORT    1
 #define PSA_WANT_KEY_TYPE_DH_KEY_PAIR_EXPORT    1
 #define PSA_WANT_KEY_TYPE_DH_KEY_PAIR_GENERATE  1
-//#define PSA_WANT_KEY_TYPE_DH_KEY_PAIR_DERIVE    1 /* Not supported */
+/*#define PSA_WANT_KEY_TYPE_DH_KEY_PAIR_DERIVE    1 */ /* Not supported */
 
 #endif /* PSA_CRYPTO_CONFIG_H */

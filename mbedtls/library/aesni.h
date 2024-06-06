@@ -50,13 +50,13 @@
  * Performance is about the same (see #7380).
  * In the long run, we will likely remove the assembly implementation. */
 #if defined(MBEDTLS_AESNI_HAVE_INTRINSICS)
-#define MBEDTLS_AESNI_HAVE_CODE 2 // via intrinsics
+#define MBEDTLS_AESNI_HAVE_CODE 2 /* via intrinsics */
 #elif defined(MBEDTLS_HAVE_ASM) && \
     (defined(__GNUC__) || defined(__clang__)) && defined(MBEDTLS_ARCH_IS_X64)
 /* Can we do AESNI with inline assembly?
  * (Only implemented with gas syntax, only for 64-bit.)
  */
-#define MBEDTLS_AESNI_HAVE_CODE 1 // via assembly
+#define MBEDTLS_AESNI_HAVE_CODE 1 /* via assembly */
 #else
 #error "MBEDTLS_AESNI_C defined, but neither intrinsics nor assembly available"
 #endif

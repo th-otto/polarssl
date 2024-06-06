@@ -23,16 +23,17 @@
 
 int mbedtls_asn1_write_len(unsigned char **p, const unsigned char *start, size_t len)
 {
+    int required = 1;
+
 #if SIZE_MAX > 0xFFFFFFFF
     if (len > 0xFFFFFFFF) {
         return MBEDTLS_ERR_ASN1_INVALID_LENGTH;
     }
 #endif
 
-    int required = 1;
-
     if (len >= 0x80) {
-        for (size_t l = len; l != 0; l >>= 8) {
+    	size_t l;
+        for (l = len; l != 0; l >>= 8) {
             required++;
         }
     }
@@ -101,8 +102,8 @@ int mbedtls_asn1_write_mpi(unsigned char **p, const unsigned char *start, const 
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
     size_t len = 0;
 
-    // Write the MPI
-    //
+    /* Write the MPI */
+    /* */
     len = mbedtls_mpi_size(X);
 
     /* DER represents 0 with a sign bit (0=nonnegative) and 7 value bits, not
@@ -118,9 +119,9 @@ int mbedtls_asn1_write_mpi(unsigned char **p, const unsigned char *start, const 
     (*p) -= len;
     MBEDTLS_MPI_CHK(mbedtls_mpi_write_binary(X, *p, len));
 
-    // DER format assumes 2s complement for numbers, so the leftmost bit
-    // should be 0 for positive numbers and 1 for negative numbers.
-    //
+    /* DER format assumes 2s complement for numbers, so the leftmost bit */
+    /* should be 0 for positive numbers and 1 for negative numbers. */
+    /* */
     if (X->s == 1 && **p & 0x80) {
         if (*p - start < 1) {
             return MBEDTLS_ERR_ASN1_BUF_TOO_SMALL;
@@ -139,8 +140,8 @@ cleanup:
 
 int mbedtls_asn1_write_null(unsigned char **p, const unsigned char *start)
 {
-    // Write NULL
-    //
+    /* Write NULL */
+    /* */
     return mbedtls_asn1_write_len_and_tag(p, start, 0, MBEDTLS_ASN1_NULL);
 }
 
@@ -380,8 +381,8 @@ mbedtls_asn1_named_data *mbedtls_asn1_store_named_data(
     mbedtls_asn1_named_data *cur;
 
     if ((cur = asn1_find_named_data(*head, oid, oid_len)) == NULL) {
-        // Add new entry if not present yet based on OID
-        //
+        /* Add new entry if not present yet based on OID */
+        /* */
         cur = (mbedtls_asn1_named_data *) mbedtls_calloc(1,
                                                          sizeof(mbedtls_asn1_named_data));
         if (cur == NULL) {

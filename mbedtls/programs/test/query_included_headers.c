@@ -26,4 +26,5 @@ int main(void)
     mbedtls_printf("PSA_CRYPTO_STRUCT_ALT_H\n");
 #endif
 
+    return 0;
 }

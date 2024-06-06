@@ -395,16 +395,20 @@ static int rsa_pss_expected_salt_len(psa_algorithm_t alg,
                                      const mbedtls_rsa_context *rsa,
                                      size_t hash_length)
 {
+    int klen;
+    int hlen;
+    int room;
+
     if (PSA_ALG_IS_RSA_PSS_ANY_SALT(alg)) {
         return MBEDTLS_RSA_SALT_LEN_ANY;
     }
     /* Otherwise: standard salt length, i.e. largest possible salt length
      * up to the hash length. */
-    int klen = (int) mbedtls_rsa_get_len(rsa);   // known to fit
-    int hlen = (int) hash_length; // known to fit
-    int room = klen - 2 - hlen;
+    klen = (int) mbedtls_rsa_get_len(rsa);   /* known to fit */
+    hlen = (int) hash_length; /* known to fit */
+    room = klen - 2 - hlen;
     if (room < 0) {
-        return 0;  // there is no valid signature in this case anyway
+        return 0;  /* there is no valid signature in this case anyway */
     } else if (room > hlen) {
         return hlen;
     } else {

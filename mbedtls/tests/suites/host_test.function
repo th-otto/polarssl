@@ -35,10 +35,11 @@ int verify_string(char **str)
 int verify_int(char *str, intmax_t *p_value)
 {
     char *end = NULL;
+    long value;
     errno = 0;
     /* Limit the range to long: for large integers, the test framework will
      * use expressions anyway. */
-    long value = strtol(str, &end, 0);
+    value = strtol(str, &end, 0);
     if (errno == EINVAL || *end != '\0') {
         mbedtls_fprintf(stderr,
                         "Expected integer for parameter and got: %s\n", str);
@@ -443,6 +444,9 @@ static void write_outcome_result(FILE *outcome_file,
  */
 static void try_chdir_if_supported(const char *argv0)
 {
+    size_t path_size;
+    char *path;
+    int ret;
     /* We might want to allow backslash as well, for Windows. But then we also
      * need to consider chdir() vs _chdir(), and different conventions
      * regarding paths in argv[0] (naively enabling this code with
@@ -452,14 +456,14 @@ static void try_chdir_if_supported(const char *argv0)
     if (slash == NULL) {
         return;
     }
-    size_t path_size = slash - argv0 + 1;
-    char *path = mbedtls_calloc(1, path_size);
+    path_size = slash - argv0 + 1;
+    path = mbedtls_calloc(1, path_size);
     if (path == NULL) {
         return;
     }
     memcpy(path, argv0, path_size - 1);
     path[path_size - 1] = 0;
-    int ret = chdir(path);
+    ret = chdir(path);
     if (ret != 0) {
         mbedtls_fprintf(stderr, "%s: note: chdir(\"%s\") failed.\n",
                         __func__, path);

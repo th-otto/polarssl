@@ -502,6 +502,7 @@ int mbedtls_ssl_ticket_parse(void *p_ticket,
     }
 
 #if defined(MBEDTLS_HAVE_TIME)
+	{
     mbedtls_ms_time_t ticket_creation_time, ticket_age;
     mbedtls_ms_time_t ticket_lifetime =
         (mbedtls_ms_time_t) key->lifetime * 1000;
@@ -516,6 +517,7 @@ int mbedtls_ssl_ticket_parse(void *p_ticket,
     if (ticket_age < 0 || ticket_age > ticket_lifetime) {
         ret = MBEDTLS_ERR_SSL_SESSION_TICKET_EXPIRED;
         goto cleanup;
+    }
     }
 #endif
 

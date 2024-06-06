@@ -1005,8 +1005,9 @@ void ecp_calc_public(int grp_id, data_t *private_data,
                      int expected_ret, data_t *expected_public)
 {
     mbedtls_ecp_keypair key;
-    mbedtls_ecp_keypair_init(&key);
     mbedtls_test_rnd_pseudo_info rnd_info;
+
+    mbedtls_ecp_keypair_init(&key);
     memset(&rnd_info, 0x00, sizeof(mbedtls_test_rnd_pseudo_info));
 
     TEST_EQUAL(mbedtls_ecp_group_load(&key.grp, grp_id), 0);
@@ -1018,11 +1019,12 @@ void ecp_calc_public(int grp_id, data_t *private_data,
                expected_ret);
 
     if (expected_ret == 0) {
+        unsigned char buf[MBEDTLS_ECP_MAX_PT_LEN];
+        size_t length;
+
         TEST_EQUAL(mbedtls_ecp_check_pub_priv(&key, &key,
                                               &mbedtls_test_rnd_pseudo_rand, &rnd_info),
                    0);
-        unsigned char buf[MBEDTLS_ECP_MAX_PT_LEN];
-        size_t length;
         TEST_EQUAL(mbedtls_ecp_point_write_binary(&key.grp, &key.Q,
                                                   MBEDTLS_ECP_PF_UNCOMPRESSED,
                                                   &length, buf, sizeof(buf)),
@@ -1090,8 +1092,8 @@ exit:
 void ecp_set_public_key_group_check(int grp_id, int expected_ret)
 {
     mbedtls_ecp_keypair key;
-    mbedtls_ecp_keypair_init(&key);
     mbedtls_ecp_point Q;
+    mbedtls_ecp_keypair_init(&key);
     mbedtls_ecp_point_init(&Q);
 
     TEST_EQUAL(mbedtls_ecp_set_public_key(grp_id, &key, &Q),
@@ -1107,10 +1109,10 @@ exit:
 void ecp_set_public_key_good(int grp_id, data_t *public_data)
 {
     mbedtls_ecp_keypair key;
-    mbedtls_ecp_keypair_init(&key);
     mbedtls_ecp_group grp;
-    mbedtls_ecp_group_init(&grp);
     mbedtls_ecp_point Q;
+    mbedtls_ecp_keypair_init(&key);
+    mbedtls_ecp_group_init(&grp);
     mbedtls_ecp_point_init(&Q);
 
     TEST_EQUAL(mbedtls_ecp_group_load(&grp, grp_id), 0);
@@ -1143,12 +1145,14 @@ void ecp_set_public_key_after_private(int private_grp_id, data_t *private_data,
                                       int public_grp_id, data_t *public_data)
 {
     mbedtls_ecp_keypair key;
-    mbedtls_ecp_keypair_init(&key);
     mbedtls_ecp_group grp;
-    mbedtls_ecp_group_init(&grp);
     mbedtls_ecp_point Q;
-    mbedtls_ecp_point_init(&Q);
     mbedtls_mpi d;
+    int ret;
+
+    mbedtls_ecp_keypair_init(&key);
+    mbedtls_ecp_group_init(&grp);
+    mbedtls_ecp_point_init(&Q);
     mbedtls_mpi_init(&d);
 
     TEST_EQUAL(mbedtls_ecp_group_load(&grp, public_grp_id), 0);
@@ -1160,7 +1164,7 @@ void ecp_set_public_key_after_private(int private_grp_id, data_t *private_data,
                0);
     TEST_EQUAL(mbedtls_mpi_copy(&d, &key.d), 0);
 
-    int ret = mbedtls_ecp_set_public_key(public_grp_id, &key, &Q);
+    ret = mbedtls_ecp_set_public_key(public_grp_id, &key, &Q);
 
     if (private_grp_id == public_grp_id) {
         TEST_EQUAL(ret, 0);
@@ -1184,8 +1188,9 @@ void mbedtls_ecp_read_key(int grp_id, data_t *in_key, int expected, int canonica
 {
     int ret = 0;
     mbedtls_ecp_keypair key;
-    mbedtls_ecp_keypair_init(&key);
     mbedtls_ecp_keypair key2;
+
+    mbedtls_ecp_keypair_init(&key);
     mbedtls_ecp_keypair_init(&key2);
 
     TEST_EQUAL(mbedtls_mpi_lset(&key.Q.X, 1), 0);
@@ -1222,13 +1227,13 @@ void mbedtls_ecp_read_key(int grp_id, data_t *in_key, int expected, int canonica
         } else {
             unsigned char export1[MBEDTLS_ECP_MAX_BYTES];
             unsigned char export2[MBEDTLS_ECP_MAX_BYTES];
-
             size_t length1 = 0xdeadbeef;
+            size_t length2 = 0xdeadbeef;
+
             TEST_EQUAL(mbedtls_ecp_write_key_ext(&key, &length1,
                                                  export1, sizeof(export1)), 0);
             TEST_EQUAL(mbedtls_ecp_read_key(grp_id, &key2, export1, length1),
                        expected);
-            size_t length2 = 0xdeadbeef;
             TEST_EQUAL(mbedtls_ecp_write_key_ext(&key2, &length2,
                                                  export2, sizeof(export2)), 0);
             TEST_MEMORY_COMPARE(export1, length1,
@@ -1258,8 +1263,10 @@ void ecp_write_key(int grp_id, data_t *in_key,
                    int exported_size, int expected_ret)
 {
     mbedtls_ecp_keypair key;
-    mbedtls_ecp_keypair_init(&key);
     unsigned char *exported = NULL;
+    size_t i;
+
+    mbedtls_ecp_keypair_init(&key);
 
     TEST_EQUAL(mbedtls_ecp_read_key(grp_id, &key, in_key->x, in_key->len), 0);
 
@@ -1291,7 +1298,7 @@ void ecp_write_key(int grp_id, data_t *in_key,
 
         if (length < in_key->len) {
             /* Shorter output (only possible with Weierstrass keys) */
-            for (size_t i = 0; i < in_key->len - length; i++) {
+            for (i = 0; i < in_key->len - length; i++) {
                 mbedtls_test_set_step(i);
                 TEST_EQUAL(in_key->x[i], 0);
             }
@@ -1300,7 +1307,7 @@ void ecp_write_key(int grp_id, data_t *in_key,
         } else {
             TEST_MEMORY_COMPARE(in_key->x, in_key->len,
                                 key_start, length);
-            for (size_t i = 0; i < exported_size - length; i++) {
+            for (i = 0; i < exported_size - length; i++) {
                 mbedtls_test_set_step(i);
                 TEST_EQUAL(zeros_start[i], 0);
             }
@@ -1318,8 +1325,10 @@ void ecp_write_key_ext(int grp_id, data_t *in_key,
                        int exported_size, int expected_ret)
 {
     mbedtls_ecp_keypair key;
-    mbedtls_ecp_keypair_init(&key);
+    size_t olen;
     unsigned char *exported = NULL;
+
+    mbedtls_ecp_keypair_init(&key);
 
     if (in_key->len != 0) {
         TEST_EQUAL(mbedtls_ecp_read_key(grp_id, &key, in_key->x, in_key->len), 0);
@@ -1328,7 +1337,7 @@ void ecp_write_key_ext(int grp_id, data_t *in_key,
     }
 
     TEST_CALLOC(exported, exported_size);
-    size_t olen = 0xdeadbeef;
+    olen = 0xdeadbeef;
     TEST_EQUAL(mbedtls_ecp_write_key_ext(&key, &olen, exported, exported_size),
                expected_ret);
 

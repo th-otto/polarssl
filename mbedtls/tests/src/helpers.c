@@ -260,7 +260,7 @@ void mbedtls_test_set_mutex_usage_error(const char *msg)
     mbedtls_mutex_unlock(&mbedtls_test_info_mutex);
 #endif /* MBEDTLS_THREADING_C */
 }
-#endif // #if defined(MBEDTLS_TEST_MUTEX_USAGE)
+#endif /* #if defined(MBEDTLS_TEST_MUTEX_USAGE) */
 
 #if defined(MBEDTLS_BIGNUM_C)
 

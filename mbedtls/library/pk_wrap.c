@@ -988,7 +988,7 @@ static int eckey_check_pair_psa(mbedtls_pk_context *pub, mbedtls_pk_context *prv
         return ret;
     }
 
-    // From now on prv_key_buf is used to store the public key of prv.
+    /* From now on prv_key_buf is used to store the public key of prv. */
     status = psa_export_public_key(key_id, prv_key_buf, sizeof(prv_key_buf),
                                    &prv_key_len);
     ret = PSA_PK_TO_MBEDTLS_ERR(status);

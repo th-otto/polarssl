@@ -52,9 +52,9 @@ struct mbedtls_ssl_tls13_labels_struct const mbedtls_ssl_tls13_labels =
  * The HkdfLabel is specified in RFC 8446 as follows:
  *
  * struct HkdfLabel {
- *   uint16 length;            // Length of expanded key material
- *   opaque label<7..255>;     // Always prefixed by "tls13 "
- *   opaque context<0..255>;   // Usually a communication transcript hash
+ *   uint16 length;            / / Length of expanded key material
+ *   opaque label<7..255>;     / / Always prefixed by "tls13 "
+ *   opaque context<0..255>;   / / Usually a communication transcript hash
  * };
  *
  * Parameters:

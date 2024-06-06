@@ -20,7 +20,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "Usage: %s REPRODUCER_FILE\n", argv0);
         return 1;
     }
-    //opens the file, get its size, and reads it into a buffer
+    /*opens the file, get its size, and reads it into a buffer */
     fp = fopen(argv[1], "rb");
     if (fp == NULL) {
         fprintf(stderr, "%s: Error in fopen\n", argv0);
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
         return 2;
     }
 
-    //launch fuzzer
+    /*launch fuzzer */
     LLVMFuzzerTestOneInput(Data, Size);
     free(Data);
     fclose(fp);

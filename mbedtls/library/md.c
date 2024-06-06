@@ -846,7 +846,7 @@ static const md_name_entry md_names[] = {
 #endif
 #if defined(MBEDTLS_MD_CAN_SHA1)
     { "SHA1", MBEDTLS_MD_SHA1 },
-    { "SHA", MBEDTLS_MD_SHA1 }, // compatibility fallback
+    { "SHA", MBEDTLS_MD_SHA1 }, /* compatibility fallback */
 #endif
 #if defined(MBEDTLS_MD_CAN_SHA224)
     { "SHA224", MBEDTLS_MD_SHA224 },
@@ -877,11 +877,11 @@ static const md_name_entry md_names[] = {
 
 const mbedtls_md_info_t *mbedtls_md_info_from_string(const char *md_name)
 {
+    const md_name_entry *entry = md_names;
     if (NULL == md_name) {
         return NULL;
     }
 
-    const md_name_entry *entry = md_names;
     while (entry->md_name != NULL &&
            strcmp(entry->md_name, md_name) != 0) {
         ++entry;
@@ -892,11 +892,11 @@ const mbedtls_md_info_t *mbedtls_md_info_from_string(const char *md_name)
 
 const char *mbedtls_md_get_name(const mbedtls_md_info_t *md_info)
 {
+    const md_name_entry *entry = md_names;
     if (md_info == NULL) {
         return NULL;
     }
 
-    const md_name_entry *entry = md_names;
     while (entry->md_type != MBEDTLS_MD_NONE &&
            entry->md_type != md_info->type) {
         ++entry;

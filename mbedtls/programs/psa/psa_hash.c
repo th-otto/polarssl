@@ -63,6 +63,7 @@ int main(void)
     size_t hash_length;
     psa_hash_operation_t hash_operation = PSA_HASH_OPERATION_INIT;
     psa_hash_operation_t cloned_hash_operation = PSA_HASH_OPERATION_INIT;
+    size_t j;
 
     mbedtls_printf("PSA Crypto API: SHA-256 example\n\n");
 
@@ -142,7 +143,7 @@ int main(void)
     /* Print out result */
     mbedtls_printf("The SHA-256( '%s' ) is: ", sample_message);
 
-    for (size_t j = 0; j < expected_hash_len; j++) {
+    for (j = 0; j < expected_hash_len; j++) {
         mbedtls_printf("%02x", hash[j]);
     }
 

@@ -24,11 +24,11 @@ void dummy_init(void)
 
 int dummy_send(void *ctx, const unsigned char *buf, size_t len)
 {
-    //silence warning about unused parameter
+    /*silence warning about unused parameter */
     (void) ctx;
     (void) buf;
 
-    //pretends we wrote everything ok
+    /*pretends we wrote everything ok */
     if (len > INT_MAX) {
         return -1;
     }
@@ -37,18 +37,18 @@ int dummy_send(void *ctx, const unsigned char *buf, size_t len)
 
 int fuzz_recv(void *ctx, unsigned char *buf, size_t len)
 {
-    //reads from the buffer from fuzzer
+    /*reads from the buffer from fuzzer */
     fuzzBufferOffset_t *biomemfuzz = (fuzzBufferOffset_t *) ctx;
 
     if (biomemfuzz->Offset == biomemfuzz->Size) {
-        //EOF
+        /*EOF */
         return 0;
     }
     if (len > INT_MAX) {
         return -1;
     }
     if (len + biomemfuzz->Offset > biomemfuzz->Size) {
-        //do not overflow
+        /*do not overflow */
         len = biomemfuzz->Size - biomemfuzz->Offset;
     }
     memcpy(buf, biomemfuzz->Data + biomemfuzz->Offset, len);
@@ -62,12 +62,12 @@ int dummy_random(void *p_rng, unsigned char *output, size_t output_len)
     size_t i;
 
 #if defined(MBEDTLS_CTR_DRBG_C)
-    //mbedtls_ctr_drbg_random requires a valid mbedtls_ctr_drbg_context in p_rng
+    /*mbedtls_ctr_drbg_random requires a valid mbedtls_ctr_drbg_context in p_rng */
     if (p_rng != NULL) {
-        //use mbedtls_ctr_drbg_random to find bugs in it
+        /*use mbedtls_ctr_drbg_random to find bugs in it */
         ret = mbedtls_ctr_drbg_random(p_rng, output, output_len);
     } else {
-        //fall through to pseudo-random
+        /*fall through to pseudo-random */
         ret = 0;
     }
 #else
@@ -75,7 +75,7 @@ int dummy_random(void *p_rng, unsigned char *output, size_t output_len)
     ret = 0;
 #endif
     for (i = 0; i < output_len; i++) {
-        //replace result with pseudo random
+        /*replace result with pseudo random */
         output[i] = (unsigned char) rand();
     }
     return ret;
@@ -86,11 +86,11 @@ int dummy_entropy(void *data, unsigned char *output, size_t len)
     size_t i;
     (void) data;
 
-    //use mbedtls_entropy_func to find bugs in it
-    //test performance impact of entropy
-    //ret = mbedtls_entropy_func(data, output, len);
+    /*use mbedtls_entropy_func to find bugs in it */
+    /*test performance impact of entropy */
+    /*ret = mbedtls_entropy_func(data, output, len); */
     for (i = 0; i < len; i++) {
-        //replace result with pseudo random
+        /*replace result with pseudo random */
         output[i] = (unsigned char) rand();
     }
     return 0;

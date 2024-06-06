@@ -46,6 +46,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
 #if defined(MBEDTLS_ECP_C)
         if (mbedtls_pk_get_type(&pk) == MBEDTLS_PK_ECKEY ||
             mbedtls_pk_get_type(&pk) == MBEDTLS_PK_ECKEY_DH) {
+            mbedtls_mpi d;
             mbedtls_ecp_keypair *ecp = mbedtls_pk_ec(pk);
             mbedtls_ecp_group_id grp_id = mbedtls_ecp_keypair_get_group_id(ecp);
             const mbedtls_ecp_curve_info *curve_info =
@@ -59,7 +60,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
 
             /* It's a public key, so the private value should not have
              * been changed from its initialization to 0. */
-            mbedtls_mpi d;
             mbedtls_mpi_init(&d);
             if (mbedtls_ecp_export(ecp, NULL, &d, NULL) != 0) {
                 abort();
@@ -84,7 +84,7 @@ exit:
 #else
     (void) Data;
     (void) Size;
-#endif //MBEDTLS_PK_PARSE_C
+#endif /*MBEDTLS_PK_PARSE_C */
 
     return 0;
 }

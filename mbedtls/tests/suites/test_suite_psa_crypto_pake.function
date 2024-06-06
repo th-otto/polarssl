@@ -138,6 +138,7 @@ static void ecjpake_do_round(psa_algorithm_t alg, unsigned int primitive,
     size_t c_x1_pr_len, c_x2_pr_len, c_x2s_pr_len;
     size_t c_x1_pr_off, c_x2_pr_off, c_x2s_pr_off;
     psa_status_t status;
+    size_t extra_output_len;
 
     TEST_CALLOC(buffer0, buffer_length);
     TEST_CALLOC(buffer1, buffer_length);
@@ -199,7 +200,6 @@ static void ecjpake_do_round(psa_algorithm_t alg, unsigned int primitive,
                 buffer0 + buffer0_off);
             DO_ROUND_UPDATE_OFFSETS(buffer0_off, s_x2_pr_off, s_x2_pr_len);
 
-            size_t extra_output_len;
             DO_ROUND_CONDITIONAL_CHECK_FAILURE(
                 ERR_INJECT_EXTRA_OUTPUT,
                 psa_pake_output(server, PSA_PAKE_STEP_KEY_SHARE,
@@ -614,10 +614,14 @@ void ecjpake_setup(int alg_arg, int key_type_pw_arg, int key_usage_pw_arg,
 
     psa_key_derivation_operation_t key_derivation =
         PSA_KEY_DERIVATION_OPERATION_INIT;
+    size_t size_key_share;
+    size_t size_zk_public;
+    size_t size_zk_proof;
+    size_t buf_size;
 
     PSA_INIT();
 
-    size_t buf_size = PSA_PAKE_OUTPUT_SIZE(alg, primitive_arg,
+    buf_size = PSA_PAKE_OUTPUT_SIZE(alg, primitive_arg,
                                            PSA_PAKE_STEP_KEY_SHARE);
     TEST_CALLOC(output_buffer, buf_size);
 
@@ -680,11 +684,11 @@ void ecjpake_setup(int alg_arg, int key_type_pw_arg, int key_usage_pw_arg,
     SETUP_ALWAYS_CHECK_STEP(psa_pake_set_password_key(&operation, key),
                             ERR_IN_SET_PASSWORD_KEY);
 
-    const size_t size_key_share = PSA_PAKE_INPUT_SIZE(alg, primitive,
+    size_key_share = PSA_PAKE_INPUT_SIZE(alg, primitive,
                                                       PSA_PAKE_STEP_KEY_SHARE);
-    const size_t size_zk_public = PSA_PAKE_INPUT_SIZE(alg, primitive,
+    size_zk_public = PSA_PAKE_INPUT_SIZE(alg, primitive,
                                                       PSA_PAKE_STEP_ZK_PUBLIC);
-    const size_t size_zk_proof = PSA_PAKE_INPUT_SIZE(alg, primitive,
+    size_zk_proof = PSA_PAKE_INPUT_SIZE(alg, primitive,
                                                      PSA_PAKE_STEP_ZK_PROOF);
 
     if (test_input) {
@@ -1084,6 +1088,7 @@ void pake_input_getters_user()
     uint8_t user_ret[20] = { 0 }; // max user length is 20 bytes
     size_t user_len_ret = 0;
     size_t buffer_len_ret = 0;
+    size_t i;
 
     psa_pake_primitive_t primitive = PSA_PAKE_PRIMITIVE(
         PSA_PAKE_PRIMITIVE_TYPE_ECC,
@@ -1095,7 +1100,7 @@ void pake_input_getters_user()
     psa_pake_cs_set_primitive(&cipher_suite, primitive);
     psa_pake_cs_set_hash(&cipher_suite, PSA_ALG_SHA_256);
 
-    for (size_t i = 0; i < ARRAY_LENGTH(users); i++) {
+    for (i = 0; i < ARRAY_LENGTH(users); i++) {
         uint8_t *user = (uint8_t *) users[i];
         uint8_t user_len = strlen(users[i]);
 
@@ -1147,6 +1152,7 @@ void pake_input_getters_peer()
     uint8_t peer_ret[20] = { 0 }; // max peer length is 20 bytes
     size_t peer_len_ret = 0;
     size_t buffer_len_ret = 0;
+    size_t i;
 
     psa_pake_primitive_t primitive = PSA_PAKE_PRIMITIVE(
         PSA_PAKE_PRIMITIVE_TYPE_ECC,
@@ -1158,7 +1164,7 @@ void pake_input_getters_peer()
     psa_pake_cs_set_primitive(&cipher_suite, primitive);
     psa_pake_cs_set_hash(&cipher_suite, PSA_ALG_SHA_256);
 
-    for (size_t i = 0; i < ARRAY_LENGTH(peers); i++) {
+    for (i = 0; i < ARRAY_LENGTH(peers); i++) {
         uint8_t *peer = (uint8_t *) peers[i];
         uint8_t peer_len = strlen(peers[i]);
 

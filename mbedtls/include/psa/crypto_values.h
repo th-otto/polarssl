@@ -959,7 +959,7 @@
  * Then you may create and use a key as follows:
  * - Set the key usage field using #PSA_ALG_ANY_HASH, for example:
  *   ```
- *   psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_HASH); // or VERIFY
+ *   psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_HASH); / / or VERIFY
  *   psa_set_key_algorithm(&attributes, PSA_xxx_SIGNATURE(PSA_ALG_ANY_HASH));
  *   ```
  * - Import or generate key material.

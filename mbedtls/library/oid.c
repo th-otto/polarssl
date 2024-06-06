@@ -926,6 +926,7 @@ int mbedtls_oid_get_numeric_string(char *buf, size_t size,
     char *p = buf;
     size_t n = size;
     unsigned int value = 0;
+	size_t i;
 
     if (size > INT_MAX) {
         /* Avoid overflow computing return value */
@@ -937,7 +938,7 @@ int mbedtls_oid_get_numeric_string(char *buf, size_t size,
         return MBEDTLS_ERR_ASN1_OUT_OF_DATA;
     }
 
-    for (size_t i = 0; i < oid->len; i++) {
+    for (i = 0; i < oid->len; i++) {
         /* Prevent overflow in value. */
         if (value > (UINT_MAX >> 7)) {
             return MBEDTLS_ERR_ASN1_INVALID_DATA;
@@ -1022,6 +1023,7 @@ static int oid_subidentifier_encode_into(unsigned char **p,
                                          unsigned int value)
 {
     size_t num_bytes = oid_subidentifier_num_bytes(value);
+	size_t i;
 
     if ((size_t) (bound - *p) < num_bytes) {
         return MBEDTLS_ERR_OID_BUF_TOO_SMALL;
@@ -1029,7 +1031,7 @@ static int oid_subidentifier_encode_into(unsigned char **p,
     (*p)[num_bytes - 1] = (unsigned char) (value & 0x7f);
     value >>= 7;
 
-    for (size_t i = 2; i <= num_bytes; i++) {
+    for (i = 2; i <= num_bytes; i++) {
         (*p)[num_bytes - i] = 0x80 | (unsigned char) (value & 0x7f);
         value >>= 7;
     }
@@ -1049,10 +1051,15 @@ int mbedtls_oid_from_numeric_string(mbedtls_asn1_buf *oid,
     unsigned int component1, component2;
     size_t encoded_len;
     unsigned char *resized_mem;
+	size_t i;
+	size_t bytes_per_subidentifier;
+	size_t max_possible_bytes;
+    unsigned char *out_ptr;
+    unsigned char *out_bound;
 
     /* Count the number of dots to get a worst-case allocation size. */
     size_t num_dots = 0;
-    for (size_t i = 0; i < size; i++) {
+    for (i = 0; i < size; i++) {
         if (oid_str[i] == '.') {
             num_dots++;
         }
@@ -1068,15 +1075,15 @@ int mbedtls_oid_from_numeric_string(mbedtls_asn1_buf *oid,
      *
      * bytes = ceil(subidentifer_size * 8 / 7)
      */
-    size_t bytes_per_subidentifier = (((sizeof(unsigned int) * 8) - 1) / 7)
+    bytes_per_subidentifier = (((sizeof(unsigned int) * 8) - 1) / 7)
                                      + 1;
-    size_t max_possible_bytes = num_dots * bytes_per_subidentifier;
+    max_possible_bytes = num_dots * bytes_per_subidentifier;
     oid->p = mbedtls_calloc(max_possible_bytes, 1);
     if (oid->p == NULL) {
         return MBEDTLS_ERR_ASN1_ALLOC_FAILED;
     }
-    unsigned char *out_ptr = oid->p;
-    unsigned char *out_bound = oid->p + max_possible_bytes;
+    out_ptr = oid->p;
+    out_bound = oid->p + max_possible_bytes;
 
     ret = oid_parse_number(&component1, &str_ptr, str_bound);
     if (ret != 0) {

@@ -68,5 +68,5 @@ int main(int argc, char **argv)
     fclose(fp);
     mbedtls_platform_zeroize(buf, sizeof(buf));
 
-    mbedtls_exit(exit_code);   // GDB_BREAK_HERE -- don't remove this comment!
+    mbedtls_exit(exit_code);   /* GDB_BREAK_HERE -- don't remove this comment! */
 }

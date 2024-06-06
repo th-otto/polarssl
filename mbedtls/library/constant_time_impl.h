@@ -21,8 +21,8 @@
  * definitions are here, and constant_time_internal.h has only the declarations.
  *
  * This results in duplicate declarations of the form:
- *     static inline void f();         // from constant_time_internal.h
- *     static inline void f() { ... }  // from constant_time_impl.h
+ *     static inline void f();         / / from constant_time_internal.h
+ *     static inline void f() { ... }  / / from constant_time_impl.h
  * when constant_time_internal.h is included.
  *
  * This appears to behave as if the declaration-without-definition was not present
@@ -39,11 +39,11 @@
 /* Disable asm under Memsan because it confuses Memsan and generates false errors.
  *
  * We also disable under Valgrind by default, because it's more useful
- * for Valgrind to test the plain C implementation. MBEDTLS_TEST_CONSTANT_FLOW_ASM //no-check-names
+ * for Valgrind to test the plain C implementation. MBEDTLS_TEST_CONSTANT_FLOW_ASM
  * may be set to permit building asm under Valgrind.
  */
 #if defined(MBEDTLS_TEST_CONSTANT_FLOW_MEMSAN) || \
-    (defined(MBEDTLS_TEST_CONSTANT_FLOW_VALGRIND) && !defined(MBEDTLS_TEST_CONSTANT_FLOW_ASM)) //no-check-names
+    (defined(MBEDTLS_TEST_CONSTANT_FLOW_VALGRIND) && !defined(MBEDTLS_TEST_CONSTANT_FLOW_ASM)) /* no-check-names */
 #define MBEDTLS_CT_NO_ASM
 #elif defined(__has_feature)
 #if __has_feature(memory_sanitizer)
@@ -203,13 +203,13 @@ static inline mbedtls_ct_condition_t mbedtls_ct_bool(mbedtls_ct_uint_t x)
 #pragma warning( push )
 #pragma warning( disable : 4146 )
 #endif
-    // y is negative (i.e., top bit set) iff x is non-zero
+    /* y is negative (i.e., top bit set) iff x is non-zero */
     mbedtls_ct_int_t y = (-xo) | -(xo >> 1);
 
-    // extract only the sign bit of y so that y == 1 (if x is non-zero) or 0 (if x is zero)
+    /* extract only the sign bit of y so that y == 1 (if x is non-zero) or 0 (if x is zero) */
     y = (((mbedtls_ct_uint_t) y) >> (MBEDTLS_CT_SIZE - 1));
 
-    // -y has all bits set (if x is non-zero), or all bits clear (if x is zero)
+    /* -y has all bits set (if x is non-zero), or all bits clear (if x is zero) */
     return (mbedtls_ct_condition_t) (-y);
 #if defined(_MSC_VER)
 #pragma warning( pop )
@@ -383,13 +383,13 @@ static inline mbedtls_ct_condition_t mbedtls_ct_uint_lt(mbedtls_ct_uint_t x, mbe
      * the MSB of y is 0.)
      */
 
-    // Select either y, or x - y
+    /* Select either y, or x - y */
     mbedtls_ct_uint_t ret = mbedtls_ct_if(cond, yo, (mbedtls_ct_uint_t) (xo - yo));
 
-    // Extract only the MSB of ret
+    /* Extract only the MSB of ret */
     ret = ret >> (MBEDTLS_CT_SIZE - 1);
 
-    // Convert to a condition (i.e., all bits set iff non-zero)
+    /* Convert to a condition (i.e., all bits set iff non-zero) */
     return mbedtls_ct_bool(ret);
 #endif
 }

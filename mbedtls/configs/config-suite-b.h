@@ -65,7 +65,7 @@
 #define MBEDTLS_AES_ROM_TABLES
 
 /* Save RAM by adjusting to our exact needs */
-#define MBEDTLS_MPI_MAX_SIZE    48 // 384-bit EC curve = 48 bytes
+#define MBEDTLS_MPI_MAX_SIZE    48 /* 384-bit EC curve = 48 bytes */
 
 /* Save RAM at the expense of speed, see ecp.h */
 #define MBEDTLS_ECP_WINDOW_SIZE        2
@@ -97,10 +97,10 @@
 
 /* These defines are present so that the config modifying scripts can enable
  * them during tests/scripts/test-ref-configs.pl */
-//#define MBEDTLS_USE_PSA_CRYPTO
-//#define MBEDTLS_PSA_CRYPTO_C
+/*#define MBEDTLS_USE_PSA_CRYPTO */
+/*#define MBEDTLS_PSA_CRYPTO_C */
 
 /* Error messages and TLS debugging traces
  * (huge code size increase, needed for tests/ssl-opt.sh) */
-//#define MBEDTLS_DEBUG_C
-//#define MBEDTLS_ERROR_C
+/*#define MBEDTLS_DEBUG_C */
+/*#define MBEDTLS_ERROR_C */

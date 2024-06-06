@@ -47,6 +47,8 @@ static void ssl_tls13_select_ciphersuite(
     psa_algorithm_t psk_hash_alg,
     const mbedtls_ssl_ciphersuite_t **selected_ciphersuite_info)
 {
+	const unsigned char *p;
+
     *selected_ciphersuite_info = NULL;
 
     /*
@@ -58,7 +60,7 @@ static void ssl_tls13_select_ciphersuite(
         return;
     }
 
-    for (const unsigned char *p = cipher_suites;
+    for (p = cipher_suites;
          p < cipher_suites_end; p += 2) {
         /*
          * "cipher_suites_end - p is even" is an invariant of the loop. As
@@ -737,10 +739,10 @@ static int ssl_tls13_write_server_pre_shared_key_ext(mbedtls_ssl_context *ssl,
                                                      size_t *olen)
 {
     unsigned char *p = (unsigned char *) buf;
+    int not_using_psk = 0;
 
     *olen = 0;
 
-    int not_using_psk = 0;
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
     not_using_psk = (mbedtls_svc_key_id_is_null(ssl->handshake->psk_opaque));
 #else
@@ -1230,10 +1232,10 @@ static int ssl_tls13_pick_key_cert(mbedtls_ssl_context *ssl)
  *
  * uint16 ProtocolVersion;
  * opaque Random[32];
- * uint8 CipherSuite[2];    // Cryptographic suite selector
+ * uint8 CipherSuite[2];    / / Cryptographic suite selector
  *
  * struct {
- *      ProtocolVersion legacy_version = 0x0303;    // TLS v1.2
+ *      ProtocolVersion legacy_version = 0x0303;    / / TLS v1.2
  *      Random random;
  *      opaque legacy_session_id<0..32>;
  *      CipherSuite cipher_suites<2..2^16-2>;
@@ -1296,7 +1298,7 @@ static int ssl_tls13_parse_client_hello(mbedtls_ssl_context *ssl,
     MBEDTLS_SSL_CHK_BUF_READ_PTR(p, end, 38);
 
     /* ...
-     * ProtocolVersion legacy_version = 0x0303; // TLS 1.2
+     * ProtocolVersion legacy_version = 0x0303; / / TLS 1.2
      * ...
      * with ProtocolVersion defined as:
      * uint16 ProtocolVersion;
@@ -2238,7 +2240,7 @@ static int ssl_tls13_write_hrr_key_share_ext(mbedtls_ssl_context *ssl,
  * Structure of ServerHello message:
  *
  *     struct {
- *        ProtocolVersion legacy_version = 0x0303;    // TLS v1.2
+ *        ProtocolVersion legacy_version = 0x0303;    / / TLS v1.2
  *        Random random;
  *        opaque legacy_session_id_echo<0..32>;
  *        CipherSuite cipher_suite;
@@ -2262,7 +2264,7 @@ static int ssl_tls13_write_server_hello_body(mbedtls_ssl_context *ssl,
     ssl->handshake->sent_extensions = MBEDTLS_SSL_EXT_MASK_NONE;
 
     /* ...
-     * ProtocolVersion legacy_version = 0x0303; // TLS 1.2
+     * ProtocolVersion legacy_version = 0x0303; / / TLS 1.2
      * ...
      * with ProtocolVersion defined as:
      * uint16 ProtocolVersion;

@@ -161,27 +161,29 @@ static int write_private_key(mbedtls_pk_context *key, const char *output_file)
 static int show_ecp_key(const mbedtls_ecp_keypair *ecp, int has_private)
 {
     int ret = 0;
+    mbedtls_ecp_group grp;
+    mbedtls_mpi D;
+    mbedtls_ecp_point pt;
+    mbedtls_mpi X, Y;
+    unsigned char point_bin[MBEDTLS_ECP_MAX_PT_LEN];
+    size_t len;
 
     const mbedtls_ecp_curve_info *curve_info =
         mbedtls_ecp_curve_info_from_grp_id(
             mbedtls_ecp_keypair_get_group_id(ecp));
     mbedtls_printf("curve: %s\n", curve_info->name);
 
-    mbedtls_ecp_group grp;
     mbedtls_ecp_group_init(&grp);
-    mbedtls_mpi D;
     mbedtls_mpi_init(&D);
-    mbedtls_ecp_point pt;
     mbedtls_ecp_point_init(&pt);
-    mbedtls_mpi X, Y;
-    mbedtls_mpi_init(&X); mbedtls_mpi_init(&Y);
+    mbedtls_mpi_init(&X);
+    mbedtls_mpi_init(&Y);
 
     MBEDTLS_MPI_CHK(mbedtls_ecp_export(ecp, &grp,
                                        (has_private ? &D : NULL),
                                        &pt));
 
-    unsigned char point_bin[MBEDTLS_ECP_MAX_PT_LEN];
-    size_t len = 0;
+    len = 0;
     MBEDTLS_MPI_CHK(mbedtls_ecp_point_write_binary(
                         &grp, &pt, MBEDTLS_ECP_PF_UNCOMPRESSED,
                         &len, point_bin, sizeof(point_bin)));

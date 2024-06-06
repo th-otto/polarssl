@@ -145,7 +145,9 @@ int psa_status_to_mbedtls(psa_status_t status,
                           size_t local_errors_num,
                           int (*fallback_f)(psa_status_t))
 {
-    for (size_t i = 0; i < local_errors_num; i++) {
+	size_t i;
+
+    for (i = 0; i < local_errors_num; i++) {
         if (status == local_translations[i].psa_status) {
             return local_translations[i].mbedtls_error;
         }
@@ -354,8 +356,8 @@ int mbedtls_psa_get_random(void *p_rng,
      * its own state internally and doesn't let the caller access that state.
      * So we just ignore the state parameter, and in practice we'll pass
      * NULL. */
-    (void) p_rng;
     psa_status_t status = psa_generate_random(output, output_size);
+    (void) p_rng;
     if (status == PSA_SUCCESS) {
         return 0;
     } else {

@@ -135,10 +135,10 @@ int mbedtls_pk_ecc_set_pubkey_from_prv(mbedtls_pk_context *pk,
 
     (void) prv;
     (void) prv_len;
-
+	{
     mbedtls_ecp_keypair *eck = (mbedtls_ecp_keypair *) pk->pk_ctx;
     return mbedtls_ecp_mul(&eck->grp, &eck->Q, &eck->d, &eck->grp.G, f_rng, p_rng);
-
+	}
 #endif /* MBEDTLS_USE_PSA_CRYPTO */
 }
 

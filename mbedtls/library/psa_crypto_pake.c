@@ -222,6 +222,8 @@ psa_status_t mbedtls_psa_pake_setup(mbedtls_psa_pake_operation_t *operation,
 
 #if defined(MBEDTLS_PSA_BUILTIN_ALG_JPAKE)
     if (cipher_suite.algorithm == PSA_ALG_JPAKE) {
+    	size_t user_peer_len;
+
         if (cipher_suite.type != PSA_PAKE_PRIMITIVE_TYPE_ECC ||
             cipher_suite.family != PSA_ECC_FAMILY_SECP_R1 ||
             cipher_suite.bits != 256 ||
@@ -230,7 +232,7 @@ psa_status_t mbedtls_psa_pake_setup(mbedtls_psa_pake_operation_t *operation,
             goto error;
         }
 
-        const size_t user_peer_len = sizeof(jpake_client_id); // client and server have the same length
+        user_peer_len = sizeof(jpake_client_id); /* client and server have the same length */
         if (actual_user_len != user_peer_len ||
             actual_peer_len != user_peer_len) {
             status = PSA_ERROR_NOT_SUPPORTED;
@@ -288,7 +290,7 @@ static psa_status_t mbedtls_psa_pake_output_internal(
 {
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
     size_t length;
-    (void) step; // Unused parameter
+    (void) step; /* Unused parameter */
 
 #if defined(MBEDTLS_PSA_BUILTIN_ALG_JPAKE)
     /*
@@ -407,7 +409,7 @@ static psa_status_t mbedtls_psa_pake_input_internal(
     size_t input_length)
 {
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
-    (void) step; // Unused parameter
+    (void) step; /* Unused parameter */
 
 #if defined(MBEDTLS_PSA_BUILTIN_ALG_JPAKE)
     /*

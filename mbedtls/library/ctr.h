@@ -20,9 +20,10 @@
  */
 static inline void mbedtls_ctr_increment_counter(uint8_t n[16])
 {
-    // The 32-bit version seems to perform about the same as a 64-bit version
-    // on 64-bit architectures, so no need to define a 64-bit version.
-    for (int i = 3;; i--) {
+    /* The 32-bit version seems to perform about the same as a 64-bit version */
+    /* on 64-bit architectures, so no need to define a 64-bit version. */
+    int i;
+    for (i = 3;; i--) {
         uint32_t x = MBEDTLS_GET_UINT32_BE(n, i << 2);
         x += 1;
         MBEDTLS_PUT_UINT32_BE(x, n, i << 2);

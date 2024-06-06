@@ -4871,9 +4871,9 @@ static int ecp_mod_p192(mbedtls_mpi *N)
     p = N->p;
     end = p + N->n;
 
-    ADD(3); ADD(5);             NEXT;     // A0 += A3 + A5
-    ADD(3); ADD(4); ADD(5);   NEXT;       // A1 += A3 + A4 + A5
-    ADD(4); ADD(5);             LAST;     // A2 += A4 + A5
+    ADD(3); ADD(5);             NEXT;     /* A0 += A3 + A5 */
+    ADD(3); ADD(4); ADD(5);   NEXT;       /* A1 += A3 + A4 + A5 */
+    ADD(4); ADD(5);             LAST;     /* A2 += A4 + A5 */
 
 cleanup:
     return ret;
@@ -4981,6 +4981,7 @@ static inline void sub32(uint32_t *dst, uint32_t src, signed char *carry)
 static void mbedtls_ecp_fix_negative(mbedtls_mpi *N, signed char c, size_t bits)
 {
     size_t i;
+	mbedtls_mpi_uint msw;
 
     /* Set N := 2^bits - 1 - N. We know that 0 <= N < 2^bits, so
      * set the absolute value to 0xfff...fff - N. There is no carry
@@ -4999,7 +5000,7 @@ static void mbedtls_ecp_fix_negative(mbedtls_mpi *N, signed char c, size_t bits)
 
     /* Add |c| * 2^bits to the absolute value. Since c and N are
      * negative, this adds c * 2^bits. */
-    mbedtls_mpi_uint msw = (mbedtls_mpi_uint) -c;
+    msw = (mbedtls_mpi_uint) -c;
 #if defined(MBEDTLS_HAVE_INT64)
     if (bits == 224) {
         msw <<= 32;
@@ -5016,13 +5017,13 @@ static int ecp_mod_p224(mbedtls_mpi *N)
 {
     INIT(224);
 
-    SUB(7); SUB(11);               NEXT;      // A0 += -A7 - A11
-    SUB(8); SUB(12);               NEXT;      // A1 += -A8 - A12
-    SUB(9); SUB(13);               NEXT;      // A2 += -A9 - A13
-    SUB(10); ADD(7); ADD(11);    NEXT;        // A3 += -A10 + A7 + A11
-    SUB(11); ADD(8); ADD(12);    NEXT;        // A4 += -A11 + A8 + A12
-    SUB(12); ADD(9); ADD(13);    NEXT;        // A5 += -A12 + A9 + A13
-    SUB(13); ADD(10);               LAST;     // A6 += -A13 + A10
+    SUB(7); SUB(11);               NEXT;      /* A0 += -A7 - A11 */
+    SUB(8); SUB(12);               NEXT;      /* A1 += -A8 - A12 */
+    SUB(9); SUB(13);               NEXT;      /* A2 += -A9 - A13 */
+    SUB(10); ADD(7); ADD(11);    NEXT;        /* A3 += -A10 + A7 + A11 */
+    SUB(11); ADD(8); ADD(12);    NEXT;        /* A4 += -A11 + A8 + A12 */
+    SUB(12); ADD(9); ADD(13);    NEXT;        /* A5 += -A12 + A9 + A13 */
+    SUB(13); ADD(10);               LAST;     /* A6 += -A13 + A10 */
 
 cleanup:
     return ret;
@@ -5038,28 +5039,28 @@ static int ecp_mod_p256(mbedtls_mpi *N)
     INIT(256);
 
     ADD(8); ADD(9);
-    SUB(11); SUB(12); SUB(13); SUB(14);             NEXT;         // A0
+    SUB(11); SUB(12); SUB(13); SUB(14);             NEXT;         /* A0 */
 
     ADD(9); ADD(10);
-    SUB(12); SUB(13); SUB(14); SUB(15);             NEXT;         // A1
+    SUB(12); SUB(13); SUB(14); SUB(15);             NEXT;         /* A1 */
 
     ADD(10); ADD(11);
-    SUB(13); SUB(14); SUB(15);                        NEXT;       // A2
+    SUB(13); SUB(14); SUB(15);                        NEXT;       /* A2 */
 
     ADD(11); ADD(11); ADD(12); ADD(12); ADD(13);
-    SUB(15); SUB(8); SUB(9);                        NEXT;         // A3
+    SUB(15); SUB(8); SUB(9);                        NEXT;         /* A3 */
 
     ADD(12); ADD(12); ADD(13); ADD(13); ADD(14);
-    SUB(9); SUB(10);                                   NEXT;      // A4
+    SUB(9); SUB(10);                                   NEXT;      /* A4 */
 
     ADD(13); ADD(13); ADD(14); ADD(14); ADD(15);
-    SUB(10); SUB(11);                                   NEXT;     // A5
+    SUB(10); SUB(11);                                   NEXT;     /* A5 */
 
     ADD(14); ADD(14); ADD(15); ADD(15); ADD(14); ADD(13);
-    SUB(8); SUB(9);                                   NEXT;       // A6
+    SUB(8); SUB(9);                                   NEXT;       /* A6 */
 
     ADD(15); ADD(15); ADD(15); ADD(8);
-    SUB(10); SUB(11); SUB(12); SUB(13);             LAST;         // A7
+    SUB(10); SUB(11); SUB(12); SUB(13);             LAST;         /* A7 */
 
 cleanup:
     return ret;
@@ -5075,40 +5076,40 @@ static int ecp_mod_p384(mbedtls_mpi *N)
     INIT(384);
 
     ADD(12); ADD(21); ADD(20);
-    SUB(23);                                              NEXT;   // A0
+    SUB(23);                                              NEXT;   /* A0 */
 
     ADD(13); ADD(22); ADD(23);
-    SUB(12); SUB(20);                                   NEXT;     // A2
+    SUB(12); SUB(20);                                   NEXT;     /* A2 */
 
     ADD(14); ADD(23);
-    SUB(13); SUB(21);                                   NEXT;     // A2
+    SUB(13); SUB(21);                                   NEXT;     /* A2 */
 
     ADD(15); ADD(12); ADD(20); ADD(21);
-    SUB(14); SUB(22); SUB(23);                        NEXT;       // A3
+    SUB(14); SUB(22); SUB(23);                        NEXT;       /* A3 */
 
     ADD(21); ADD(21); ADD(16); ADD(13); ADD(12); ADD(20); ADD(22);
-    SUB(15); SUB(23); SUB(23);                        NEXT;       // A4
+    SUB(15); SUB(23); SUB(23);                        NEXT;       /* A4 */
 
     ADD(22); ADD(22); ADD(17); ADD(14); ADD(13); ADD(21); ADD(23);
-    SUB(16);                                              NEXT;   // A5
+    SUB(16);                                              NEXT;   /* A5 */
 
     ADD(23); ADD(23); ADD(18); ADD(15); ADD(14); ADD(22);
-    SUB(17);                                              NEXT;   // A6
+    SUB(17);                                              NEXT;   /* A6 */
 
     ADD(19); ADD(16); ADD(15); ADD(23);
-    SUB(18);                                              NEXT;   // A7
+    SUB(18);                                              NEXT;   /* A7 */
 
     ADD(20); ADD(17); ADD(16);
-    SUB(19);                                              NEXT;   // A8
+    SUB(19);                                              NEXT;   /* A8 */
 
     ADD(21); ADD(18); ADD(17);
-    SUB(20);                                              NEXT;   // A9
+    SUB(20);                                              NEXT;   /* A9 */
 
     ADD(22); ADD(19); ADD(18);
-    SUB(21);                                              NEXT;   // A10
+    SUB(21);                                              NEXT;   /* A10 */
 
     ADD(23); ADD(20); ADD(19);
-    SUB(22);                                              LAST;   // A11
+    SUB(22);                                              LAST;   /* A11 */
 
 cleanup:
     return ret;
@@ -5309,8 +5310,8 @@ cleanup:
  * Write N as A0 + 2^224 A1, return A0 + R * A1.
  * Actually do two passes, since R is big.
  */
-#define P_KOBLITZ_MAX   (256 / 8 / sizeof(mbedtls_mpi_uint))      // Max limbs in P
-#define P_KOBLITZ_R     (8 / sizeof(mbedtls_mpi_uint))            // Limbs in R
+#define P_KOBLITZ_MAX   (256 / 8 / sizeof(mbedtls_mpi_uint))      /* Max limbs in P */
+#define P_KOBLITZ_R     (8 / sizeof(mbedtls_mpi_uint))            /* Limbs in R */
 static inline int ecp_mod_koblitz(mbedtls_mpi *N, const mbedtls_mpi_uint *Rp, size_t p_limbs,
                                   size_t adjust, size_t shift, mbedtls_mpi_uint mask)
 {

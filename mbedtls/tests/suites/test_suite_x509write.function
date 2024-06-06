@@ -686,13 +686,13 @@ void mbedtls_x509_string_to_names(char *name, char *parsed_name,
     size_t len = 0;
     mbedtls_asn1_named_data *names = NULL;
     mbedtls_x509_name parsed;
-    memset(&parsed, 0, sizeof(parsed));
     mbedtls_x509_name *parsed_cur = NULL;
     mbedtls_x509_name *parsed_prv = NULL;
     unsigned char buf[1024] = { 0 };
     unsigned char out[1024] = { 0 };
     unsigned char *c = buf + sizeof(buf);
 
+    memset(&parsed, 0, sizeof(parsed));
     USE_PSA_INIT();
 
     ret = mbedtls_x509_string_to_names(&names, name);
@@ -741,12 +741,11 @@ exit:
 void x509_set_extension_length_check()
 {
     int ret = 0;
-
     mbedtls_x509write_csr ctx;
-    mbedtls_x509write_csr_init(&ctx);
-
     unsigned char buf[EXT_KEY_USAGE_TMP_BUF_MAX_LENGTH] = { 0 };
     unsigned char *p = buf + sizeof(buf);
+
+    mbedtls_x509write_csr_init(&ctx);
 
     ret = mbedtls_x509_set_extension(&(ctx.MBEDTLS_PRIVATE(extensions)),
                                      MBEDTLS_OID_EXTENDED_KEY_USAGE,

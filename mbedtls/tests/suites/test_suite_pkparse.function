@@ -18,6 +18,12 @@
 static int test_psa_bridge(const mbedtls_pk_context *ctx,
                            psa_key_usage_t usage_flag)
 {
+    psa_algorithm_t exercise_usage;
+    psa_algorithm_t exercise_alg;
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    mbedtls_svc_key_id_t psa_key = MBEDTLS_SVC_KEY_ID_INIT;
+    int ok = 0;
+
     switch (usage_flag) {
         case PSA_KEY_USAGE_SIGN_HASH:
             mbedtls_test_set_step(0);
@@ -42,18 +48,14 @@ static int test_psa_bridge(const mbedtls_pk_context *ctx,
             break;
     }
 
-    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-    mbedtls_svc_key_id_t psa_key = MBEDTLS_SVC_KEY_ID_INIT;
-    int ok = 0;
-
     TEST_EQUAL(mbedtls_pk_get_psa_attributes(ctx, usage_flag, &attributes), 0);
     TEST_EQUAL(mbedtls_pk_import_into_psa(ctx, &attributes, &psa_key), 0);
     if (!mbedtls_test_key_consistency_psa_pk(psa_key, ctx)) {
         goto exit;
     }
 
-    psa_algorithm_t exercise_usage = psa_get_key_usage_flags(&attributes);
-    psa_algorithm_t exercise_alg = psa_get_key_algorithm(&attributes);
+    exercise_usage = psa_get_key_usage_flags(&attributes);
+    exercise_alg = psa_get_key_algorithm(&attributes);
     if (mbedtls_test_can_exercise_psa_algorithm(exercise_alg)) {
         TEST_ASSERT(mbedtls_test_psa_exercise_key(psa_key,
                                                   exercise_usage,
@@ -119,11 +121,12 @@ void pk_parse_keyfile_rsa(char *key_file, char *password, int result)
 
     if (res == 0) {
         mbedtls_rsa_context *rsa;
+        size_t bitlen;
         TEST_ASSERT(mbedtls_pk_can_do(&ctx, MBEDTLS_PK_RSA));
         rsa = mbedtls_pk_rsa(ctx);
         TEST_EQUAL(mbedtls_rsa_check_privkey(rsa), 0);
 
-        size_t bitlen = mbedtls_rsa_get_bitlen(rsa);
+        bitlen = mbedtls_rsa_get_bitlen(rsa);
         TEST_EQUAL(mbedtls_pk_get_bitlen(&ctx), bitlen);
         TEST_EQUAL(mbedtls_pk_get_len(&ctx), (bitlen + 7) / 8);
 
@@ -160,11 +163,12 @@ void pk_parse_public_keyfile_rsa(char *key_file, int result)
 
     if (res == 0) {
         mbedtls_rsa_context *rsa;
+        size_t bitlen;
         TEST_ASSERT(mbedtls_pk_can_do(&ctx, MBEDTLS_PK_RSA));
         rsa = mbedtls_pk_rsa(ctx);
         TEST_EQUAL(mbedtls_rsa_check_pubkey(rsa), 0);
 
-        size_t bitlen = mbedtls_rsa_get_bitlen(rsa);
+        bitlen = mbedtls_rsa_get_bitlen(rsa);
         TEST_EQUAL(mbedtls_pk_get_bitlen(&ctx), bitlen);
         TEST_EQUAL(mbedtls_pk_get_len(&ctx), (bitlen + 7) / 8);
 
@@ -202,9 +206,11 @@ void pk_parse_public_keyfile_ec(char *key_file, int result)
          * not because this is already done by the internal "pk_get_ecpubkey()"
          * function */
 #else
+        {
         const mbedtls_ecp_keypair *eckey;
         eckey = mbedtls_pk_ec_ro(ctx);
         TEST_EQUAL(mbedtls_ecp_check_pubkey(&eckey->grp, &eckey->Q), 0);
+	}
 #endif
 
 #if defined(MBEDTLS_PSA_CRYPTO_C)
@@ -241,8 +247,10 @@ void pk_parse_keyfile_ec(char *key_file, char *password, int result)
 #if defined(MBEDTLS_PK_USE_PSA_EC_DATA)
         /* PSA keys are already checked on import so nothing to do here. */
 #else
+        {
         const mbedtls_ecp_keypair *eckey = mbedtls_pk_ec_ro(ctx);
         TEST_EQUAL(mbedtls_ecp_check_privkey(&eckey->grp, &eckey->d), 0);
+	}
 #endif
 
 #if defined(MBEDTLS_PSA_CRYPTO_C)

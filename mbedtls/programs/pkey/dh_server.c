@@ -67,6 +67,7 @@ int main(void)
     mbedtls_aes_context aes;
 
     mbedtls_mpi N, P, Q, D, E, dhm_P, dhm_G;
+    size_t rsa_key_len;
 
     mbedtls_net_init(&listen_fd);
     mbedtls_net_init(&client_fd);
@@ -198,7 +199,7 @@ int main(void)
         goto exit;
     }
 
-    const size_t rsa_key_len = mbedtls_rsa_get_len(&rsa);
+    rsa_key_len = mbedtls_rsa_get_len(&rsa);
     buf[n] = (unsigned char) (rsa_key_len >> 8);
     buf[n + 1] = (unsigned char) (rsa_key_len);
 

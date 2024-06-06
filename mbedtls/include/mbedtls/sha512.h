@@ -26,8 +26,8 @@ extern "C" {
 #endif
 
 #if !defined(MBEDTLS_SHA512_ALT)
-// Regular implementation
-//
+/* Regular implementation */
+
 
 /**
  * \brief          The SHA-512 context structure.

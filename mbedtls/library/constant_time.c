@@ -130,8 +130,9 @@ int mbedtls_ct_memcmp_partial(const void *a,
     volatile const unsigned char *B = (volatile const unsigned char *) b;
 
     size_t valid_end = n - skip_tail;
+	size_t i;
 
-    for (size_t i = 0; i < n; i++) {
+    for (i = 0; i < n; i++) {
         unsigned char x = A[i], y = B[i];
         unsigned int d = x ^ y;
         mbedtls_ct_condition_t valid = mbedtls_ct_bool_and(mbedtls_ct_uint_ge(i, skip_head),
@@ -151,12 +152,14 @@ int mbedtls_ct_memcmp_partial(const void *a,
 void mbedtls_ct_memmove_left(void *start, size_t total, size_t offset)
 {
     volatile unsigned char *buf = start;
-    for (size_t i = 0; i < total; i++) {
+    size_t i, n;
+
+    for (i = 0; i < total; i++) {
         mbedtls_ct_condition_t no_op = mbedtls_ct_uint_gt(total - offset, i);
         /* The first `total - offset` passes are a no-op. The last
          * `offset` passes shift the data one byte to the left and
          * zero out the last byte. */
-        for (size_t n = 0; n < total - 1; n++) {
+        for (n = 0; n < total - 1; n++) {
             unsigned char current = buf[n];
             unsigned char next    = buf[n+1];
             buf[n] = mbedtls_ct_uint_if(no_op, current, next);
@@ -180,6 +183,7 @@ void mbedtls_ct_memcpy_if(mbedtls_ct_condition_t condition,
     const uint32_t mask     = (uint32_t) condition;
     const uint32_t not_mask = (uint32_t) ~mbedtls_ct_compiler_opaque(condition);
 #endif
+    size_t i = 0;
 
     /* If src2 is NULL, setup src2 so that we read from the destination address.
      *
@@ -191,7 +195,6 @@ void mbedtls_ct_memcpy_if(mbedtls_ct_condition_t condition,
     }
 
     /* dest[i] = c1 == c2 ? src[i] : dest[i] */
-    size_t i = 0;
 #if defined(MBEDTLS_EFFICIENT_UNALIGNED_ACCESS)
 #if defined(MBEDTLS_CT_SIZE_64)
     for (; (i + 8) <= len; i += 8) {

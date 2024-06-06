@@ -24,7 +24,7 @@
  */
 
 /* System support */
-//#define MBEDTLS_HAVE_TIME /* Optionally used in Hello messages */
+/*#define MBEDTLS_HAVE_TIME */ /* Optionally used in Hello messages */
 /* Other MBEDTLS_HAVE_XXX flags irrelevant for this configuration */
 
 /* Mbed TLS modules */
@@ -83,10 +83,10 @@
 
 /* These defines are present so that the config modifying scripts can enable
  * them during tests/scripts/test-ref-configs.pl */
-//#define MBEDTLS_USE_PSA_CRYPTO
-//#define MBEDTLS_PSA_CRYPTO_C
+/*#define MBEDTLS_USE_PSA_CRYPTO */
+/*#define MBEDTLS_PSA_CRYPTO_C */
 
 /* Error messages and TLS debugging traces
  * (huge code size increase, needed for tests/ssl-opt.sh) */
-//#define MBEDTLS_DEBUG_C
-//#define MBEDTLS_ERROR_C
+/*#define MBEDTLS_DEBUG_C */
+/*#define MBEDTLS_ERROR_C */

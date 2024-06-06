@@ -361,6 +361,8 @@ int mbedtls_nist_kw_unwrap(mbedtls_nist_kw_context *ctx,
     } else if (mode == MBEDTLS_KW_MODE_KWP) {
         size_t padlen = 0;
         uint32_t Plen;
+        const uint8_t zero[KW_SEMIBLOCK_LENGTH] = { 0 };
+
         /*
          * According to SP 800-38F Table 1, the ciphertext length for KWP
          * must be between 2 to 2^29 semiblocks inclusive.
@@ -414,7 +416,6 @@ int mbedtls_nist_kw_unwrap(mbedtls_nist_kw_context *ctx,
         padlen &= 7;
 
         /* Check padding in "constant-time" */
-        const uint8_t zero[KW_SEMIBLOCK_LENGTH] = { 0 };
         diff = mbedtls_ct_memcmp_partial(
             &output[*out_len - KW_SEMIBLOCK_LENGTH], zero,
             KW_SEMIBLOCK_LENGTH, KW_SEMIBLOCK_LENGTH - padlen, 0);

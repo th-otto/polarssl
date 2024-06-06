@@ -229,6 +229,7 @@ __MBEDTLS_TEST_TEMPLATE__PLATFORM_CODE
  */
 int main(int argc, const char *argv[])
 {
+    int ret;
 #if defined(MBEDTLS_TEST_HOOKS)
     extern void (*mbedtls_test_hook_test_fail)(const char *test, int line, const char *file);
     mbedtls_test_hook_test_fail = &mbedtls_test_fail;
@@ -252,7 +253,7 @@ int main(int argc, const char *argv[])
         try_chdir_if_supported(argv[0]);
     }
 
-    int ret = mbedtls_test_platform_setup();
+    ret = mbedtls_test_platform_setup();
     if (ret != 0) {
         mbedtls_fprintf(stderr,
                         "FATAL: Failed to initialize platform - error %d\n",

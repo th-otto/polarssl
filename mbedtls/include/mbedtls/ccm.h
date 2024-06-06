@@ -59,8 +59,8 @@ extern "C" {
 #endif
 
 #if !defined(MBEDTLS_CCM_ALT)
-// Regular implementation
-//
+/* Regular implementation */
+
 
 /**
  * \brief    The CCM context-type definition. The CCM context is passed

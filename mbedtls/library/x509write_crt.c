@@ -111,7 +111,7 @@ int mbedtls_x509write_crt_set_serial(mbedtls_x509write_cert *ctx,
 
     return 0;
 }
-#endif // MBEDTLS_BIGNUM_C && !MBEDTLS_DEPRECATED_REMOVED
+#endif /* MBEDTLS_BIGNUM_C && !MBEDTLS_DEPRECATED_REMOVED */
 
 int mbedtls_x509write_crt_set_serial_raw(mbedtls_x509write_cert *ctx,
                                          unsigned char *serial, size_t serial_len)
@@ -239,7 +239,7 @@ static int mbedtls_x509write_crt_set_key_identifier(mbedtls_x509write_cert *ctx,
     MBEDTLS_ASN1_CHK_ADD(len, mbedtls_asn1_write_len(&c, buf, len));
     MBEDTLS_ASN1_CHK_ADD(len, mbedtls_asn1_write_tag(&c, buf, tag));
 
-    if (is_ca) { // writes AuthorityKeyIdentifier sequence
+    if (is_ca) { /* writes AuthorityKeyIdentifier sequence */
         MBEDTLS_ASN1_CHK_ADD(len, mbedtls_asn1_write_len(&c, buf, len));
         MBEDTLS_ASN1_CHK_ADD(len,
                              mbedtls_asn1_write_tag(&c,

@@ -84,8 +84,9 @@ const unsigned char key_bytes[32] = { 0x2a };
 /* Print the contents of a buffer in hex */
 void print_buf(const char *title, uint8_t *buf, size_t len)
 {
+	size_t i;
     printf("%s:", title);
-    for (size_t i = 0; i < len; i++) {
+    for (i = 0; i < len; i++) {
         printf(" %02x", buf[i]);
     }
     printf("\n");
@@ -120,6 +121,7 @@ static psa_status_t aead_prepare(const char *info,
                                  psa_algorithm_t *alg)
 {
     psa_status_t status;
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
 
     /* Convert arg to alg + key_bits + key_type */
     size_t key_bits;
@@ -146,11 +148,10 @@ static psa_status_t aead_prepare(const char *info,
     }
 
     /* Prepare key attributes */
-    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
     psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_ENCRYPT);
     psa_set_key_algorithm(&attributes, *alg);
     psa_set_key_type(&attributes, key_type);
-    psa_set_key_bits(&attributes, key_bits);   // optional
+    psa_set_key_bits(&attributes, key_bits);   /* optional */
 
     /* Import key */
     PSA_CHECK(psa_import_key(&attributes, key_bytes, key_bits / 8, key));
@@ -169,6 +170,7 @@ static void aead_info(psa_key_id_t key, psa_algorithm_t alg)
 {
     psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
     (void) psa_get_key_attributes(key, &attr);
+    {
     psa_key_type_t key_type = psa_get_key_type(&attr);
     size_t key_bits = psa_get_key_bits(&attr);
     psa_algorithm_t base_alg = PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg);
@@ -183,6 +185,7 @@ static void aead_info(psa_key_id_t key, psa_algorithm_t alg)
 
     printf("%s, %u, %s, %u\n",
            type_str, (unsigned) key_bits, base_str, (unsigned) tag_len);
+    }
 }
 
 /*
@@ -219,7 +222,7 @@ static int aead_encrypt(psa_key_id_t key, psa_algorithm_t alg,
     print_buf("out", out, olen);
 
 exit:
-    psa_aead_abort(&op);   // required on errors, harmless on success
+    psa_aead_abort(&op);   /* required on errors, harmless on success */
     return status;
 }
 

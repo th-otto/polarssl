@@ -67,9 +67,9 @@ int mbedtls_x509_write_set_san_common(mbedtls_asn1_named_data **extensions,
             {
                 const mbedtls_asn1_named_data *chunk = &cur->node.san.directory_name;
                 while (chunk != NULL) {
-                    // Max 4 bytes for length, +1 for tag,
-                    // additional 4 max for length, +1 for tag.
-                    // See x509_write_name for more information.
+                    /* Max 4 bytes for length, +1 for tag, */
+                    /* additional 4 max for length, +1 for tag. */
+                    /* See x509_write_name for more information. */
                     CHECK_OVERFLOW_ADD(buflen, 4 + 1 + 4 + 1);
                     CHECK_OVERFLOW_ADD(buflen, chunk->oid.len);
                     CHECK_OVERFLOW_ADD(buflen, chunk->val.len);

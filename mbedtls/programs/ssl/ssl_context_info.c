@@ -492,18 +492,18 @@ void print_deserialized_ssl_cert(const uint8_t *ssl, uint32_t len)
  *
  * The data structure in the buffer:
  *  uint64 start_time;
- *  uint8 ciphersuite[2];        // defined by the standard
- *  uint8 compression;           // 0 or 1
- *  uint8 session_id_len;        // at most 32
+ *  uint8 ciphersuite[2];        / / defined by the standard
+ *  uint8 compression;           / / 0 or 1
+ *  uint8 session_id_len;        / / at most 32
  *  opaque session_id[32];
- *  opaque master[48];           // fixed length in the standard
+ *  opaque master[48];           / / fixed length in the standard
  *  uint32 verify_result;
- *  opaque peer_cert<0..2^24-1>; // length 0 means no peer cert
- *  opaque ticket<0..2^24-1>;    // length 0 means no ticket
+ *  opaque peer_cert<0..2^24-1>; / / length 0 means no peer cert
+ *  opaque ticket<0..2^24-1>;    / / length 0 means no ticket
  *  uint32 ticket_lifetime;
- *  uint8 mfl_code;              // up to 255 according to standard
- *  uint8 trunc_hmac;            // 0 or 1
- *  uint8 encrypt_then_mac;      // 0 or 1
+ *  uint8 mfl_code;              / / up to 255 according to standard
+ *  uint8 trunc_hmac;            / / 0 or 1
+ *  uint8 encrypt_then_mac;      / / 0 or 1
  *
  * /p ssl               pointer to serialized session
  * /p len               number of bytes in the buffer
@@ -553,12 +553,14 @@ void print_deserialized_ssl_session(const uint8_t *ssl, uint32_t len,
         printf("\tcipher flags   : 0x%02X\n", ciphersuite_info->MBEDTLS_PRIVATE(flags));
 
 #if defined(MBEDTLS_CIPHER_C)
+	    {
         const mbedtls_cipher_info_t *cipher_info;
         cipher_info = mbedtls_cipher_info_from_type(ciphersuite_info->MBEDTLS_PRIVATE(cipher));
         if (cipher_info == NULL) {
             printf_err("Cannot find cipher info\n");
         } else {
             printf("\tcipher         : %s\n", mbedtls_cipher_info_get_name(cipher_info));
+        }
         }
 #else /* MBEDTLS_CIPHER_C */
         printf("\tcipher type     : %d\n", ciphersuite_info->MBEDTLS_PRIVATE(cipher));
@@ -721,27 +723,27 @@ void print_deserialized_ssl_session(const uint8_t *ssl, uint32_t len,
  * the context when serialization was created.
  *
  * The data structure in the buffer:
- *  // header
+ *  / / header
  *  uint8 version[3];
  *  uint8 configuration[5];
- *  // session sub-structure
+ *  / / session sub-structure
  *  uint32_t session_len;
- *  opaque session<1..2^32-1>;  // see mbedtls_ssl_session_save()
- *  // transform sub-structure
- *  uint8 random[64];           // ServerHello.random+ClientHello.random
+ *  opaque session<1..2^32-1>;  / / see mbedtls_ssl_session_save()
+ *  / / transform sub-structure
+ *  uint8 random[64];           / / ServerHello.random+ClientHello.random
  *  uint8 in_cid_len;
- *  uint8 in_cid<0..2^8-1>      // Connection ID: expected incoming value
+ *  uint8 in_cid<0..2^8-1>      / / Connection ID: expected incoming value
  *  uint8 out_cid_len;
- *  uint8 out_cid<0..2^8-1>     // Connection ID: outgoing value to use
- *  // fields from ssl_context
- *  uint32 badmac_seen;         // DTLS: number of records with failing MAC
- *  uint64 in_window_top;       // DTLS: last validated record seq_num
- *  uint64 in_window;           // DTLS: bitmask for replay protection
- *  uint8 disable_datagram_packing; // DTLS: only one record per datagram
- *  uint64 cur_out_ctr;         // Record layer: outgoing sequence number
- *  uint16 mtu;                 // DTLS: path mtu (max outgoing fragment size)
+ *  uint8 out_cid<0..2^8-1>     / / Connection ID: outgoing value to use
+ *  / / fields from ssl_context
+ *  uint32 badmac_seen;         / / DTLS: number of records with failing MAC
+ *  uint64 in_window_top;       / / DTLS: last validated record seq_num
+ *  uint64 in_window;           / / DTLS: bitmask for replay protection
+ *  uint8 disable_datagram_packing; / / DTLS: only one record per datagram
+ *  uint64 cur_out_ctr;         / / Record layer: outgoing sequence number
+ *  uint16 mtu;                 / / DTLS: path mtu (max outgoing fragment size)
  *  uint8 alpn_chosen_len;
- *  uint8 alpn_chosen<0..2^8-1> // ALPN: negotiated application protocol
+ *  uint8 alpn_chosen<0..2^8-1> / / ALPN: negotiated application protocol
  *
  * /p ssl   pointer to serialized session
  * /p len   number of bytes in the buffer

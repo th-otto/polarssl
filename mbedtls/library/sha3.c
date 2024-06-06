@@ -25,20 +25,20 @@
  * x86-64.
  */
 #if !defined(MBEDTLS_SHA3_THETA_UNROLL)
-    #define MBEDTLS_SHA3_THETA_UNROLL 0 //no-check-names
+    #define MBEDTLS_SHA3_THETA_UNROLL 0 /* no-check-names */
 #endif
 #if !defined(MBEDTLS_SHA3_CHI_UNROLL)
     #if defined(__OPTIMIZE_SIZE__)
-        #define MBEDTLS_SHA3_CHI_UNROLL 0 //no-check-names
+        #define MBEDTLS_SHA3_CHI_UNROLL 0 /* no-check-names */
     #else
-        #define MBEDTLS_SHA3_CHI_UNROLL 1 //no-check-names
+        #define MBEDTLS_SHA3_CHI_UNROLL 1 /* no-check-names */
     #endif
 #endif
 #if !defined(MBEDTLS_SHA3_PI_UNROLL)
-    #define MBEDTLS_SHA3_PI_UNROLL 1 //no-check-names
+    #define MBEDTLS_SHA3_PI_UNROLL 1 /* no-check-names */
 #endif
 #if !defined(MBEDTLS_SHA3_RHO_UNROLL)
-    #define MBEDTLS_SHA3_RHO_UNROLL 1 //no-check-names
+    #define MBEDTLS_SHA3_RHO_UNROLL 1 /* no-check-names */
 #endif
 
 #include "mbedtls/sha3.h"
@@ -91,7 +91,7 @@ static const uint32_t pi[6] = {
     0x110b070a, 0x10050312, 0x04181508, 0x0d13170f, 0x0e14020c, 0x01060916
 };
 
-#define ROTR64(x, y) (((x) << (64U - (y))) | ((x) >> (y))) // 64-bit rotate right
+#define ROTR64(x, y) (((x) << (64U - (y))) | ((x) >> (y))) /* 64-bit rotate right */
 #define ABSORB(ctx, idx, v) do { ctx->state[(idx) >> 3] ^= ((uint64_t) (v)) << (((idx) & 0x7) << 3); \
 } while (0)
 #define SQUEEZE(ctx, idx) ((uint8_t) (ctx->state[(idx) >> 3] >> (((idx) & 0x7) << 3)))
@@ -103,12 +103,14 @@ static void keccak_f1600(mbedtls_sha3_context *ctx)
     uint64_t lane[5];
     uint64_t *s = ctx->state;
     int i;
+	int round;
 
-    for (int round = 0; round < 24; round++) {
+    for (round = 0; round < 24; round++) {
         uint64_t t;
+		uint32_t p;
 
         /* Theta */
-#if MBEDTLS_SHA3_THETA_UNROLL == 0 //no-check-names
+#if MBEDTLS_SHA3_THETA_UNROLL == 0 /* no-check-names */
         for (i = 0; i < 5; i++) {
             lane[i] = s[i] ^ s[i + 5] ^ s[i + 10] ^ s[i + 15] ^ s[i + 20];
         }
@@ -167,7 +169,7 @@ static void keccak_f1600(mbedtls_sha3_context *ctx)
             }
         }
 #else
-        uint32_t p = pi[0];
+        p = pi[0];
         SWAP(s[MBEDTLS_BYTE_0(p)], t); SWAP(s[MBEDTLS_BYTE_1(p)], t);
         SWAP(s[MBEDTLS_BYTE_2(p)], t); SWAP(s[MBEDTLS_BYTE_3(p)], t);
         p = pi[1];
@@ -188,7 +190,7 @@ static void keccak_f1600(mbedtls_sha3_context *ctx)
 #endif
 
         /* Chi */
-#if MBEDTLS_SHA3_CHI_UNROLL == 0 //no-check-names
+#if MBEDTLS_SHA3_CHI_UNROLL == 0 /* no-check-names */
         for (i = 0; i <= 20; i += 5) {
             lane[0] = s[i]; lane[1] = s[i + 1]; lane[2] = s[i + 2];
             lane[3] = s[i + 3]; lane[4] = s[i + 4];
@@ -304,7 +306,7 @@ int mbedtls_sha3_update(mbedtls_sha3_context *ctx,
                         size_t ilen)
 {
     if (ilen >= 8) {
-        // 8-byte align index
+        /* 8-byte align index */
         int align_bytes = 8 - (ctx->index % 8);
         if (align_bytes) {
             for (; align_bytes > 0; align_bytes--) {
@@ -317,7 +319,7 @@ int mbedtls_sha3_update(mbedtls_sha3_context *ctx,
             }
         }
 
-        // process input in 8-byte chunks
+        /* process input in 8-byte chunks */
         while (ilen >= 8) {
             ABSORB(ctx, ctx->index, MBEDTLS_GET_UINT64_LE(input, 0));
             input += 8;
@@ -328,7 +330,7 @@ int mbedtls_sha3_update(mbedtls_sha3_context *ctx,
         }
     }
 
-    // handle remaining bytes
+    /* handle remaining bytes */
     while (ilen-- > 0) {
         ABSORB(ctx, ctx->index, *input++);
         if ((ctx->index = (ctx->index + 1) % ctx->max_block_size) == 0) {
@@ -593,6 +595,7 @@ static int mbedtls_sha3_long_kat_test(int verbose,
     unsigned char buffer[1000];
     unsigned char hash[64];
     int result = 0;
+	int i;
 
     memset(buffer, 'a', 1000);
 
@@ -610,7 +613,7 @@ static int mbedtls_sha3_long_kat_test(int verbose,
     }
 
     /* Process 1,000,000 (one million) 'a' characters */
-    for (int i = 0; i < 1000; i++) {
+    for (i = 0; i < 1000; i++) {
         result = mbedtls_sha3_update(&ctx, buffer, 1000);
         if (result != 0) {
             if (verbose != 0) {

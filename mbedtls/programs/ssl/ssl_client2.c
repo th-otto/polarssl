@@ -1038,7 +1038,7 @@ usage:
 
         if ((q = strchr(p, '=')) == NULL) {
             mbedtls_printf("param requires a value: '%s'\n", p);
-            p = NULL; // avoid "unrecnognized param" message
+            p = NULL; /* avoid "unrecnognized param" message */
             goto usage;
         }
         *q++ = '\0';
@@ -3181,12 +3181,14 @@ exit:
 #endif  /* MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED && MBEDTLS_USE_PSA_CRYPTO */
 
 #if defined(MBEDTLS_USE_PSA_CRYPTO) || defined(MBEDTLS_SSL_PROTO_TLS1_3)
+    {
     const char *message = mbedtls_test_helper_is_psa_leaking();
     if (message) {
         if (ret == 0) {
             ret = 1;
         }
         mbedtls_printf("PSA memory leak detected: %s\n",  message);
+    }
     }
 #endif /* MBEDTLS_USE_PSA_CRYPTO || MBEDTLS_SSL_PROTO_TLS1_3 */
 
@@ -3216,7 +3218,7 @@ exit:
     mbedtls_memory_buffer_alloc_free();
 #endif  /* MBEDTLS_MEMORY_BUFFER_ALLOC_C */
 
-    // Shell can not handle large exit numbers -> 1 for errors
+    /* Shell can not handle large exit numbers -> 1 for errors */
     if (ret < 0) {
         ret = 1;
     }

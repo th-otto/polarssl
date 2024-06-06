@@ -340,7 +340,7 @@
  * This module adds support for the Hashed Message Authentication Code
  * (HMAC)-based key derivation function (HKDF).
  */
-//#define MBEDTLS_HKDF_C /* Used for HUK deriviation */
+/*#define MBEDTLS_HKDF_C */ /* Used for HUK deriviation */
 
 /**
  * \def MBEDTLS_MEMORY_BUFFER_ALLOC_C
@@ -441,7 +441,7 @@
  * The value of this symbol is typically a path in double quotes, either
  * absolute or relative to a directory on the include search path.
  */
-//#define MBEDTLS_CONFIG_FILE "mbedtls/mbedtls_config.h"
+/*#define MBEDTLS_CONFIG_FILE "mbedtls/mbedtls_config.h" */
 
 /**
  * \def MBEDTLS_USER_CONFIG_FILE
@@ -458,7 +458,7 @@
  * The value of this symbol is typically a path in double quotes, either
  * absolute or relative to a directory on the include search path.
  */
-//#define MBEDTLS_USER_CONFIG_FILE "/dev/null"
+/*#define MBEDTLS_USER_CONFIG_FILE "/dev/null" */
 
 /**
  * \def MBEDTLS_PSA_CRYPTO_CONFIG_FILE
@@ -476,7 +476,7 @@
  * The value of this symbol is typically a path in double quotes, either
  * absolute or relative to a directory on the include search path.
  */
-//#define MBEDTLS_PSA_CRYPTO_CONFIG_FILE "psa/crypto_config.h"
+/*#define MBEDTLS_PSA_CRYPTO_CONFIG_FILE "psa/crypto_config.h" */
 
 /**
  * \def MBEDTLS_PSA_CRYPTO_USER_CONFIG_FILE
@@ -493,7 +493,7 @@
  * The value of this symbol is typically a path in double quotes, either
  * absolute or relative to a directory on the include search path.
  */
-//#define MBEDTLS_PSA_CRYPTO_USER_CONFIG_FILE "/dev/null"
+/*#define MBEDTLS_PSA_CRYPTO_USER_CONFIG_FILE "/dev/null" */
 
 /** \} name SECTION: General configuration options */
 

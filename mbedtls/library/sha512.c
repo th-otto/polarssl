@@ -1043,9 +1043,11 @@ static int mbedtls_sha512_common_self_test(int verbose, int is384)
         }
 
         if (i == 2) {
+        	int j;
+
             memset(buf, 'a', buflen = 1000);
 
-            for (int j = 0; j < 1000; j++) {
+            for (j = 0; j < 1000; j++) {
                 ret = mbedtls_sha512_update(&ctx, buf, buflen);
                 if (ret != 0) {
                     goto fail;

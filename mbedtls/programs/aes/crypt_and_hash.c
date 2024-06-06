@@ -102,8 +102,9 @@ int main(int argc, char *argv[])
         mbedtls_printf("Available ciphers:\n");
         list = mbedtls_cipher_list();
         while (*list) {
+            const char *name;
             cipher_info = mbedtls_cipher_info_from_type(*list);
-            const char *name = mbedtls_cipher_info_get_name(cipher_info);
+            name = mbedtls_cipher_info_get_name(cipher_info);
 
             if (name) {
                 mbedtls_printf("  %s\n", mbedtls_cipher_info_get_name(cipher_info));

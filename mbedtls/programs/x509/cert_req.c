@@ -220,12 +220,13 @@ usage:
                 /* Find the first non-escaped ; occurrence and remove escaped ones */
                 do {
                     if ((semicolon = strchr(r, ';')) != NULL) {
+                        size_t size_left;
                         if (*(semicolon-1) != '\\') {
                             r = semicolon;
                             break;
                         }
                         /* Remove the escape character */
-                        size_t size_left = strlen(semicolon);
+                        size_left = strlen(semicolon);
                         memmove(semicolon-1, semicolon, size_left);
                         *(semicolon + size_left - 1) = '\0';
                         /* r will now point at the character after the semicolon */

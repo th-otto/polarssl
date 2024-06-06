@@ -51,7 +51,7 @@ printf "%d", -0x7fffffff
 printf_int:"%d":-0x7fffffff:"-2147483647"
 
 printf "%d", -2147483648
-printf_int:"%d":-2147483648:"-2147483648"
+printf_int:"%d":-2147483648U:"-2147483648"
 
 printf "%d", -0x80000000
 printf_int:"%d":-0x80000000:"-2147483648"

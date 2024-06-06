@@ -283,7 +283,7 @@ int mbedtls_cipher_cmac_finish(mbedtls_cipher_context_t *ctx,
 
     cmac_ctx = ctx->cmac_ctx;
     block_size = mbedtls_cipher_info_get_block_size(ctx->cipher_info);
-    MBEDTLS_ASSUME(block_size <= MBEDTLS_CMAC_MAX_BLOCK_SIZE); // silence GCC warning
+    MBEDTLS_ASSUME(block_size <= MBEDTLS_CMAC_MAX_BLOCK_SIZE); /* silence GCC warning */
     state = cmac_ctx->state;
 
     mbedtls_platform_zeroize(K1, sizeof(K1));

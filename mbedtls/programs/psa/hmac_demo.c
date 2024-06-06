@@ -30,7 +30,7 @@
 
 #include "psa/crypto.h"
 
-#include "mbedtls/platform_util.h" // for mbedtls_platform_zeroize
+#include "mbedtls/platform_util.h" /* for mbedtls_platform_zeroize */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -61,8 +61,9 @@ const unsigned char key_bytes[32] = { 0 };
 /* Print the contents of a buffer in hex */
 void print_buf(const char *title, uint8_t *buf, size_t len)
 {
+	size_t i;
     printf("%s:", title);
-    for (size_t i = 0; i < len; i++) {
+    for (i = 0; i < len; i++) {
         printf(" %02x", buf[i]);
     }
     printf("\n");
@@ -94,18 +95,21 @@ psa_status_t hmac_demo(void)
 {
     psa_status_t status;
     const psa_algorithm_t alg = PSA_ALG_HMAC(PSA_ALG_SHA_256);
-    uint8_t out[PSA_MAC_MAX_SIZE]; // safe but not optimal
+    uint8_t out[PSA_MAC_MAX_SIZE]; /* safe but not optimal */
     /* PSA_MAC_LENGTH(PSA_KEY_TYPE_HMAC, 8 * sizeof( key_bytes ), alg)
-     * should work but see https://github.com/Mbed-TLS/mbedtls/issues/4320 */
+     * should work but see https://github.com/Mbed-TLS/mbedtls/issues/4320
+     */
 
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
     psa_key_id_t key = 0;
+    psa_mac_operation_t op = PSA_MAC_OPERATION_INIT;
+    size_t out_len = 0;
 
     /* prepare key */
     psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_MESSAGE);
     psa_set_key_algorithm(&attributes, alg);
     psa_set_key_type(&attributes, PSA_KEY_TYPE_HMAC);
-    psa_set_key_bits(&attributes, 8 * sizeof(key_bytes));     // optional
+    psa_set_key_bits(&attributes, 8 * sizeof(key_bytes));     /* optional */
 
     status = psa_import_key(&attributes,
                             key_bytes, sizeof(key_bytes), &key);
@@ -114,8 +118,6 @@ psa_status_t hmac_demo(void)
     }
 
     /* prepare operation */
-    psa_mac_operation_t op = PSA_MAC_OPERATION_INIT;
-    size_t out_len = 0;
 
     /* compute HMAC(key, msg1_part1 | msg1_part2) */
     PSA_CHECK(psa_mac_sign_setup(&op, key, alg));
@@ -132,7 +134,7 @@ psa_status_t hmac_demo(void)
     print_buf("msg2", out, out_len);
 
 exit:
-    psa_mac_abort(&op);   // needed on error, harmless on success
+    psa_mac_abort(&op);   /* needed on error, harmless on success */
     psa_destroy_key(key);
     mbedtls_platform_zeroize(out, sizeof(out));
 

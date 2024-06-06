@@ -541,12 +541,13 @@ usage:
                 /* Find the first non-escaped ; occurrence and remove escaped ones */
                 do {
                     if ((semicolon = strchr(r, ';')) != NULL) {
+                        size_t size_left;
                         if (*(semicolon-1) != '\\') {
                             r = semicolon;
                             break;
                         }
                         /* Remove the escape character */
-                        size_t size_left = strlen(semicolon);
+                        size_left = strlen(semicolon);
                         memmove(semicolon-1, semicolon, size_left);
                         *(semicolon + size_left - 1) = '\0';
                         /* r will now point at the character after the semicolon */
@@ -687,15 +688,15 @@ usage:
 
     mbedtls_printf(" ok\n");
 
-    // Parse serial to MPI
-    //
+    /* Parse serial to MPI */
+    /* */
     mbedtls_printf("  . Reading serial number...");
     fflush(stdout);
 
     if (serial_frmt == SERIAL_FRMT_HEX) {
         ret = mbedtls_test_unhexify(serial, sizeof(serial),
                                     opt.serial_hex, &serial_len);
-    } else { // SERIAL_FRMT_DEC || SERIAL_FRMT_UNSPEC
+    } else { /* SERIAL_FRMT_DEC || SERIAL_FRMT_UNSPEC */
         ret = parse_serial_decimal_format(serial, sizeof(serial),
                                           opt.serial, &serial_len);
     }
@@ -707,8 +708,8 @@ usage:
 
     mbedtls_printf(" ok\n");
 
-    // Parse issuer certificate if present
-    //
+    /* Parse issuer certificate if present */
+    /* */
     if (!opt.selfsign && strlen(opt.issuer_crt)) {
         /*
          * 1.0.a. Load the certificates
@@ -738,8 +739,8 @@ usage:
     }
 
 #if defined(MBEDTLS_X509_CSR_PARSE_C)
-    // Parse certificate request if present
-    //
+    /* Parse certificate request if present */
+    /* */
     if (!opt.selfsign && strlen(opt.request_file)) {
         /*
          * 1.0.b. Load the CSR
@@ -801,8 +802,8 @@ usage:
         goto exit;
     }
 
-    // Check if key and issuer certificate match
-    //
+    /* Check if key and issuer certificate match */
+    /* */
     if (strlen(opt.issuer_crt)) {
         if (mbedtls_pk_check_pair(&issuer_crt.pk, issuer_key,
                                   mbedtls_ctr_drbg_random, &ctr_drbg) != 0) {

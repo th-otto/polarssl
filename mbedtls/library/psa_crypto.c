@@ -184,7 +184,7 @@ static uint8_t psa_get_drivers_initialized(void)
  */
 #define LOCAL_INPUT_DECLARE(input, input_copy_name) \
     psa_crypto_local_input_t LOCAL_INPUT_COPY_OF_##input = PSA_CRYPTO_LOCAL_INPUT_INIT; \
-    const uint8_t *input_copy_name = NULL;
+    const uint8_t *input_copy_name = NULL
 
 /* Allocate a copy of the buffer input and set the pointer input_copy to
  * point to the start of the copy.
@@ -226,7 +226,7 @@ static uint8_t psa_get_drivers_initialized(void)
  */
 #define LOCAL_OUTPUT_DECLARE(output, output_copy_name) \
     psa_crypto_local_output_t LOCAL_OUTPUT_COPY_OF_##output = PSA_CRYPTO_LOCAL_OUTPUT_INIT; \
-    uint8_t *output_copy_name = NULL;
+    uint8_t *output_copy_name = NULL
 
 /* Allocate a copy of the buffer output and set the pointer output_copy to
  * point to the start of the copy.
@@ -862,6 +862,10 @@ static psa_algorithm_t psa_key_policy_algorithm_intersection(
     if (PSA_ALG_IS_MAC(alg1) && PSA_ALG_IS_MAC(alg2) &&
         (PSA_ALG_FULL_LENGTH_MAC(alg1) ==
          PSA_ALG_FULL_LENGTH_MAC(alg2))) {
+        size_t alg1_len;
+        size_t alg2_len;
+        size_t restricted_len;
+
         /* Validate the combination of key type and algorithm. Since the base
          * algorithm of alg1 and alg2 are the same, we only need this once. */
         if (PSA_SUCCESS != psa_mac_key_can_do(alg1, key_type)) {
@@ -876,9 +880,9 @@ static psa_algorithm_t psa_key_policy_algorithm_intersection(
          * Note that for at-least-this-length wildcard algorithms, the output
          * length is set to the shortest allowed length, which allows us to
          * calculate the most restrictive tag length for the intersection. */
-        size_t alg1_len = PSA_MAC_LENGTH(key_type, 0, alg1);
-        size_t alg2_len = PSA_MAC_LENGTH(key_type, 0, alg2);
-        size_t restricted_len = alg1_len > alg2_len ? alg1_len : alg2_len;
+        alg1_len = PSA_MAC_LENGTH(key_type, 0, alg1);
+        alg2_len = PSA_MAC_LENGTH(key_type, 0, alg2);
+        restricted_len = alg1_len > alg2_len ? alg1_len : alg2_len;
 
         /* If both are wildcards, return most restrictive wildcard */
         if (((alg1 & PSA_ALG_MAC_AT_LEAST_THIS_LENGTH_FLAG) != 0) &&
@@ -941,6 +945,9 @@ static int psa_key_algorithm_permits(psa_key_type_t key_type,
         PSA_ALG_IS_MAC(requested_alg) &&
         (PSA_ALG_FULL_LENGTH_MAC(policy_alg) ==
          PSA_ALG_FULL_LENGTH_MAC(requested_alg))) {
+        size_t requested_output_length;
+        size_t default_output_length;
+
         /* Validate the combination of key type and algorithm. Since the policy
          * and requested algorithms are the same, we only need this once. */
         if (PSA_SUCCESS != psa_mac_key_can_do(policy_alg, key_type)) {
@@ -952,9 +959,9 @@ static int psa_key_algorithm_permits(psa_key_type_t key_type,
          * Note that none of the currently supported algorithms have an output
          * length dependent on actual key size, so setting it to a bogus value
          * of 0 is currently OK. */
-        size_t requested_output_length = PSA_MAC_LENGTH(
+        requested_output_length = PSA_MAC_LENGTH(
             key_type, 0, requested_alg);
-        size_t default_output_length = PSA_MAC_LENGTH(
+        default_output_length = PSA_MAC_LENGTH(
             key_type, 0,
             PSA_ALG_FULL_LENGTH_MAC(requested_alg));
 
@@ -2278,12 +2285,14 @@ exit:
 
 psa_status_t psa_hash_abort(psa_hash_operation_t *operation)
 {
+	psa_status_t status;
+
     /* Aborting a non-active operation is allowed */
     if (operation->id == 0) {
         return PSA_SUCCESS;
     }
 
-    psa_status_t status = psa_driver_wrapper_hash_abort(operation);
+    status = psa_driver_wrapper_hash_abort(operation);
     operation->id = 0;
 
     return status;
@@ -2496,12 +2505,14 @@ exit:
 psa_status_t psa_hash_clone(const psa_hash_operation_t *source_operation,
                             psa_hash_operation_t *target_operation)
 {
+	psa_status_t status;
+
     if (source_operation->id == 0 ||
         target_operation->id != 0) {
         return PSA_ERROR_BAD_STATE;
     }
 
-    psa_status_t status = psa_driver_wrapper_hash_clone(source_operation,
+    status = psa_driver_wrapper_hash_clone(source_operation,
                                                         target_operation);
     if (status != PSA_SUCCESS) {
         psa_hash_abort(target_operation);
@@ -2517,12 +2528,14 @@ psa_status_t psa_hash_clone(const psa_hash_operation_t *source_operation,
 
 psa_status_t psa_mac_abort(psa_mac_operation_t *operation)
 {
+	psa_status_t status;
+
     /* Aborting a non-active operation is allowed */
     if (operation->id == 0) {
         return PSA_SUCCESS;
     }
 
-    psa_status_t status = psa_driver_wrapper_mac_abort(operation);
+    status = psa_driver_wrapper_mac_abort(operation);
     operation->mac_size = 0;
     operation->is_sign = 0;
     operation->id = 0;
@@ -3459,6 +3472,8 @@ uint32_t psa_verify_hash_get_num_ops(
 static psa_status_t psa_sign_hash_abort_internal(
     psa_sign_hash_interruptible_operation_t *operation)
 {
+	psa_status_t status;
+
     if (operation->id == 0) {
         /* The object has (apparently) been initialized but it is not (yet)
          * in use. It's ok to call abort on such an object, and there's
@@ -3466,7 +3481,7 @@ static psa_status_t psa_sign_hash_abort_internal(
         return PSA_SUCCESS;
     }
 
-    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+    status = PSA_ERROR_CORRUPTION_DETECTED;
 
     status = psa_driver_wrapper_sign_hash_abort(operation);
 
@@ -3617,6 +3632,8 @@ psa_status_t psa_sign_hash_abort(
 static psa_status_t psa_verify_hash_abort_internal(
     psa_verify_hash_interruptible_operation_t *operation)
 {
+	psa_status_t status;
+
     if (operation->id == 0) {
         /* The object has (apparently) been initialized but it is not (yet)
          * in use. It's ok to call abort on such an object, and there's
@@ -3624,7 +3641,7 @@ static psa_status_t psa_verify_hash_abort_internal(
         return PSA_SUCCESS;
     }
 
-    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+    status = PSA_ERROR_CORRUPTION_DETECTED;
 
     status = psa_driver_wrapper_verify_hash_abort(operation);
 
@@ -6011,9 +6028,10 @@ psa_status_t psa_key_derivation_output_bytes(
     size_t output_length)
 {
     psa_status_t status;
+    psa_algorithm_t kdf_alg;
     LOCAL_OUTPUT_DECLARE(output_external, output);
 
-    psa_algorithm_t kdf_alg = psa_key_derivation_get_kdf_alg(operation);
+    kdf_alg = psa_key_derivation_get_kdf_alg(operation);
 
     if (operation->alg == 0) {
         /* This is a blank operation. */
@@ -6156,21 +6174,21 @@ static psa_status_t psa_generate_derived_ecc_key_weierstrass_helper(
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     size_t m;
     size_t m_bytes;
+    mbedtls_ecp_group ecp_group;
+	psa_ecc_family_t curve;
+    mbedtls_ecp_group_id grp_id;
 
     mbedtls_mpi_init(&k);
     mbedtls_mpi_init(&diff_N_2);
 
-    psa_ecc_family_t curve = PSA_KEY_TYPE_ECC_GET_FAMILY(
-        slot->attr.type);
-    mbedtls_ecp_group_id grp_id =
-        mbedtls_ecc_group_from_psa(curve, bits);
+    curve = PSA_KEY_TYPE_ECC_GET_FAMILY(slot->attr.type);
+    grp_id = mbedtls_ecc_group_from_psa(curve, bits);
 
     if (grp_id == MBEDTLS_ECP_DP_NONE) {
         ret = MBEDTLS_ERR_ASN1_INVALID_DATA;
         goto cleanup;
     }
 
-    mbedtls_ecp_group ecp_group;
     mbedtls_ecp_group_init(&ecp_group);
 
     MBEDTLS_MPI_CHK(mbedtls_ecp_group_load(&ecp_group, grp_id));
@@ -6550,6 +6568,10 @@ static psa_status_t psa_key_derivation_set_maximum_capacity(
     psa_key_derivation_operation_t *operation,
     psa_algorithm_t kdf_alg)
 {
+	psa_status_t status;
+    psa_algorithm_t hash_alg;
+    size_t hash_size;
+
 #if defined(PSA_WANT_ALG_TLS12_ECJPAKE_TO_PMS)
     if (kdf_alg == PSA_ALG_TLS12_ECJPAKE_TO_PMS) {
         operation->capacity = PSA_HASH_LENGTH(PSA_ALG_SHA_256);
@@ -6572,8 +6594,8 @@ static psa_status_t psa_key_derivation_set_maximum_capacity(
 
     /* After this point, if kdf_alg is not valid then value of hash_alg may be
      * invalid or meaningless but it does not affect this function */
-    psa_algorithm_t hash_alg = PSA_ALG_GET_HASH(kdf_alg);
-    size_t hash_size = PSA_HASH_LENGTH(hash_alg);
+    hash_alg = PSA_ALG_GET_HASH(kdf_alg);
+    hash_size = PSA_HASH_LENGTH(hash_alg);
     if (hash_size == 0) {
         return PSA_ERROR_NOT_SUPPORTED;
     }
@@ -6581,7 +6603,7 @@ static psa_status_t psa_key_derivation_set_maximum_capacity(
     /* Make sure that hash_alg is a supported hash algorithm. Otherwise
      * we might fail later, which is somewhat unfriendly and potentially
      * risk-prone. */
-    psa_status_t status = psa_hash_try_support(hash_alg);
+    status = psa_hash_try_support(hash_alg);
     if (status != PSA_SUCCESS) {
         return status;
     }
@@ -6635,6 +6657,8 @@ static psa_status_t psa_key_derivation_setup_kdf(
     psa_key_derivation_operation_t *operation,
     psa_algorithm_t kdf_alg)
 {
+	psa_status_t status;
+
     /* Make sure that operation->ctx is properly zero-initialised. (Macro
      * initialisers for this union leave some bytes unspecified.) */
     memset(&operation->ctx, 0, sizeof(operation->ctx));
@@ -6644,7 +6668,7 @@ static psa_status_t psa_key_derivation_setup_kdf(
         return PSA_ERROR_NOT_SUPPORTED;
     }
 
-    psa_status_t status = psa_key_derivation_set_maximum_capacity(operation,
+    status = psa_key_derivation_set_maximum_capacity(operation,
                                                                   kdf_alg);
     return status;
 }
@@ -6949,6 +6973,8 @@ static psa_status_t psa_tls12_prf_psk_to_ms_set_key(
     size_t data_length)
 {
     psa_status_t status;
+    uint8_t *pms;
+    uint8_t *cur;
     const size_t pms_len = (prf->state == PSA_TLS12_PRF_STATE_OTHER_KEY_SET ?
                             4 + data_length + prf->other_secret_length :
                             4 + 2 * data_length);
@@ -6957,11 +6983,11 @@ static psa_status_t psa_tls12_prf_psk_to_ms_set_key(
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    uint8_t *pms = mbedtls_calloc(1, pms_len);
+    pms = mbedtls_calloc(1, pms_len);
     if (pms == NULL) {
         return PSA_ERROR_INSUFFICIENT_MEMORY;
     }
-    uint8_t *cur = pms;
+    cur = pms;
 
     /* pure-PSK:
      * Quoting RFC 4279, Section 2:
@@ -8684,14 +8710,15 @@ static psa_status_t psa_jpake_prologue(
     psa_pake_step_t step,
     psa_jpake_io_mode_t io_mode)
 {
+    psa_jpake_computation_stage_t *computation_stage;
+
     if (step != PSA_PAKE_STEP_KEY_SHARE &&
         step != PSA_PAKE_STEP_ZK_PUBLIC &&
         step != PSA_PAKE_STEP_ZK_PROOF) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    psa_jpake_computation_stage_t *computation_stage =
-        &operation->computation_stage.jpake;
+    computation_stage = &operation->computation_stage.jpake;
 
     if (computation_stage->round != PSA_JPAKE_FIRST &&
         computation_stage->round != PSA_JPAKE_SECOND) {
@@ -9079,7 +9106,7 @@ psa_status_t psa_crypto_local_input_alloc(const uint8_t *input, size_t input_len
 {
     psa_status_t status;
 
-    *local_input = PSA_CRYPTO_LOCAL_INPUT_INIT;
+    *local_input = ((psa_crypto_local_input_t) PSA_CRYPTO_LOCAL_INPUT_INIT);
 
     if (input_len == 0) {
         return PSA_SUCCESS;
@@ -9120,7 +9147,7 @@ void psa_crypto_local_input_free(psa_crypto_local_input_t *local_input)
 psa_status_t psa_crypto_local_output_alloc(uint8_t *output, size_t output_len,
                                            psa_crypto_local_output_t *local_output)
 {
-    *local_output = PSA_CRYPTO_LOCAL_OUTPUT_INIT;
+    *local_output = ((psa_crypto_local_output_t) PSA_CRYPTO_LOCAL_OUTPUT_INIT);
 
     if (output_len == 0) {
         return PSA_SUCCESS;

@@ -14,8 +14,9 @@
 #if defined(MBEDTLS_SSL_TLS_C)
 int mbedtls_test_random(void *p_rng, unsigned char *output, size_t output_len)
 {
+	size_t i;
     (void) p_rng;
-    for (size_t i = 0; i < output_len; i++) {
+    for (i = 0; i < output_len; i++) {
         output[i] = rand();
     }
 
@@ -1616,6 +1617,11 @@ int mbedtls_test_ssl_prepare_record_mac(mbedtls_record *record,
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
     psa_mac_operation_t operation = PSA_MAC_OPERATION_INIT;
 #endif
+#if defined(MBEDTLS_USE_PSA_CRYPTO)
+    unsigned char mac[PSA_HASH_MAX_SIZE];
+#else
+    unsigned char mac[MBEDTLS_MD_MAX_SIZE];
+#endif
 
     /* Serialized version of record header for MAC purposes */
     unsigned char add_data[13];
@@ -1639,7 +1645,6 @@ int mbedtls_test_ssl_prepare_record_mac(mbedtls_record *record,
     /* Use a temporary buffer for the MAC, because with the truncated HMAC
      * extension, there might not be enough room in the record for the
      * full-length MAC. */
-    unsigned char mac[PSA_HASH_MAX_SIZE];
     TEST_EQUAL(PSA_SUCCESS, psa_mac_sign_finish(&operation,
                                                 mac, sizeof(mac),
                                                 &sign_mac_length));
@@ -1651,7 +1656,6 @@ int mbedtls_test_ssl_prepare_record_mac(mbedtls_record *record,
     /* Use a temporary buffer for the MAC, because with the truncated HMAC
      * extension, there might not be enough room in the record for the
      * full-length MAC. */
-    unsigned char mac[MBEDTLS_MD_MAX_SIZE];
     TEST_EQUAL(0, mbedtls_md_hmac_finish(&transform_out->md_ctx_enc, mac));
 #endif
     memcpy(record->buf + record->data_offset + record->data_len, mac, transform_out->maclen);
@@ -2023,12 +2027,12 @@ void mbedtls_test_ssl_perform_handshake(
     int ret = -1;
 #endif
     int expected_handshake_result = options->expected_handshake_result;
+    mbedtls_test_ssl_message_queue server_queue, client_queue;
+    mbedtls_test_message_socket_context server_context, client_context;
 
     MD_OR_USE_PSA_INIT();
     mbedtls_platform_zeroize(&client, sizeof(client));
     mbedtls_platform_zeroize(&server, sizeof(server));
-    mbedtls_test_ssl_message_queue server_queue, client_queue;
-    mbedtls_test_message_socket_context server_context, client_context;
     mbedtls_test_message_socket_init(&server_context);
     mbedtls_test_message_socket_init(&client_context);
 

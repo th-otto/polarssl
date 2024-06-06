@@ -559,7 +559,7 @@ MBEDTLS_MAYBE_UNUSED static unsigned mbedtls_aes_rk_offset(uint32_t *buf)
         if (delta == 0) {
             return 0;
         } else {
-            return 4 - delta; // 16 bytes = 4 uint32_t
+            return 4 - delta; /* 16 bytes = 4 uint32_t */
         }
     }
 #else /* MAY_NEED_TO_ALIGN */
@@ -577,6 +577,7 @@ int mbedtls_aes_setkey_enc(mbedtls_aes_context *ctx, const unsigned char *key,
                            unsigned int keybits)
 {
     uint32_t *RK;
+	unsigned int i;
 
     switch (keybits) {
         case 128: ctx->nr = 10; break;
@@ -610,14 +611,14 @@ int mbedtls_aes_setkey_enc(mbedtls_aes_context *ctx, const unsigned char *key,
 #endif
 
 #if !defined(MBEDTLS_AES_USE_HARDWARE_ONLY)
-    for (unsigned int i = 0; i < (keybits >> 5); i++) {
+    for (i = 0; i < (keybits >> 5); i++) {
         RK[i] = MBEDTLS_GET_UINT32_LE(key, i << 2);
     }
 
     switch (ctx->nr) {
         case 10:
 
-            for (unsigned int i = 0; i < 10; i++, RK += 4) {
+            for (i = 0; i < 10; i++, RK += 4) {
                 RK[4]  = RK[0] ^ round_constants[i] ^
                          ((uint32_t) FSb[MBEDTLS_BYTE_1(RK[3])]) ^
                          ((uint32_t) FSb[MBEDTLS_BYTE_2(RK[3])] <<  8) ^
@@ -633,7 +634,7 @@ int mbedtls_aes_setkey_enc(mbedtls_aes_context *ctx, const unsigned char *key,
 #if !defined(MBEDTLS_AES_ONLY_128_BIT_KEY_LENGTH)
         case 12:
 
-            for (unsigned int i = 0; i < 8; i++, RK += 6) {
+            for (i = 0; i < 8; i++, RK += 6) {
                 RK[6]  = RK[0] ^ round_constants[i] ^
                          ((uint32_t) FSb[MBEDTLS_BYTE_1(RK[5])]) ^
                          ((uint32_t) FSb[MBEDTLS_BYTE_2(RK[5])] <<  8) ^
@@ -650,7 +651,7 @@ int mbedtls_aes_setkey_enc(mbedtls_aes_context *ctx, const unsigned char *key,
 
         case 14:
 
-            for (unsigned int i = 0; i < 7; i++, RK += 8) {
+            for (i = 0; i < 7; i++, RK += 8) {
                 RK[8]  = RK[0] ^ round_constants[i] ^
                          ((uint32_t) FSb[MBEDTLS_BYTE_1(RK[7])]) ^
                          ((uint32_t) FSb[MBEDTLS_BYTE_2(RK[7])] <<  8) ^
@@ -693,6 +694,7 @@ int mbedtls_aes_setkey_dec(mbedtls_aes_context *ctx, const unsigned char *key,
     int ret;
     mbedtls_aes_context cty;
     uint32_t *RK;
+	int i, j;
 
 
     mbedtls_aes_init(&cty);
@@ -733,8 +735,8 @@ int mbedtls_aes_setkey_dec(mbedtls_aes_context *ctx, const unsigned char *key,
     *RK++ = *SK++;
     *RK++ = *SK++;
     SK -= 8;
-    for (int i = ctx->nr - 1; i > 0; i--, SK -= 8) {
-        for (int j = 0; j < 4; j++, SK++) {
+    for (i = ctx->nr - 1; i > 0; i--, SK -= 8) {
+        for (j = 0; j < 4; j++, SK++) {
             *RK++ = AES_RT0(FSb[MBEDTLS_BYTE_0(*SK)]) ^
                     AES_RT1(FSb[MBEDTLS_BYTE_1(*SK)]) ^
                     AES_RT2(FSb[MBEDTLS_BYTE_2(*SK)]) ^
@@ -1011,9 +1013,9 @@ MBEDTLS_MAYBE_UNUSED static void aes_maybe_realign(mbedtls_aes_context *ctx)
 {
     unsigned new_offset = mbedtls_aes_rk_offset(ctx->buf);
     if (new_offset != ctx->rk_offset) {
-        memmove(ctx->buf + new_offset,     // new address
-                ctx->buf + ctx->rk_offset, // current address
-                (ctx->nr + 1) * 16);       // number of round keys * bytes per rk
+        memmove(ctx->buf + new_offset,     /* new address */
+                ctx->buf + ctx->rk_offset, /* current address */
+                (ctx->nr + 1) * 16);       /* number of round keys * bytes per rk */
         ctx->rk_offset = new_offset;
     }
 }
@@ -1078,6 +1080,7 @@ int mbedtls_aes_crypt_cbc(mbedtls_aes_context *ctx,
 {
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
     unsigned char temp[16];
+    const unsigned char *ivp;
 
     if (mode != MBEDTLS_AES_ENCRYPT && mode != MBEDTLS_AES_DECRYPT) {
         return MBEDTLS_ERR_AES_BAD_INPUT_DATA;
@@ -1098,13 +1101,13 @@ int mbedtls_aes_crypt_cbc(mbedtls_aes_context *ctx,
             return 0;
         }
 
-        // If padlock data misaligned, we just fall back to
-        // unaccelerated mode
-        //
+        /* If padlock data misaligned, we just fall back to */
+        /* unaccelerated mode */
+        /* */
     }
 #endif
 
-    const unsigned char *ivp = iv;
+    ivp = iv;
 
     if (mode == MBEDTLS_AES_DECRYPT) {
         while (length > 0) {
@@ -1445,12 +1448,13 @@ int mbedtls_aes_crypt_ctr(mbedtls_aes_context *ctx,
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
 
     size_t offset = *nc_off;
+	size_t i;
 
     if (offset > 0x0F) {
         return MBEDTLS_ERR_AES_BAD_INPUT_DATA;
     }
 
-    for (size_t i = 0; i < length;) {
+    for (i = 0; i < length;) {
         size_t n = 16;
         if (offset == 0) {
             ret = mbedtls_aes_crypt_ecb(ctx, MBEDTLS_AES_ENCRYPT, nonce_counter, stream_block);
@@ -1466,12 +1470,12 @@ int mbedtls_aes_crypt_ctr(mbedtls_aes_context *ctx,
             n = (length - i);
         }
         mbedtls_xor(&output[i], &input[i], &stream_block[offset], n);
-        // offset might be non-zero for the last block, but in that case, we don't use it again
+        /* offset might be non-zero for the last block, but in that case, we don't use it again */
         offset = 0;
         i += n;
     }
 
-    // capture offset for future resumption
+    /* capture offset for future resumption */
     *nc_off = (*nc_off + length) % 16;
 
     ret = 0;

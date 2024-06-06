@@ -69,14 +69,15 @@ void hash_valid_multipart(int alg_arg,
     size_t output_size = expected1->len;
     size_t length = SIZE_MAX;
     mbedtls_psa_hash_operation_t operation0; // original
-    memset(&operation0, 0, sizeof(operation0));
     mbedtls_psa_hash_operation_t clone_start; // cloned after setup
-    memset(&clone_start, 0, sizeof(clone_start));
     mbedtls_psa_hash_operation_t clone_middle; // cloned between updates
-    memset(&clone_middle, 0, sizeof(clone_middle));
     mbedtls_psa_hash_operation_t clone_end; // cloned before finish
-    memset(&clone_end, 0, sizeof(clone_end));
     mbedtls_psa_hash_operation_t clone_more; // cloned before finish
+
+    memset(&operation0, 0, sizeof(operation0));
+    memset(&clone_start, 0, sizeof(clone_start));
+    memset(&clone_middle, 0, sizeof(clone_middle));
+    memset(&clone_end, 0, sizeof(clone_end));
     memset(&clone_more, 0, sizeof(clone_more));
 
     /* Nominal case with two update calls */

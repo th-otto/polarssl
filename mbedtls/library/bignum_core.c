@@ -117,10 +117,11 @@ mbedtls_ct_condition_t mbedtls_mpi_core_uint_le_mpi(mbedtls_mpi_uint min,
 {
     /* min <= least significant limb? */
     mbedtls_ct_condition_t min_le_lsl = mbedtls_ct_uint_ge(A[0], min);
+	size_t i;
 
     /* limbs other than the least significant one are all zero? */
     mbedtls_ct_condition_t msll_mask = MBEDTLS_CT_FALSE;
-    for (size_t i = 1; i < A_limbs; i++) {
+    for (i = 1; i < A_limbs; i++) {
         msll_mask = mbedtls_ct_bool_or(msll_mask, mbedtls_ct_bool(A[i]));
     }
 
@@ -134,8 +135,9 @@ mbedtls_ct_condition_t mbedtls_mpi_core_lt_ct(const mbedtls_mpi_uint *A,
                                               size_t limbs)
 {
     mbedtls_ct_condition_t ret = MBEDTLS_CT_FALSE, cond = MBEDTLS_CT_FALSE, done = MBEDTLS_CT_FALSE;
+	size_t i;
 
-    for (size_t i = limbs; i > 0; i--) {
+    for (i = limbs; i > 0; i--) {
         /*
          * If B[i - 1] < A[i - 1] then A < B is false and the result must
          * remain 0.
@@ -170,6 +172,8 @@ void mbedtls_mpi_core_cond_assign(mbedtls_mpi_uint *X,
                                   size_t limbs,
                                   mbedtls_ct_condition_t assign)
 {
+	size_t i;
+
     if (X == A) {
         return;
     }
@@ -179,7 +183,7 @@ void mbedtls_mpi_core_cond_assign(mbedtls_mpi_uint *X,
      * (this is more optimal since here we don't have to handle the case where
      * we copy awkwardly sized data).
      */
-    for (size_t i = 0; i < limbs; i++) {
+    for (i = 0; i < limbs; i++) {
         X[i] = mbedtls_ct_mpi_uint_if(assign, A[i], X[i]);
     }
 }
@@ -189,11 +193,13 @@ void mbedtls_mpi_core_cond_swap(mbedtls_mpi_uint *X,
                                 size_t limbs,
                                 mbedtls_ct_condition_t swap)
 {
+	size_t i;
+
     if (X == Y) {
         return;
     }
 
-    for (size_t i = 0; i < limbs; i++) {
+    for (i = 0; i < limbs; i++) {
         mbedtls_mpi_uint tmp = X[i];
         X[i] = mbedtls_ct_mpi_uint_if(swap, Y[i], X[i]);
         Y[i] = mbedtls_ct_mpi_uint_if(swap, tmp, Y[i]);
@@ -212,9 +218,11 @@ int mbedtls_mpi_core_read_le(mbedtls_mpi_uint *X,
     }
 
     if (X != NULL) {
+    	size_t i;
+
         memset(X, 0, X_limbs * ciL);
 
-        for (size_t i = 0; i < input_length; i++) {
+        for (i = 0; i < input_length; i++) {
             size_t offset = ((i % ciL) << 3);
             X[i / ciL] |= ((mbedtls_mpi_uint) input[i]) << offset;
         }
@@ -261,6 +269,7 @@ int mbedtls_mpi_core_write_le(const mbedtls_mpi_uint *A,
 {
     size_t stored_bytes = A_limbs * ciL;
     size_t bytes_to_copy;
+   	size_t i;
 
     if (stored_bytes < output_length) {
         bytes_to_copy = stored_bytes;
@@ -269,14 +278,14 @@ int mbedtls_mpi_core_write_le(const mbedtls_mpi_uint *A,
 
         /* The output buffer is smaller than the allocated size of A.
          * However A may fit if its leading bytes are zero. */
-        for (size_t i = bytes_to_copy; i < stored_bytes; i++) {
+        for (i = bytes_to_copy; i < stored_bytes; i++) {
             if (GET_BYTE(A, i) != 0) {
                 return MBEDTLS_ERR_MPI_BUFFER_TOO_SMALL;
             }
         }
     }
 
-    for (size_t i = 0; i < bytes_to_copy; i++) {
+    for (i = 0; i < bytes_to_copy; i++) {
         output[i] = GET_BYTE(A, i);
     }
 
@@ -296,6 +305,7 @@ int mbedtls_mpi_core_write_be(const mbedtls_mpi_uint *X,
     size_t stored_bytes;
     size_t bytes_to_copy;
     unsigned char *p;
+	size_t i;
 
     stored_bytes = X_limbs * ciL;
 
@@ -313,14 +323,14 @@ int mbedtls_mpi_core_write_be(const mbedtls_mpi_uint *X,
          * However X may fit if its leading bytes are zero. */
         bytes_to_copy = output_length;
         p = output;
-        for (size_t i = bytes_to_copy; i < stored_bytes; i++) {
+        for (i = bytes_to_copy; i < stored_bytes; i++) {
             if (GET_BYTE(X, i) != 0) {
                 return MBEDTLS_ERR_MPI_BUFFER_TOO_SMALL;
             }
         }
     }
 
-    for (size_t i = 0; i < bytes_to_copy; i++) {
+    for (i = 0; i < bytes_to_copy; i++) {
         p[bytes_to_copy - i - 1] = GET_BYTE(X, i);
     }
 
@@ -408,8 +418,9 @@ mbedtls_mpi_uint mbedtls_mpi_core_add(mbedtls_mpi_uint *X,
                                       size_t limbs)
 {
     mbedtls_mpi_uint c = 0;
+	size_t i;
 
-    for (size_t i = 0; i < limbs; i++) {
+    for (i = 0; i < limbs; i++) {
         mbedtls_mpi_uint t = c + A[i];
         c = (t < A[i]);
         t += B[i];
@@ -426,10 +437,11 @@ mbedtls_mpi_uint mbedtls_mpi_core_add_if(mbedtls_mpi_uint *X,
                                          unsigned cond)
 {
     mbedtls_mpi_uint c = 0;
+	size_t i;
 
     mbedtls_ct_condition_t do_add = mbedtls_ct_bool(cond);
 
-    for (size_t i = 0; i < limbs; i++) {
+    for (i = 0; i < limbs; i++) {
         mbedtls_mpi_uint add = mbedtls_ct_mpi_uint_if_else_0(do_add, A[i]);
         mbedtls_mpi_uint t = c + X[i];
         c = (t < X[i]);
@@ -447,8 +459,9 @@ mbedtls_mpi_uint mbedtls_mpi_core_sub(mbedtls_mpi_uint *X,
                                       size_t limbs)
 {
     mbedtls_mpi_uint c = 0;
+	size_t i;
 
-    for (size_t i = 0; i < limbs; i++) {
+    for (i = 0; i < limbs; i++) {
         mbedtls_mpi_uint z = (A[i] < c);
         mbedtls_mpi_uint t = A[i] - c;
         c = (t < B[i]) + z;
@@ -463,6 +476,10 @@ mbedtls_mpi_uint mbedtls_mpi_core_mla(mbedtls_mpi_uint *d, size_t d_len,
                                       mbedtls_mpi_uint b)
 {
     mbedtls_mpi_uint c = 0; /* carry */
+    size_t excess_len;
+    size_t steps_x8;
+    size_t steps_x1;
+
     /*
      * It is a documented precondition of this function that d_len >= s_len.
      * If that's not the case, we swap these round: this turns what would be
@@ -471,9 +488,9 @@ mbedtls_mpi_uint mbedtls_mpi_core_mla(mbedtls_mpi_uint *d, size_t d_len,
     if (d_len < s_len) {
         s_len = d_len;
     }
-    size_t excess_len = d_len - s_len;
-    size_t steps_x8 = s_len / 8;
-    size_t steps_x1 = s_len & 7;
+    excess_len = d_len - s_len;
+    steps_x8 = s_len / 8;
+    steps_x1 = s_len & 7;
 
     while (steps_x8--) {
         MULADDC_X8_INIT
@@ -500,9 +517,11 @@ void mbedtls_mpi_core_mul(mbedtls_mpi_uint *X,
                           const mbedtls_mpi_uint *A, size_t A_limbs,
                           const mbedtls_mpi_uint *B, size_t B_limbs)
 {
+	size_t i;
+
     memset(X, 0, (A_limbs + B_limbs) * ciL);
 
-    for (size_t i = 0; i < B_limbs; i++) {
+    for (i = 0; i < B_limbs; i++) {
         (void) mbedtls_mpi_core_mla(X + i, A_limbs + 1, A, A_limbs, B[i]);
     }
 }
@@ -513,10 +532,11 @@ void mbedtls_mpi_core_mul(mbedtls_mpi_uint *X,
 mbedtls_mpi_uint mbedtls_mpi_core_montmul_init(const mbedtls_mpi_uint *N)
 {
     mbedtls_mpi_uint x = N[0];
-
+	unsigned int i;
+	
     x += ((N[0] + 2) & 4) << 1;
 
-    for (unsigned int i = biL; i >= 8; i /= 2) {
+    for (i = biL; i >= 8; i /= 2) {
         x *= (2 - (N[0] * x));
     }
 
@@ -532,9 +552,13 @@ void mbedtls_mpi_core_montmul(mbedtls_mpi_uint *X,
                               mbedtls_mpi_uint mm,
                               mbedtls_mpi_uint *T)
 {
+	size_t i;
+	mbedtls_mpi_uint carry;
+	mbedtls_mpi_uint borrow;
+
     memset(T, 0, (2 * AN_limbs + 1) * ciL);
 
-    for (size_t i = 0; i < AN_limbs; i++) {
+    for (i = 0; i < AN_limbs; i++) {
         /* T = (T + u0*B + u1*N) / 2^biL */
         mbedtls_mpi_uint u0 = A[i];
         mbedtls_mpi_uint u1 = (T[0] + u0 * B[0]) * mm;
@@ -555,8 +579,8 @@ void mbedtls_mpi_core_montmul(mbedtls_mpi_uint *X,
      * loop above.
      */
 
-    mbedtls_mpi_uint carry  = T[AN_limbs];
-    mbedtls_mpi_uint borrow = mbedtls_mpi_core_sub(X, T, N, AN_limbs);
+    carry  = T[AN_limbs];
+    borrow = mbedtls_mpi_core_sub(X, T, N, AN_limbs);
 
     /*
      * Using R as the Montgomery radix (auxiliary modulus) i.e. 2^(biL*AN_limbs):
@@ -600,7 +624,9 @@ void mbedtls_mpi_core_ct_uint_table_lookup(mbedtls_mpi_uint *dest,
                                            size_t count,
                                            size_t index)
 {
-    for (size_t i = 0; i < count; i++, table += limbs) {
+	size_t i;
+
+    for (i = 0; i < count; i++, table += limbs) {
         mbedtls_ct_condition_t assign = mbedtls_ct_uint_eq(i, index);
         mbedtls_mpi_core_cond_assign(dest, table, limbs, assign);
     }
@@ -728,18 +754,22 @@ static void exp_mod_precompute_window(const mbedtls_mpi_uint *A,
                                       mbedtls_mpi_uint *Wtable,
                                       mbedtls_mpi_uint *temp)
 {
+	mbedtls_mpi_uint *W1;
+	mbedtls_mpi_uint *Wprev;
+	size_t i;
+
     /* W[0] = 1 (in Montgomery presentation) */
     memset(Wtable, 0, AN_limbs * ciL);
     Wtable[0] = 1;
     mbedtls_mpi_core_montmul(Wtable, Wtable, RR, AN_limbs, N, AN_limbs, mm, temp);
 
     /* W[1] = A (already in Montgomery presentation) */
-    mbedtls_mpi_uint *W1 = Wtable + AN_limbs;
+    W1 = Wtable + AN_limbs;
     memcpy(W1, A, AN_limbs * ciL);
 
     /* W[i+1] = W[i] * W[1], i >= 2 */
-    mbedtls_mpi_uint *Wprev = W1;
-    for (size_t i = 2; i < welem; i++) {
+    Wprev = W1;
+    for (i = 2; i < welem; i++) {
         mbedtls_mpi_uint *Wcur = Wprev + AN_limbs;
         mbedtls_mpi_core_montmul(Wcur, Wprev, W1, AN_limbs, N, AN_limbs, mm, temp);
         Wprev = Wcur;
@@ -774,6 +804,10 @@ void mbedtls_mpi_core_exp_mod(mbedtls_mpi_uint *X,
      * for table_limbs, select_limbs and (2 * AN_limbs + 1) for montmul. */
     const size_t table_limbs  = welem * AN_limbs;
     const size_t select_limbs = AN_limbs;
+    size_t E_limb_index;
+    size_t E_bit_index;
+    size_t window_bits;
+    mbedtls_mpi_uint window;
 
     /* Pointers to specific parts of the temporary working memory pool */
     mbedtls_mpi_uint *const Wtable  = T;
@@ -801,12 +835,12 @@ void mbedtls_mpi_core_exp_mod(mbedtls_mpi_uint *X,
     /* We'll process the bits of E from most significant
      * (limb_index=E_limbs-1, E_bit_index=biL-1) to least significant
      * (limb_index=0, E_bit_index=0). */
-    size_t E_limb_index = E_limbs;
-    size_t E_bit_index = 0;
+    E_limb_index = E_limbs;
+    E_bit_index = 0;
     /* At any given time, window contains window_bits bits from E.
      * window_bits can go up to wsize. */
-    size_t window_bits = 0;
-    mbedtls_mpi_uint window = 0;
+    window_bits = 0;
+    window = 0;
 
     do {
         /* Square */
@@ -846,7 +880,9 @@ mbedtls_mpi_uint mbedtls_mpi_core_sub_int(mbedtls_mpi_uint *X,
                                           mbedtls_mpi_uint c,  /* doubles as carry */
                                           size_t limbs)
 {
-    for (size_t i = 0; i < limbs; i++) {
+	size_t i;
+
+    for (i = 0; i < limbs; i++) {
         mbedtls_mpi_uint s = A[i];
         mbedtls_mpi_uint t = s - c;
         c = (t > s);
@@ -861,8 +897,9 @@ mbedtls_ct_condition_t mbedtls_mpi_core_check_zero_ct(const mbedtls_mpi_uint *A,
 {
     volatile const mbedtls_mpi_uint *force_read_A = A;
     mbedtls_mpi_uint bits = 0;
+	size_t i;
 
-    for (size_t i = 0; i < limbs; i++) {
+    for (i = 0; i < limbs; i++) {
         bits |= force_read_A[i];
     }
 

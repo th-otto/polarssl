@@ -24,7 +24,7 @@ static mbedtls_x509_crt srvcert;
 static mbedtls_pk_context pkey;
 #endif
 #endif
-#endif // MBEDTLS_SSL_PROTO_DTLS
+#endif /* MBEDTLS_SSL_PROTO_DTLS */
 
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
 {
@@ -145,14 +145,14 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
         ret = mbedtls_ssl_handshake(&ssl);
 
         if (ret == 0) {
-            //keep reading data from server until the end
+            /*keep reading data from server until the end */
             do {
                 len = sizeof(buf) - 1;
                 ret = mbedtls_ssl_read(&ssl, buf, len);
                 if (ret == MBEDTLS_ERR_SSL_WANT_READ) {
                     continue;
                 } else if (ret <= 0) {
-                    //EOF or error
+                    /*EOF or error */
                     break;
                 }
             } while (1);

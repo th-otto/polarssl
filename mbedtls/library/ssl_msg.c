@@ -782,31 +782,31 @@ static void ssl_extract_add_data_from_record(unsigned char *add_data,
 #if defined(MBEDTLS_SSL_DTLS_CONNECTION_ID) && \
         MBEDTLS_SSL_DTLS_CONNECTION_ID_COMPAT == 0
         if (rec->cid_len != 0) {
-            // seq_num_placeholder
+            /* seq_num_placeholder */
             memcpy(cur, seq_num_placeholder, sizeof(seq_num_placeholder));
             cur += sizeof(seq_num_placeholder);
 
-            // tls12_cid type
+            /* tls12_cid type */
             *cur = rec->type;
             cur++;
 
-            // cid_length
+            /* cid_length */
             *cur = rec->cid_len;
             cur++;
         } else
 #endif /* MBEDTLS_SSL_DTLS_CONNECTION_ID */
         {
-            // epoch + sequence number
+            /* epoch + sequence number */
             memcpy(cur, rec->ctr, sizeof(rec->ctr));
             cur += sizeof(rec->ctr);
         }
     }
 
-    // type
+    /* type */
     *cur = rec->type;
     cur++;
 
-    // version
+    /* version */
     memcpy(cur, rec->ver, sizeof(rec->ver));
     cur += sizeof(rec->ver);
 
@@ -814,15 +814,15 @@ static void ssl_extract_add_data_from_record(unsigned char *add_data,
     MBEDTLS_SSL_DTLS_CONNECTION_ID_COMPAT == 1
 
     if (rec->cid_len != 0) {
-        // CID
+        /* CID */
         memcpy(cur, rec->cid, rec->cid_len);
         cur += rec->cid_len;
 
-        // cid_length
+        /* cid_length */
         *cur = rec->cid_len;
         cur++;
 
-        // length of inner plaintext
+        /* length of inner plaintext */
         MBEDTLS_PUT_UINT16_BE(ad_len_field, cur, 0);
         cur += 2;
     } else
@@ -830,15 +830,15 @@ static void ssl_extract_add_data_from_record(unsigned char *add_data,
     MBEDTLS_SSL_DTLS_CONNECTION_ID_COMPAT == 0
 
     if (rec->cid_len != 0) {
-        // epoch + sequence number
+        /* epoch + sequence number */
         memcpy(cur, rec->ctr, sizeof(rec->ctr));
         cur += sizeof(rec->ctr);
 
-        // CID
+        /* CID */
         memcpy(cur, rec->cid, rec->cid_len);
         cur += rec->cid_len;
 
-        // length of inner plaintext
+        /* length of inner plaintext */
         MBEDTLS_PUT_UINT16_BE(ad_len_field, cur, 0);
         cur += 2;
     } else
@@ -1033,13 +1033,15 @@ int mbedtls_ssl_encrypt_buf(mbedtls_ssl_context *ssl,
 #if defined(MBEDTLS_SSL_SOME_SUITES_USE_MAC)
     if (ssl_mode == MBEDTLS_SSL_MODE_STREAM ||
         ssl_mode == MBEDTLS_SSL_MODE_CBC) {
+        unsigned char mac[MBEDTLS_SSL_MAC_ADD];
+        int ret;
+
         if (post_avail < transform->maclen) {
             MBEDTLS_SSL_DEBUG_MSG(1, ("Buffer provided for encrypted record not large enough"));
             return MBEDTLS_ERR_SSL_BUFFER_TOO_SMALL;
         }
 #if defined(MBEDTLS_SSL_PROTO_TLS1_2)
-        unsigned char mac[MBEDTLS_SSL_MAC_ADD];
-        int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
+        ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
         psa_mac_operation_t operation = PSA_MAC_OPERATION_INIT;
         psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
@@ -1945,6 +1947,7 @@ hmac_failed_etm_enabled:
          * validity of the padding, always perform exactly
          * `min(256,plaintext_len)` reads (but take into account
          * only the last `padlen` bytes for the padding check). */
+        {
         size_t pad_count = 0;
         volatile unsigned char * const check = data;
 
@@ -1981,6 +1984,7 @@ hmac_failed_etm_enabled:
          * padlen hasn't been changed and the previous assertion
          * data_len >= padlen still holds. */
         rec->data_len -= padlen;
+        }
     } else
 #endif /* MBEDTLS_SSL_SOME_SUITES_USE_CBC */
     {
@@ -2034,6 +2038,7 @@ hmac_failed_etm_enabled:
          * Note that max_len + maclen is never more than the buffer
          * length, as we previously did in_msglen -= maclen too.
          */
+        {
         const size_t max_len = rec->data_len + padlen;
         const size_t min_len = (max_len > 256) ? max_len - 256 : 0;
 
@@ -2058,6 +2063,7 @@ hmac_failed_etm_enabled:
                                  rec->data_len,
                                  min_len, max_len,
                                  transform->maclen);
+        }
 #endif /* MBEDTLS_SSL_PROTO_TLS1_2 */
 
 #if defined(MBEDTLS_SSL_DEBUG_ALL)
@@ -3378,15 +3384,15 @@ static int mbedtls_ssl_dtls_record_replay_check(mbedtls_ssl_context *ssl, uint8_
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
     unsigned char *original_in_ctr;
 
-    // save original in_ctr
+    /* save original in_ctr */
     original_in_ctr = ssl->in_ctr;
 
-    // use counter from record
+    /* use counter from record */
     ssl->in_ctr = record_in_ctr;
 
     ret = mbedtls_ssl_dtls_replay_check((mbedtls_ssl_context const *) ssl);
 
-    // restore the counter
+    /* restore the counter */
     ssl->in_ctr = original_in_ctr;
 
     return ret;
@@ -3691,8 +3697,8 @@ static int ssl_check_record_type(uint8_t record_type)
 /*
  * ContentType type;
  * ProtocolVersion version;
- * uint16 epoch;            // DTLS only
- * uint48 sequence_number;  // DTLS only
+ * uint16 epoch;            / / DTLS only
+ * uint48 sequence_number;  / / DTLS only
  * uint16 length;
  *
  * Return 0 if header looks sane (and, for DTLS, the record is expected)
@@ -3779,8 +3785,8 @@ static int ssl_parse_record_header(mbedtls_ssl_context const *ssl,
          *   ProtocolVersion version;
          *   uint16 epoch;
          *   uint48 sequence_number;
-         *   opaque cid[cid_length]; // Additional field compared to
-         *                           // default DTLS record format
+         *   opaque cid[cid_length]; / / Additional field compared to
+         *                           / / default DTLS record format
          *   uint16 length;
          *   opaque enc_content[DTLSCiphertext.length];
          * } DTLSCiphertext;

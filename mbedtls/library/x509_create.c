@@ -206,13 +206,17 @@ static int parse_attribute_value_hex_der_encoded(const char *s,
                                                  size_t *data_len,
                                                  int *tag)
 {
+    size_t der_length;
+    unsigned char *der;
+	size_t i;
+
     /* Step 1: preliminary length checks. */
     /* Each byte is encoded by exactly two hexadecimal digits. */
     if (len % 2 != 0) {
         /* Odd number of hex digits */
         return MBEDTLS_ERR_X509_INVALID_NAME;
     }
-    size_t const der_length = len / 2;
+    der_length = len / 2;
     if (der_length > MBEDTLS_X509_MAX_DN_NAME_SIZE + 4) {
         /* The payload would be more than MBEDTLS_X509_MAX_DN_NAME_SIZE
          * (after subtracting the ASN.1 tag and length). Reject this early
@@ -226,12 +230,12 @@ static int parse_attribute_value_hex_der_encoded(const char *s,
     }
 
     /* Step 2: Decode the hex string into an intermediate buffer. */
-    unsigned char *der = mbedtls_calloc(1, der_length);
+    der = mbedtls_calloc(1, der_length);
     if (der == NULL) {
         return MBEDTLS_ERR_X509_ALLOC_FAILED;
     }
     /* Beyond this point, der needs to be freed on exit. */
-    for (size_t i = 0; i < der_length; i++) {
+    for (i = 0; i < der_length; i++) {
         int c = hexpair_to_int(s + 2 * i);
         if (c < 0) {
             goto error;
@@ -256,7 +260,7 @@ static int parse_attribute_value_hex_der_encoded(const char *s,
         }
         /* Strings must not contain null bytes. */
         if (MBEDTLS_ASN1_IS_STRING_TAG(*tag)) {
-            for (size_t i = 0; i < *data_len; i++) {
+            for (i = 0; i < *data_len; i++) {
                 if (p[i] == 0) {
                     goto error;
                 }
@@ -315,6 +319,8 @@ int mbedtls_x509_string_to_names(mbedtls_asn1_named_data **head, const char *nam
         }
 
         if (!in_attr_type && ((*c == ',' && *(c-1) != '\\') || c == end)) {
+            mbedtls_asn1_named_data *cur;
+
             if (s == c) {
                 mbedtls_free(oid.p);
                 return MBEDTLS_ERR_X509_INVALID_NAME;
@@ -343,7 +349,7 @@ int mbedtls_x509_string_to_names(mbedtls_asn1_named_data **head, const char *nam
                 }
             }
 
-            mbedtls_asn1_named_data *cur =
+            cur =
                 mbedtls_asn1_store_named_data(head, (char *) oid.p, oid.len,
                                               (unsigned char *) data,
                                               data_len);
@@ -353,7 +359,7 @@ int mbedtls_x509_string_to_names(mbedtls_asn1_named_data **head, const char *nam
                 return MBEDTLS_ERR_X509_ALLOC_FAILED;
             }
 
-            // set tagType
+            /* set tagType */
             cur->val.tag = tag;
 
             while (c < end && *(c + 1) == ' ') {
@@ -420,13 +426,13 @@ static int x509_write_name(unsigned char **p,
     const unsigned char *name   = cur_name->val.p;
     size_t name_len             = cur_name->val.len;
 
-    // Write correct string tag and value
+    /* Write correct string tag and value */
     MBEDTLS_ASN1_CHK_ADD(len, mbedtls_asn1_write_tagged_string(p, start,
                                                                cur_name->val.tag,
                                                                (const char *) name,
                                                                name_len));
-    // Write OID
-    //
+    /* Write OID */
+    /* */
     MBEDTLS_ASN1_CHK_ADD(len, mbedtls_asn1_write_oid(p, start, oid,
                                                      oid_len));
 
@@ -489,8 +495,8 @@ int mbedtls_x509_write_sig(unsigned char **p, unsigned char *start,
     MBEDTLS_ASN1_CHK_ADD(len, mbedtls_asn1_write_len(p, start, len));
     MBEDTLS_ASN1_CHK_ADD(len, mbedtls_asn1_write_tag(p, start, MBEDTLS_ASN1_BIT_STRING));
 
-    // Write OID
-    //
+    /* Write OID */
+    /* */
     if (pk_alg == MBEDTLS_PK_ECDSA) {
         /*
          * The AlgorithmIdentifier's parameters field must be absent for DSA/ECDSA signature

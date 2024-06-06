@@ -44,8 +44,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "mbedtls/platform.h" // for mbedtls_setbuf
-#include "mbedtls/platform_util.h" // for mbedtls_platform_zeroize
+#include "mbedtls/platform.h" /* for mbedtls_setbuf */
+#include "mbedtls/platform_util.h" /* for mbedtls_platform_zeroize */
 
 #include <psa/crypto.h>
 
@@ -132,7 +132,7 @@ int main(void)
  * directly without worrying about data representation issues such as
  * integer sizes and endianness, because the data is meant to be read
  * back by the same program on the same machine. */
-#define WRAPPED_DATA_MAGIC "key_ladder_demo" // including trailing null byte
+#define WRAPPED_DATA_MAGIC "key_ladder_demo" /* including trailing null byte */
 #define WRAPPED_DATA_MAGIC_LENGTH (sizeof(WRAPPED_DATA_MAGIC))
 typedef struct {
     char magic[WRAPPED_DATA_MAGIC_LENGTH];

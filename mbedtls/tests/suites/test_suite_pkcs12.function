@@ -29,6 +29,7 @@ void pkcs12_derive_key(int md_type, int key_size_arg,
     unsigned char *salt = NULL;
     size_t salt_len = 0;
     size_t key_size = key_size_arg;
+    int ret;
 
     MD_PSA_INIT();
 
@@ -46,7 +47,7 @@ void pkcs12_derive_key(int md_type, int key_size_arg,
 
     TEST_CALLOC(output_data, key_size);
 
-    int ret = mbedtls_pkcs12_derivation(output_data,
+    ret = mbedtls_pkcs12_derivation(output_data,
                                         key_size,
                                         password,
                                         password_len,

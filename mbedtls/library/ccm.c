@@ -348,7 +348,7 @@ int mbedtls_ccm_update_ad(mbedtls_ccm_context *ctx,
 
         if (ctx->processed == ctx->add_len) {
             ctx->state |= CCM_STATE__AUTH_DATA_FINISHED;
-            ctx->processed = 0; // prepare for mbedtls_ccm_update()
+            ctx->processed = 0; /* prepare for mbedtls_ccm_update() */
         }
     }
 

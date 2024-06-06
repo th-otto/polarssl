@@ -131,6 +131,7 @@ static int ssl_tls13_parse_alpn_ext(mbedtls_ssl_context *ssl,
     const unsigned char *end = buf + len;
     size_t protocol_name_list_len, protocol_name_len;
     const unsigned char *protocol_name_list_end;
+	const char **alpn;
 
     /* If we didn't send it, the server shouldn't send it */
     if (ssl->conf->alpn_list == NULL) {
@@ -159,7 +160,7 @@ static int ssl_tls13_parse_alpn_ext(mbedtls_ssl_context *ssl,
 
     /* Check that the server chosen protocol was in our list and save it */
     MBEDTLS_SSL_CHK_BUF_READ_PTR(p, protocol_name_list_end, protocol_name_len);
-    for (const char **alpn = ssl->conf->alpn_list; *alpn != NULL; alpn++) {
+    for (alpn = ssl->conf->alpn_list; *alpn != NULL; alpn++) {
         if (protocol_name_len == strlen(*alpn) &&
             memcmp(p, *alpn, protocol_name_len) == 0) {
             ssl->alpn_chosen = *alpn;
@@ -565,8 +566,8 @@ static int ssl_tls13_write_cookie_ext(mbedtls_ssl_context *ssl,
                                       size_t *out_len)
 {
     unsigned char *p = buf;
-    *out_len = 0;
     mbedtls_ssl_handshake_params *handshake = ssl->handshake;
+    *out_len = 0;
 
     if (handshake->cookie == NULL) {
         MBEDTLS_SSL_DEBUG_MSG(3, ("no cookie to send; skip extension"));
@@ -1574,7 +1575,7 @@ static int ssl_tls13_check_server_hello_session_id_echo(mbedtls_ssl_context *ssl
 /* Parse ServerHello message and configure context
  *
  * struct {
- *    ProtocolVersion legacy_version = 0x0303; // TLS 1.2
+ *    ProtocolVersion legacy_version = 0x0303; / / TLS 1.2
  *    Random random;
  *    opaque legacy_session_id_echo<0..32>;
  *    CipherSuite cipher_suite;
@@ -1615,7 +1616,7 @@ static int ssl_tls13_parse_server_hello(mbedtls_ssl_context *ssl,
     MBEDTLS_SSL_DEBUG_BUF(3, "server hello, version", p, 2);
 
     /* ...
-     * ProtocolVersion legacy_version = 0x0303; // TLS 1.2
+     * ProtocolVersion legacy_version = 0x0303; / / TLS 1.2
      * ...
      * with ProtocolVersion defined as:
      * uint16 ProtocolVersion;

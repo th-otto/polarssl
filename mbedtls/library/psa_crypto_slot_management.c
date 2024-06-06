@@ -395,6 +395,7 @@ psa_status_t psa_get_and_lock_key_slot(mbedtls_svc_key_id_t key,
     /* Loading keys from storage requires support for such a mechanism */
 #if defined(MBEDTLS_PSA_CRYPTO_STORAGE_C) || \
     defined(MBEDTLS_PSA_CRYPTO_BUILTIN_KEYS)
+    {
     psa_key_id_t volatile_key_id;
 
     status = psa_reserve_free_key_slot(&volatile_key_id, p_slot);
@@ -435,6 +436,7 @@ psa_status_t psa_get_and_lock_key_slot(mbedtls_svc_key_id_t key,
                                       PSA_SLOT_FULL);
         status = psa_register_read(*p_slot);
     }
+	}
 
 #else /* MBEDTLS_PSA_CRYPTO_STORAGE_C || MBEDTLS_PSA_CRYPTO_BUILTIN_KEYS */
     status = PSA_ERROR_INVALID_HANDLE;

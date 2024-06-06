@@ -9,7 +9,7 @@
  */
 
 /* System support */
-//#define MBEDTLS_HAVE_ASM
+/*#define MBEDTLS_HAVE_ASM */
 #define MBEDTLS_HAVE_TIME
 #define MBEDTLS_HAVE_TIME_DATE
 
@@ -72,6 +72,6 @@
 #define MBEDTLS_SHA256_C
 #define MBEDTLS_SHA384_C
 #define MBEDTLS_SHA512_C
-//#define MBEDTLS_THREADING_C
+/*#define MBEDTLS_THREADING_C */
 #define MBEDTLS_TIMING_C
 #define MBEDTLS_VERSION_C

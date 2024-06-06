@@ -286,6 +286,8 @@ void mbedtls_asn1_write_algorithm_identifier(data_t *oid,
         /* Only do a parse-back test if the parameters aren't too large for
          * a small-heap environment. The boundary is somewhat arbitrary. */
         if (ret >= 0 && par_len <= 1234) {
+            unsigned char *end_complete;
+            unsigned char *p;
             mbedtls_asn1_buf alg = { 0, 0, NULL };
             mbedtls_asn1_buf params = { 0, 0, NULL };
             /* The writing function doesn't write the parameters unless
@@ -297,7 +299,7 @@ void mbedtls_asn1_write_algorithm_identifier(data_t *oid,
             unsigned char expected_params_tag;
             size_t expected_params_len;
             TEST_CALLOC(buf_complete, len_complete);
-            unsigned char *end_complete = buf_complete + len_complete;
+            end_complete = buf_complete + len_complete;
             memcpy(buf_complete, data.p, data_len);
             if (par_len == 0) {
                 /* mbedtls_asn1_write_algorithm_identifier() wrote a NULL */
@@ -318,7 +320,7 @@ void mbedtls_asn1_write_algorithm_identifier(data_t *oid,
             } else {
                 TEST_FAIL("Bad test data: invalid length of ASN.1 element");
             }
-            unsigned char *p = buf_complete;
+            p = buf_complete;
             TEST_EQUAL(mbedtls_asn1_get_alg(&p, end_complete,
                                             &alg, &params), 0);
             TEST_EQUAL(alg.tag, MBEDTLS_ASN1_OID);
@@ -391,6 +393,7 @@ void test_asn1_write_bitstrings(data_t *bitstring, int bits,
 {
     generic_write_data_t data = { NULL, NULL, NULL, NULL, 0 };
     int ret;
+    size_t value_bits;
     int (*func)(unsigned char **p, const unsigned char *start,
                 const unsigned char *buf, size_t bits) =
         (is_named ? mbedtls_asn1_write_named_bitstring :
@@ -411,7 +414,7 @@ void test_asn1_write_bitstrings(data_t *bitstring, int bits,
             masked_bitstring[byte_length - 1] &= ~(0xff >> (bits % 8));
         }
     }
-    size_t value_bits = bits;
+    value_bits = bits;
     if (is_named) {
         /* In a named bit string, all trailing 0 bits are removed. */
         while (byte_length > 0 && masked_bitstring[byte_length - 1] == 0) {
@@ -420,7 +423,8 @@ void test_asn1_write_bitstrings(data_t *bitstring, int bits,
         value_bits = 8 * byte_length;
         if (byte_length > 0) {
             unsigned char last_byte = masked_bitstring[byte_length - 1];
-            for (unsigned b = 1; b < 0xff && (last_byte & b) == 0; b <<= 1) {
+            unsigned b;
+            for (b = 1; b < 0xff && (last_byte & b) == 0; b <<= 1) {
                 --value_bits;
             }
         }

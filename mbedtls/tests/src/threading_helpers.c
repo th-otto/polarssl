@@ -88,7 +88,7 @@ int (*mbedtls_test_thread_join)(mbedtls_test_thread_t *thread) = threading_threa
  * The normal usage of a mutex is:
  * ```
  * digraph mutex_states {
- *   "UNINITIALIZED"; // the initial state
+ *   "UNINITIALIZED"; / / the initial state
  *   "IDLE";
  *   "FREED";
  *   "LOCKED";
@@ -130,9 +130,9 @@ enum value_of_mutex_state_field {
      * compatibility with threading_mutex_init_pthread() and
      * threading_mutex_free_pthread(). MUTEX_LOCKED could be any nonzero
      * value. */
-    MUTEX_FREED = 0, //! < Set by mbedtls_test_wrap_mutex_free
-    MUTEX_IDLE = 1, //! < Set by mbedtls_test_wrap_mutex_init and by mbedtls_test_wrap_mutex_unlock
-    MUTEX_LOCKED = 2, //! < Set by mbedtls_test_wrap_mutex_lock
+    MUTEX_FREED = 0, /*! < Set by mbedtls_test_wrap_mutex_free */
+    MUTEX_IDLE = 1, /*! < Set by mbedtls_test_wrap_mutex_init and by mbedtls_test_wrap_mutex_unlock */
+    MUTEX_LOCKED = 2, /*! < Set by mbedtls_test_wrap_mutex_lock */
 };
 
 typedef struct {

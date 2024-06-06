@@ -25,8 +25,8 @@ extern "C" {
 #endif
 
 #if !defined(MBEDTLS_MD5_ALT)
-// Regular implementation
-//
+/* Regular implementation */
+
 
 /**
  * \brief          MD5 context structure

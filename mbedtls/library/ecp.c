@@ -1260,6 +1260,8 @@ static int mbedtls_ecp_sw_derive_y(const mbedtls_ecp_group *grp,
      * was indeed a square so this function will return garbage in Y if X
      * does not correspond to a point on the curve.
      */
+    int ret;
+    mbedtls_mpi exp;
 
     /* Check prerequisite p = 3 mod 4 */
     if (mbedtls_mpi_get_bit(&grp->P, 0) != 1 ||
@@ -1267,8 +1269,6 @@ static int mbedtls_ecp_sw_derive_y(const mbedtls_ecp_group *grp,
         return MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE;
     }
 
-    int ret;
-    mbedtls_mpi exp;
     mbedtls_mpi_init(&exp);
 
     /* use Y to store intermediate result, actually w above */
@@ -1326,6 +1326,7 @@ static int ecp_normalize_jac(const mbedtls_ecp_group *grp, mbedtls_ecp_point *pt
 #if defined(MBEDTLS_ECP_NO_FALLBACK) && defined(MBEDTLS_ECP_NORMALIZE_JAC_ALT)
     return MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE;
 #else
+	{
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
     mbedtls_mpi T;
     mbedtls_mpi_init(&T);
@@ -1343,6 +1344,7 @@ cleanup:
     mbedtls_mpi_free(&T);
 
     return ret;
+    }
 #endif /* !defined(MBEDTLS_ECP_NO_FALLBACK) || !defined(MBEDTLS_ECP_NORMALIZE_JAC_ALT) */
 }
 
@@ -1373,6 +1375,7 @@ static int ecp_normalize_jac_many(const mbedtls_ecp_group *grp,
 #if defined(MBEDTLS_ECP_NO_FALLBACK) && defined(MBEDTLS_ECP_NORMALIZE_JAC_MANY_ALT)
     return MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE;
 #else
+	{
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
     size_t i;
     mbedtls_mpi *c, t;
@@ -1447,6 +1450,7 @@ cleanup:
     mbedtls_free(c);
 
     return ret;
+    }
 #endif /* !defined(MBEDTLS_ECP_NO_FALLBACK) || !defined(MBEDTLS_ECP_NORMALIZE_JAC_MANY_ALT) */
 }
 
@@ -1500,6 +1504,7 @@ static int ecp_double_jac(const mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
 #if defined(MBEDTLS_ECP_NO_FALLBACK) && defined(MBEDTLS_ECP_DOUBLE_JAC_ALT)
     return MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE;
 #else
+	{
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
 
     /* Special case for A = -3 */
@@ -1557,6 +1562,7 @@ static int ecp_double_jac(const mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
 cleanup:
 
     return ret;
+    }
 #endif /* !defined(MBEDTLS_ECP_NO_FALLBACK) || !defined(MBEDTLS_ECP_DOUBLE_JAC_ALT) */
 }
 
@@ -1597,6 +1603,7 @@ static int ecp_add_mixed(const mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
 #if defined(MBEDTLS_ECP_NO_FALLBACK) && defined(MBEDTLS_ECP_ADD_MIXED_ALT)
     return MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE;
 #else
+	{
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
 
     /* NOTE: Aliasing between input and output is allowed, so one has to make
@@ -1668,6 +1675,7 @@ static int ecp_add_mixed(const mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
 cleanup:
 
     return ret;
+    }
 #endif /* !defined(MBEDTLS_ECP_NO_FALLBACK) || !defined(MBEDTLS_ECP_ADD_MIXED_ALT) */
 }
 
@@ -2297,6 +2305,7 @@ static int ecp_mul_comb(mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
     size_t d;
     unsigned char T_size = 0, T_ok = 0;
     mbedtls_ecp_point *T = NULL;
+	int should_free_R;
 
     ECP_RS_ENTER(rsm);
 
@@ -2389,7 +2398,7 @@ cleanup:
     }
 
     /* prevent caller from using invalid value */
-    int should_free_R = (ret != 0);
+    should_free_R = (ret != 0);
 #if defined(MBEDTLS_ECP_RESTARTABLE)
     /* don't free R while in progress in case R == P */
     if (ret == MBEDTLS_ERR_ECP_IN_PROGRESS) {
@@ -2632,6 +2641,7 @@ static int ecp_mul_restartable_internal(mbedtls_ecp_group *grp, mbedtls_ecp_poin
 #if defined(MBEDTLS_ECP_INTERNAL_ALT)
     char is_grp_capable = 0;
 #endif
+    int restarting;
 
 #if defined(MBEDTLS_ECP_RESTARTABLE)
     /* reset ops count for this call if top-level */
@@ -2648,7 +2658,7 @@ static int ecp_mul_restartable_internal(mbedtls_ecp_group *grp, mbedtls_ecp_poin
     }
 #endif /* MBEDTLS_ECP_INTERNAL_ALT */
 
-    int restarting = 0;
+    restarting = 0;
 #if defined(MBEDTLS_ECP_RESTARTABLE)
     restarting = (rs_ctx != NULL && rs_ctx->rsm != NULL);
 #endif
@@ -3472,10 +3482,11 @@ int mbedtls_ecp_export(const mbedtls_ecp_keypair *key, mbedtls_ecp_group *grp,
 static int self_test_rng(void *ctx, unsigned char *out, size_t len)
 {
     static uint32_t state = 42;
+	size_t i;
 
     (void) ctx;
 
-    for (size_t i = 0; i < len; i++) {
+    for (i = 0; i < len; i++) {
         state = state * 1664525u + 1013904223u;
         out[i] = (unsigned char) state;
     }

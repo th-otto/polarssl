@@ -181,6 +181,7 @@ int mbedtls_gcm_setkey(mbedtls_gcm_context *ctx,
         return ret;
     }
 #else
+	{
     const mbedtls_cipher_info_t *cipher_info;
 
     cipher_info = mbedtls_cipher_info_from_values(cipher, keybits,
@@ -202,6 +203,7 @@ int mbedtls_gcm_setkey(mbedtls_gcm_context *ctx,
     if ((ret = mbedtls_cipher_setkey(&ctx->cipher_ctx, key, keybits,
                                      MBEDTLS_ENCRYPT)) != 0) {
         return ret;
+    }
     }
 #endif
 
@@ -1023,6 +1025,9 @@ int mbedtls_gcm_self_test(int verbose)
     mbedtls_cipher_id_t cipher = MBEDTLS_CIPHER_ID_AES;
     size_t olen;
 
+    static const int loop_limit =
+        (sizeof(ct_test_data) / sizeof(*ct_test_data)) / MAX_TESTS;
+
     if (verbose != 0) {
 #if defined(MBEDTLS_GCM_ALT)
         mbedtls_printf("  GCM note: alternative implementation.\n");
@@ -1042,9 +1047,6 @@ int mbedtls_gcm_self_test(int verbose)
         mbedtls_printf("  GCM note: built-in implementation.\n");
 #endif /* MBEDTLS_GCM_ALT */
     }
-
-    static const int loop_limit =
-        (sizeof(ct_test_data) / sizeof(*ct_test_data)) / MAX_TESTS;
 
     for (j = 0; j < loop_limit; j++) {
         int key_len = 128 + 64 * j;

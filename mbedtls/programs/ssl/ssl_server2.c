@@ -163,7 +163,7 @@ int main(void)
 #define HTTP_RESPONSE \
     "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n" \
     "<h2>Mbed TLS Test Server</h2>\r\n" \
-    "<p>Successful connection using: %s</p>\r\n" // LONG_RESPONSE
+    "<p>Successful connection using: %s</p>\r\n" /* LONG_RESPONSE */
 
 /*
  * Size of the basic I/O buffer. Able to hold our default response.
@@ -1620,6 +1620,7 @@ int main(int argc, char *argv[])
     size_t current_heap_memory, peak_heap_memory, heap_blocks;
 #endif  /* MBEDTLS_MEMORY_DEBUG */
 #endif  /* MBEDTLS_MEMORY_BUFFER_ALLOC_C */
+    size_t buf_content_size;
 
 #if defined(MBEDTLS_TEST_HOOKS)
     test_hooks_init();
@@ -1826,7 +1827,7 @@ usage:
 
         if ((q = strchr(p, '=')) == NULL) {
             mbedtls_printf("param requires a value: '%s'\n", p);
-            p = NULL; // avoid "unrecnognized param" message
+            p = NULL; /* avoid "unrecnognized param" message */
             goto usage;
         }
         *q++ = '\0';
@@ -2321,7 +2322,7 @@ usage:
 
     /* buf will alternatively contain the input read from the client and the
      * response that's about to be sent, plus a null byte in each case. */
-    size_t buf_content_size = opt.buffer_size;
+    buf_content_size = opt.buffer_size;
     /* The default response contains the ciphersuite name. Leave enough
      * room for that plus some margin. */
     if (buf_content_size < strlen(HTTP_RESPONSE) + 80) {
@@ -4297,12 +4298,14 @@ exit:
 #endif  /* MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED && MBEDTLS_USE_PSA_CRYPTO */
 
 #if defined(MBEDTLS_USE_PSA_CRYPTO) || defined(MBEDTLS_SSL_PROTO_TLS1_3)
+    {
     const char *message = mbedtls_test_helper_is_psa_leaking();
     if (message) {
         if (ret == 0) {
             ret = 1;
         }
         mbedtls_printf("PSA memory leak detected: %s\n",  message);
+    }
     }
 #endif
 
@@ -4343,7 +4346,7 @@ exit:
         mbedtls_printf(" done.\n");
     }
 
-    // Shell can not handle large exit numbers -> 1 for errors
+    /* Shell can not handle large exit numbers -> 1 for errors */
     if (ret < 0) {
         ret = 1;
     }

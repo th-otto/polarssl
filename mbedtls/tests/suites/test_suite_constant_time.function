@@ -35,9 +35,10 @@ void mbedtls_ct_memcmp_null()
 void mbedtls_ct_bool(char *input)
 {
     mbedtls_ct_uint_t v = (mbedtls_ct_uint_t) strtoull(input, NULL, 16);
+    mbedtls_ct_condition_t expected;
     TEST_ASSERT(errno == 0);
 
-    mbedtls_ct_condition_t expected = (v != 0) ? MBEDTLS_CT_TRUE : MBEDTLS_CT_FALSE;
+    expected = (v != 0) ? MBEDTLS_CT_TRUE : MBEDTLS_CT_FALSE;
     TEST_CF_SECRET(&v, sizeof(v));
     TEST_EQUAL(mbedtls_ct_bool(v), expected);
     TEST_CF_PUBLIC(&v, sizeof(v));
@@ -52,11 +53,12 @@ void mbedtls_ct_bool_xxx(char *x_str, char *y_str)
 
     mbedtls_ct_uint_t x1 = x;
     mbedtls_ct_uint_t y1 = y;
+    mbedtls_ct_condition_t expected;
 
     TEST_CF_SECRET(&x, sizeof(x));
     TEST_CF_SECRET(&y, sizeof(y));
 
-    mbedtls_ct_condition_t expected = x1 ? MBEDTLS_CT_FALSE : MBEDTLS_CT_TRUE;
+    expected = x1 ? MBEDTLS_CT_FALSE : MBEDTLS_CT_TRUE;
     TEST_EQUAL(mbedtls_ct_bool_not(mbedtls_ct_bool(x)), expected);
 
     expected = x1 != y1 ? MBEDTLS_CT_TRUE : MBEDTLS_CT_FALSE;
@@ -95,8 +97,9 @@ void mbedtls_ct_bool_xxx(char *x_str, char *y_str)
 void mbedtls_ct_uchar_in_range_if(int li, int hi, int ti)
 {
     unsigned char l = li, h = hi, t = ti;
+    unsigned x;
 
-    for (unsigned x = 0; x <= 255; x++) {
+    for (x = 0; x <= 255; x++) {
         unsigned char expected = (x >= l) && (x <= h) ? t : 0;
 
         TEST_CF_SECRET(&x, sizeof(x));
@@ -175,10 +178,11 @@ void mbedtls_ct_if(char *c_str, char *t_str, char *f_str)
 void mbedtls_ct_zeroize_if(char *c_str, int len)
 {
     uint8_t *buf = NULL;
+    size_t i;
     mbedtls_ct_condition_t c = mbedtls_ct_bool(strtoull(c_str, NULL, 16));
 
     TEST_CALLOC(buf, len);
-    for (size_t i = 0; i < (size_t) len; i++) {
+    for (i = 0; i < (size_t) len; i++) {
         buf[i] = 1;
     }
 
@@ -188,7 +192,7 @@ void mbedtls_ct_zeroize_if(char *c_str, int len)
     TEST_CF_PUBLIC(&c, sizeof(c));
     TEST_CF_PUBLIC(buf, len);
 
-    for (size_t i = 0; i < (size_t) len; i++) {
+    for (i = 0; i < (size_t) len; i++) {
         TEST_EQUAL(buf[i], c != 0 ? 0 : 1);
     }
 exit:
@@ -200,21 +204,23 @@ exit:
 void mbedtls_ct_memcmp_single_bit_diff()
 {
     uint8_t *a = NULL, *b = NULL;
+    size_t offset, bit_offset;
     size_t size = 32;
+    int result;
     TEST_CALLOC(a, size);
     TEST_CALLOC(b, size);
 
     TEST_CF_SECRET(a, size);
     TEST_CF_SECRET(b, size);
-    int result = mbedtls_ct_memcmp(a, b, size);
+    result = mbedtls_ct_memcmp(a, b, size);
     TEST_CF_PUBLIC(a, size);
     TEST_CF_PUBLIC(b, size);
     TEST_CF_PUBLIC(&result, sizeof(result));
 
     TEST_EQUAL(result, 0);
 
-    for (size_t offset = 0; offset < size; offset++) {
-        for (size_t bit_offset = 0; bit_offset < 8; bit_offset++) {
+    for (offset = 0; offset < size; offset++) {
+        for (bit_offset = 0; bit_offset < 8; bit_offset++) {
             /* Set a single bit to be different at given offset, to test that we
                detect single-bit differences */
             a[offset] = 1 << bit_offset;
@@ -243,6 +249,9 @@ exit:
 void mbedtls_ct_memcmp(int same, int size, int offset)
 {
     uint8_t *a = NULL, *b = NULL;
+    int i;
+    int reference;
+    int actual;
     TEST_CALLOC(a, size + offset);
     TEST_CALLOC(b, size + offset);
 
@@ -250,7 +259,7 @@ void mbedtls_ct_memcmp(int same, int size, int offset)
      * same gives the number of bytes (after the initial offset)
      * that will match; after that it will differ.
      */
-    for (int i = 0; i < size + offset; i++) {
+    for (i = 0; i < size + offset; i++) {
         a[i] = i & 0xff;
         if (same == -1 || (i - offset) < same) {
             b[i] = a[i];
@@ -259,12 +268,12 @@ void mbedtls_ct_memcmp(int same, int size, int offset)
         }
     }
 
-    int reference = memcmp(a + offset, b + offset, size);
+    reference = memcmp(a + offset, b + offset, size);
 
     TEST_CF_SECRET(a, size + offset);
     TEST_CF_SECRET(b, size + offset);
 
-    int actual = mbedtls_ct_memcmp(a + offset, b + offset, size);
+    actual = mbedtls_ct_memcmp(a + offset, b + offset, size);
 
     TEST_CF_PUBLIC(a, size + offset);
     TEST_CF_PUBLIC(b, size + offset);
@@ -298,6 +307,9 @@ exit:
 void mbedtls_ct_memcmp_partial(int diff, int size, int skip_head, int skip_tail)
 {
     uint8_t *a = NULL, *b = NULL;
+    int i;
+    int reference;
+    int actual;
 
     TEST_CALLOC_NONNULL(a, size);
     TEST_CALLOC_NONNULL(b, size);
@@ -305,7 +317,7 @@ void mbedtls_ct_memcmp_partial(int diff, int size, int skip_head, int skip_tail)
     TEST_ASSERT((skip_head + skip_tail) <= size);
 
     /* Construct data that matches, except for specified byte (if in range). */
-    for (int i = 0; i < size; i++) {
+    for (i = 0; i < size; i++) {
         a[i] = i & 0xff;
         b[i] = a[i];
         if (i == diff) {
@@ -314,12 +326,12 @@ void mbedtls_ct_memcmp_partial(int diff, int size, int skip_head, int skip_tail)
         }
     }
 
-    int reference = memcmp(a + skip_head, b + skip_head, size - skip_head - skip_tail);
+    reference = memcmp(a + skip_head, b + skip_head, size - skip_head - skip_tail);
 
     TEST_CF_SECRET(a, size);
     TEST_CF_SECRET(b, size);
 
-    int actual = mbedtls_ct_memcmp_partial(a, b, size, skip_head, skip_tail);
+    actual = mbedtls_ct_memcmp_partial(a, b, size, skip_head, skip_tail);
 
     TEST_CF_PUBLIC(a, size);
     TEST_CF_PUBLIC(b, size);
@@ -335,6 +347,8 @@ exit:
 /* BEGIN_CASE */
 void mbedtls_ct_memcpy_if(int eq, int size, int offset)
 {
+    int i;
+    int secret_eq;
     uint8_t *src = NULL, *src2 = NULL, *result = NULL, *expected = NULL;
     TEST_CALLOC(src, size + offset);
     TEST_CALLOC(src2, size + offset);
@@ -342,13 +356,13 @@ void mbedtls_ct_memcpy_if(int eq, int size, int offset)
     TEST_CALLOC(expected, size + offset);
 
     /* Apply offset to result only */
-    for (int i = 0; i < size + offset; i++) {
+    for (i = 0; i < size + offset; i++) {
         src[i]      = 1;
         result[i]   = 0xff;
         expected[i] = eq ? 1 : 0xff;
     }
 
-    int secret_eq = eq;
+    secret_eq = eq;
     TEST_CF_SECRET(&secret_eq, sizeof(secret_eq));
     TEST_CF_SECRET(src, size + offset);
     TEST_CF_SECRET(result, size + offset);
@@ -363,7 +377,7 @@ void mbedtls_ct_memcpy_if(int eq, int size, int offset)
 
 
     /* Apply offset to src only */
-    for (int i = 0; i < size + offset; i++) {
+    for (i = 0; i < size + offset; i++) {
         src[i]    = 1;
         result[i] = 0xff;
         expected[i] = eq ? 1 : 0xff;
@@ -383,7 +397,7 @@ void mbedtls_ct_memcpy_if(int eq, int size, int offset)
 
 
     /* Apply offset to src and src2 */
-    for (int i = 0; i < size + offset; i++) {
+    for (i = 0; i < size + offset; i++) {
         src[i]      = 1;
         src2[i]     = 2;
         result[i]   = 0xff;
@@ -406,7 +420,7 @@ void mbedtls_ct_memcpy_if(int eq, int size, int offset)
 
 
     /* result == src == dest */
-    for (int i = 0; i < size + offset; i++) {
+    for (i = 0; i < size + offset; i++) {
         src[i]      = 2;
         expected[i] = 2;
     }
@@ -436,12 +450,13 @@ void mbedtls_ct_memmove_left(int len, int offset)
 {
     size_t l = (size_t) len;
     size_t o = (size_t) offset;
+    size_t i;
 
     uint8_t *buf = NULL, *buf_expected = NULL;
     TEST_CALLOC(buf, l);
     TEST_CALLOC(buf_expected, l);
 
-    for (size_t i = 0; i < l; i++) {
+    for (i = 0; i < l; i++) {
         buf[i] = (uint8_t) i;
         buf_expected[i] = buf[i];
     }

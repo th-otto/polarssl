@@ -739,8 +739,8 @@ void mbedtls_ssl_print_extensions(const mbedtls_ssl_context *ssl,
                                   int hs_msg_type, uint32_t extensions_mask,
                                   const char *extra)
 {
-
-    for (unsigned i = 0;
+	unsigned int i;
+    for (i = 0;
          i < sizeof(extension_name_table) / sizeof(extension_name_table[0]);
          i++) {
         mbedtls_ssl_print_extension(
@@ -1166,17 +1166,19 @@ static int ssl_handshake_init(mbedtls_ssl_context *ssl)
     if (ssl->conf->curve_list != NULL) {
         size_t length;
         const mbedtls_ecp_group_id *curve_list = ssl->conf->curve_list;
+		uint16_t *group_list;
+		size_t i;
 
         for (length = 0;  (curve_list[length] != MBEDTLS_ECP_DP_NONE); length++) {
         }
 
         /* Leave room for zero termination */
-        uint16_t *group_list = mbedtls_calloc(length + 1, sizeof(uint16_t));
+        group_list = mbedtls_calloc(length + 1, sizeof(uint16_t));
         if (group_list == NULL) {
             return MBEDTLS_ERR_SSL_ALLOC_FAILED;
         }
 
-        for (size_t i = 0; i < length; i++) {
+        for (i = 0; i < length; i++) {
             uint16_t tls_id = mbedtls_ssl_get_tls_id_from_ecp_group_id(
                 curve_list[i]);
             if (tls_id == 0) {
@@ -1594,6 +1596,7 @@ int mbedtls_ssl_session_reset_int(mbedtls_ssl_context *ssl, int partial)
 #endif
 
 #if defined(MBEDTLS_SSL_DTLS_HELLO_VERIFY) && defined(MBEDTLS_SSL_SRV_C)
+	{
     int free_cli_id = 1;
 #if defined(MBEDTLS_SSL_DTLS_CLIENT_PORT_REUSE)
     free_cli_id = (partial == 0);
@@ -1602,6 +1605,7 @@ int mbedtls_ssl_session_reset_int(mbedtls_ssl_context *ssl, int partial)
         mbedtls_free(ssl->cli_id);
         ssl->cli_id = NULL;
         ssl->cli_id_len = 0;
+    }
     }
 #endif
 
@@ -3144,7 +3148,7 @@ size_t mbedtls_ssl_get_output_record_size_limit(const mbedtls_ssl_context *ssl)
         record_size_limit = ssl->session->record_size_limit;
     }
 
-    // TODO: this is currently untested
+    /* TODO: this is currently untested */
     /* During a handshake, use the value being negotiated */
     if (ssl->session_negotiate != NULL &&
         ssl->session_negotiate->record_size_limit >= MBEDTLS_SSL_RECORD_SIZE_LIMIT_MIN &&
@@ -4184,7 +4188,7 @@ static const unsigned char ssl_serialized_session_header[] = {
  *
  * struct {
  * #if defined(MBEDTLS_SSL_SESSION_TICKETS)
- *    opaque ticket<0..2^24-1>;       // length 0 means no ticket
+ *    opaque ticket<0..2^24-1>;       / / length 0 means no ticket
  *    uint32 ticket_lifetime;
  * #endif
  * } ClientOnlyData;
@@ -4193,12 +4197,12 @@ static const unsigned char ssl_serialized_session_header[] = {
  * #if defined(MBEDTLS_HAVE_TIME)
  *    uint64 start_time;
  * #endif
- *     uint8 session_id_len;           // at most 32
+ *     uint8 session_id_len;           / / at most 32
  *     opaque session_id[32];
- *     opaque master[48];              // fixed length in the standard
+ *     opaque master[48];              / / fixed length in the standard
  *     uint32 verify_result;
  * #if defined(MBEDTLS_SSL_KEEP_PEER_CERTIFICATE
- *    opaque peer_cert<0..2^24-1>;    // length 0 means no peer cert
+ *    opaque peer_cert<0..2^24-1>;    / / length 0 means no peer cert
  * #else
  *    uint8 peer_cert_digest_type;
  *    opaque peer_cert_digest<0..2^8-1>
@@ -4208,10 +4212,10 @@ static const unsigned char ssl_serialized_session_header[] = {
  *         case server: uint64 ticket_creation_time;
  *     };
  * #if defined(MBEDTLS_SSL_MAX_FRAGMENT_LENGTH)
- *    uint8 mfl_code;                 // up to 255 according to standard
+ *    uint8 mfl_code;                 / / up to 255 according to standard
  * #endif
  * #if defined(MBEDTLS_SSL_ENCRYPT_THEN_MAC)
- *    uint8 encrypt_then_mac;         // 0 or 1
+ *    uint8 encrypt_then_mac;         / / 0 or 1
  * #endif
  * } serialized_session_tls12;
  *
@@ -4256,22 +4260,22 @@ static const unsigned char ssl_serialized_session_header[] = {
  *
  * struct {
  *
- *    opaque mbedtls_version[3];   // library version: major, minor, patch
- *    opaque session_format[2];    // library-version specific 16-bit field
- *                                 // determining the format of the remaining
- *                                 // serialized data.
+ *    opaque mbedtls_version[3];   / / library version: major, minor, patch
+ *    opaque session_format[2];    / / library-version specific 16-bit field
+ *                                 / / determining the format of the remaining
+ *                                 / / serialized data.
  *
  *          Note: When updating the format, remember to keep
  *          these version+format bytes.
  *
- *                                 // In this version, `session_format` determines
- *                                 // the setting of those compile-time
- *                                 // configuration options which influence
- *                                 // the structure of mbedtls_ssl_session.
+ *                                 / / In this version, `session_format` determines
+ *                                 / / the setting of those compile-time
+ *                                 / / configuration options which influence
+ *                                 / / the structure of mbedtls_ssl_session.
  *
- *    uint8_t minor_ver;           // Protocol minor version. Possible values:
- *                                 // - TLS 1.2 (0x0303)
- *                                 // - TLS 1.3 (0x0304)
+ *    uint8_t minor_ver;           / / Protocol minor version. Possible values:
+ *                                 / / - TLS 1.2 (0x0303)
+ *                                 / / - TLS 1.3 (0x0304)
  *    uint8_t endpoint;
  *    uint16_t ciphersuite;
  *
@@ -4999,28 +5003,28 @@ static const unsigned char ssl_serialized_context_header[] = {
  * The format of the serialized data is:
  * (in the presentation language of TLS, RFC 8446 section 3)
  *
- *  // header
- *  opaque mbedtls_version[3];   // major, minor, patch
- *  opaque context_format[5];    // version-specific field determining
- *                               // the format of the remaining
- *                               // serialized data.
+ *  / / header
+ *  opaque mbedtls_version[3];   / / major, minor, patch
+ *  opaque context_format[5];    / / version-specific field determining
+ *                               / / the format of the remaining
+ *                               / / serialized data.
  *  Note: When updating the format, remember to keep these
  *        version+format bytes. (We may make their size part of the API.)
  *
- *  // session sub-structure
- *  opaque session<1..2^32-1>;  // see mbedtls_ssl_session_save()
- *  // transform sub-structure
- *  uint8 random[64];           // ServerHello.random+ClientHello.random
- *  uint8 in_cid<0..2^8-1>      // Connection ID: expected incoming value
- *  uint8 out_cid<0..2^8-1>     // Connection ID: outgoing value to use
- *  // fields from ssl_context
- *  uint32 badmac_seen;         // DTLS: number of records with failing MAC
- *  uint64 in_window_top;       // DTLS: last validated record seq_num
- *  uint64 in_window;           // DTLS: bitmask for replay protection
- *  uint8 disable_datagram_packing; // DTLS: only one record per datagram
- *  uint64 cur_out_ctr;         // Record layer: outgoing sequence number
- *  uint16 mtu;                 // DTLS: path mtu (max outgoing fragment size)
- *  uint8 alpn_chosen<0..2^8-1> // ALPN: negotiated application protocol
+ *  / / session sub-structure
+ *  opaque session<1..2^32-1>;  / / see mbedtls_ssl_session_save()
+ *  / / transform sub-structure
+ *  uint8 random[64];           / / ServerHello.random+ClientHello.random
+ *  uint8 in_cid<0..2^8-1>      / / Connection ID: expected incoming value
+ *  uint8 out_cid<0..2^8-1>     / / Connection ID: outgoing value to use
+ *  / / fields from ssl_context
+ *  uint32 badmac_seen;         / / DTLS: number of records with failing MAC
+ *  uint64 in_window_top;       / / DTLS: last validated record seq_num
+ *  uint64 in_window;           / / DTLS: bitmask for replay protection
+ *  uint8 disable_datagram_packing; / / DTLS: only one record per datagram
+ *  uint64 cur_out_ctr;         / / Record layer: outgoing sequence number
+ *  uint16 mtu;                 / / DTLS: path mtu (max outgoing fragment size)
+ *  uint8 alpn_chosen<0..2^8-1> / / ALPN: negotiated application protocol
  *
  * Note that many fields of the ssl_context or sub-structures are not
  * serialized, as they fall in one of the following categories:
@@ -5657,21 +5661,21 @@ static const uint16_t ssl_preset_default_sig_algs[] = {
     defined(MBEDTLS_MD_CAN_SHA256) && \
     defined(PSA_WANT_ECC_SECP_R1_256)
     MBEDTLS_TLS1_3_SIG_ECDSA_SECP256R1_SHA256,
-    // == MBEDTLS_SSL_TLS12_SIG_AND_HASH_ALG(MBEDTLS_SSL_SIG_ECDSA, MBEDTLS_SSL_HASH_SHA256)
+    /* == MBEDTLS_SSL_TLS12_SIG_AND_HASH_ALG(MBEDTLS_SSL_SIG_ECDSA, MBEDTLS_SSL_HASH_SHA256) */
 #endif
 
 #if defined(MBEDTLS_KEY_EXCHANGE_ECDSA_CERT_REQ_ANY_ALLOWED_ENABLED) && \
     defined(MBEDTLS_MD_CAN_SHA384) && \
     defined(PSA_WANT_ECC_SECP_R1_384)
     MBEDTLS_TLS1_3_SIG_ECDSA_SECP384R1_SHA384,
-    // == MBEDTLS_SSL_TLS12_SIG_AND_HASH_ALG(MBEDTLS_SSL_SIG_ECDSA, MBEDTLS_SSL_HASH_SHA384)
+    /* == MBEDTLS_SSL_TLS12_SIG_AND_HASH_ALG(MBEDTLS_SSL_SIG_ECDSA, MBEDTLS_SSL_HASH_SHA384) */
 #endif
 
 #if defined(MBEDTLS_KEY_EXCHANGE_ECDSA_CERT_REQ_ANY_ALLOWED_ENABLED) && \
     defined(MBEDTLS_MD_CAN_SHA512) && \
     defined(PSA_WANT_ECC_SECP_R1_521)
     MBEDTLS_TLS1_3_SIG_ECDSA_SECP521R1_SHA512,
-    // == MBEDTLS_SSL_TLS12_SIG_AND_HASH_ALG(MBEDTLS_SSL_SIG_ECDSA, MBEDTLS_SSL_HASH_SHA512)
+    /* == MBEDTLS_SSL_TLS12_SIG_AND_HASH_ALG(MBEDTLS_SSL_SIG_ECDSA, MBEDTLS_SSL_HASH_SHA512) */
 #endif
 
 #if defined(MBEDTLS_X509_RSASSA_PSS_SUPPORT) && defined(MBEDTLS_MD_CAN_SHA512)
@@ -5752,14 +5756,14 @@ static const uint16_t ssl_preset_suiteb_sig_algs[] = {
     defined(MBEDTLS_MD_CAN_SHA256) && \
     defined(MBEDTLS_ECP_HAVE_SECP256R1)
     MBEDTLS_TLS1_3_SIG_ECDSA_SECP256R1_SHA256,
-    // == MBEDTLS_SSL_TLS12_SIG_AND_HASH_ALG(MBEDTLS_SSL_SIG_ECDSA, MBEDTLS_SSL_HASH_SHA256)
+    /* == MBEDTLS_SSL_TLS12_SIG_AND_HASH_ALG(MBEDTLS_SSL_SIG_ECDSA, MBEDTLS_SSL_HASH_SHA256) */
 #endif
 
 #if defined(MBEDTLS_KEY_EXCHANGE_ECDSA_CERT_REQ_ANY_ALLOWED_ENABLED) && \
     defined(MBEDTLS_MD_CAN_SHA384) && \
     defined(MBEDTLS_ECP_HAVE_SECP384R1)
     MBEDTLS_TLS1_3_SIG_ECDSA_SECP384R1_SHA384,
-    // == MBEDTLS_SSL_TLS12_SIG_AND_HASH_ALG(MBEDTLS_SSL_SIG_ECDSA, MBEDTLS_SSL_HASH_SHA384)
+    /* == MBEDTLS_SSL_TLS12_SIG_AND_HASH_ALG(MBEDTLS_SSL_SIG_ECDSA, MBEDTLS_SSL_HASH_SHA384) */
 #endif
 
     MBEDTLS_TLS_SIG_NONE
@@ -6272,7 +6276,8 @@ int mbedtls_ssl_get_psa_curve_info_from_tls_id(uint16_t tls_id,
                                                psa_key_type_t *type,
                                                size_t *bits)
 {
-    for (int i = 0; tls_id_match_table[i].tls_id != 0; i++) {
+    int i;
+    for (i = 0; tls_id_match_table[i].tls_id != 0; i++) {
         if (tls_id_match_table[i].tls_id == tls_id) {
             if (type != NULL) {
                 *type = PSA_KEY_TYPE_ECC_KEY_PAIR(tls_id_match_table[i].psa_family);
@@ -6289,7 +6294,8 @@ int mbedtls_ssl_get_psa_curve_info_from_tls_id(uint16_t tls_id,
 
 mbedtls_ecp_group_id mbedtls_ssl_get_ecp_group_id_from_tls_id(uint16_t tls_id)
 {
-    for (int i = 0; tls_id_match_table[i].tls_id != 0; i++) {
+	int i;
+    for (i = 0; tls_id_match_table[i].tls_id != 0; i++) {
         if (tls_id_match_table[i].tls_id == tls_id) {
             return tls_id_match_table[i].ecp_group_id;
         }
@@ -6300,7 +6306,8 @@ mbedtls_ecp_group_id mbedtls_ssl_get_ecp_group_id_from_tls_id(uint16_t tls_id)
 
 uint16_t mbedtls_ssl_get_tls_id_from_ecp_group_id(mbedtls_ecp_group_id grp_id)
 {
-    for (int i = 0; tls_id_match_table[i].ecp_group_id != MBEDTLS_ECP_DP_NONE;
+    int i;
+    for (i = 0; tls_id_match_table[i].ecp_group_id != MBEDTLS_ECP_DP_NONE;
          i++) {
         if (tls_id_match_table[i].ecp_group_id == grp_id) {
             return tls_id_match_table[i].tls_id;
@@ -6334,7 +6341,8 @@ static const struct {
 
 const char *mbedtls_ssl_get_curve_name_from_tls_id(uint16_t tls_id)
 {
-    for (int i = 0; tls_id_curve_name_table[i].tls_id != 0; i++) {
+	int i;
+    for (i = 0; tls_id_curve_name_table[i].tls_id != 0; i++) {
         if (tls_id_curve_name_table[i].tls_id == tls_id) {
             return tls_id_curve_name_table[i].name;
         }
@@ -8326,6 +8334,7 @@ static int ssl_calc_finished_tls_generic(mbedtls_ssl_context *ssl, void *ctx,
 {
     unsigned int len = 12;
     const char *sender;
+    mbedtls_ssl_session *session;
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
     psa_status_t status;
     psa_hash_operation_t *hs_op = ctx;
@@ -8338,7 +8347,7 @@ static int ssl_calc_finished_tls_generic(mbedtls_ssl_context *ssl, void *ctx,
     mbedtls_md_init(&cloned_ctx);
 #endif
 
-    mbedtls_ssl_session *session = ssl->session_negotiate;
+    session = ssl->session_negotiate;
     if (!session) {
         session = ssl->session;
     }
@@ -8946,6 +8955,7 @@ static int ssl_tls12_populate_transform(mbedtls_ssl_transform *transform,
 #if defined(MBEDTLS_SSL_HAVE_AEAD)
     if (ssl_mode == MBEDTLS_SSL_MODE_AEAD) {
         size_t explicit_ivlen;
+        int is_chachapoly;
 
         transform->maclen = 0;
         mac_key_len = 0;
@@ -8960,7 +8970,7 @@ static int ssl_tls12_populate_transform(mbedtls_ssl_transform *transform,
          */
         transform->ivlen = 12;
 
-        int is_chachapoly = 0;
+        is_chachapoly = 0;
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
         is_chachapoly = (key_type == PSA_KEY_TYPE_CHACHA20);
 #else
@@ -9321,7 +9331,7 @@ int mbedtls_psa_ecjpake_write_round(
 
     return 0;
 }
-#endif //MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED && MBEDTLS_USE_PSA_CRYPTO
+#endif /*MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED && MBEDTLS_USE_PSA_CRYPTO */
 
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
 int mbedtls_ssl_get_key_exchange_md_tls1_2(mbedtls_ssl_context *ssl,
@@ -9587,6 +9597,7 @@ int mbedtls_ssl_write_sig_alg_ext(mbedtls_ssl_context *ssl, unsigned char *buf,
     unsigned char *p = buf;
     unsigned char *supported_sig_alg; /* Start of supported_signature_algorithms */
     size_t supported_sig_alg_len = 0; /* Length of supported_signature_algorithms */
+	const uint16_t *sig_alg;
 
     *out_len = 0;
 
@@ -9604,7 +9615,7 @@ int mbedtls_ssl_write_sig_alg_ext(mbedtls_ssl_context *ssl, unsigned char *buf,
      * Write supported_signature_algorithms
      */
     supported_sig_alg = p;
-    const uint16_t *sig_alg = mbedtls_ssl_get_sig_algs(ssl);
+    sig_alg = mbedtls_ssl_get_sig_algs(ssl);
     if (sig_alg == NULL) {
         return MBEDTLS_ERR_SSL_BAD_CONFIG;
     }
@@ -9730,6 +9741,7 @@ int mbedtls_ssl_parse_alpn_ext(mbedtls_ssl_context *ssl,
     const unsigned char *protocol_name_list;
     const unsigned char *protocol_name_list_end;
     size_t protocol_name_len;
+	const char **alpn;
 
     /* If ALPN not configured, just ignore the extension */
     if (ssl->conf->alpn_list == NULL) {
@@ -9774,7 +9786,7 @@ int mbedtls_ssl_parse_alpn_ext(mbedtls_ssl_context *ssl,
     }
 
     /* Use our order of preference */
-    for (const char **alpn = ssl->conf->alpn_list; *alpn != NULL; alpn++) {
+    for (alpn = ssl->conf->alpn_list; *alpn != NULL; alpn++) {
         size_t const alpn_len = strlen(*alpn);
         p = protocol_name_list;
         while (p < protocol_name_list_end) {

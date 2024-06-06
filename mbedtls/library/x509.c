@@ -900,7 +900,7 @@ int mbedtls_x509_dn_gets(char *buf, size_t size, const mbedtls_x509_name *dn)
                 }
 
                 c = name->val.p[i];
-                // Special characters requiring escaping, RFC 4514 Section 2.4
+                /* Special characters requiring escaping, RFC 4514 Section 2.4 */
                 if (c == '\0') {
                     return MBEDTLS_ERR_X509_INVALID_NAME;
                 } else {
@@ -996,11 +996,13 @@ int mbedtls_x509_sig_alg_gets(char *buf, size_t size, const mbedtls_x509_buf *si
 #if defined(MBEDTLS_X509_RSASSA_PSS_SUPPORT)
     if (pk_alg == MBEDTLS_PK_RSASSA_PSS) {
         const mbedtls_pk_rsassa_pss_options *pss_opts;
+        const char *name;
+        const char *mgf_name;
 
         pss_opts = (const mbedtls_pk_rsassa_pss_options *) sig_opts;
 
-        const char *name = md_type_to_string(md_alg);
-        const char *mgf_name = md_type_to_string(pss_opts->mgf1_hash_id);
+        name = md_type_to_string(md_alg);
+        mgf_name = md_type_to_string(pss_opts->mgf1_hash_id);
 
         ret = mbedtls_snprintf(p, n, " (%s, MGF1-%s, 0x%02X)",
                                name ? name : "???",
@@ -1449,7 +1451,7 @@ int mbedtls_x509_parse_subject_alt_name(const mbedtls_x509_buf *san_buf,
         {
             memset(san, 0, sizeof(mbedtls_x509_subject_alternative_name));
             san->type = MBEDTLS_X509_SAN_IP_ADDRESS;
-            // Only IPv6 (16 bytes) and IPv4 (4 bytes) types are supported
+            /* Only IPv6 (16 bytes) and IPv4 (4 bytes) types are supported */
             if (san_buf->len == 4 || san_buf->len == 16) {
                 memcpy(&san->san.unstructured_name,
                        san_buf, sizeof(*san_buf));
@@ -1626,6 +1628,8 @@ int mbedtls_x509_info_subject_alt_name(char **buf, size_t *size,
              */
             case MBEDTLS_X509_SAN_IP_ADDRESS:
             {
+            	unsigned char *ip;
+
                 ret = mbedtls_snprintf(p, n, "\n%s    %s : ",
                                        prefix, "iPAddress");
                 MBEDTLS_X509_SAFE_SNPRINTF;
@@ -1636,8 +1640,8 @@ int mbedtls_x509_info_subject_alt_name(char **buf, size_t *size,
                     return MBEDTLS_ERR_X509_BUFFER_TOO_SMALL;
                 }
 
-                unsigned char *ip = san.san.unstructured_name.p;
-                // Only IPv6 (16 bytes) and IPv4 (4 bytes) types are supported
+                ip = san.san.unstructured_name.p;
+                /* Only IPv6 (16 bytes) and IPv4 (4 bytes) types are supported */
                 if (san.san.unstructured_name.len == 4) {
                     ret = mbedtls_snprintf(p, n, "%u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
                     MBEDTLS_X509_SAFE_SNPRINTF;

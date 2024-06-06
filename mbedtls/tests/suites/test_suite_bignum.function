@@ -97,7 +97,7 @@ static int f_rng_bytes_left(void *state, unsigned char *buf, size_t len)
  */
 
 /* BEGIN_CASE */
-void mpi_null()
+void mpi_null(void)
 {
     mbedtls_mpi X, Y, Z;
 
@@ -144,7 +144,7 @@ exit:
 /* END_CASE */
 
 /* BEGIN_CASE */
-void mpi_zero_length_buffer_is_null()
+void mpi_zero_length_buffer_is_null(void)
 {
     mbedtls_mpi X;
     size_t olen;
@@ -1270,7 +1270,7 @@ exit:
 /* END_CASE */
 
 /* BEGIN_CASE */
-void most_negative_mpi_sint()
+void most_negative_mpi_sint(void)
 {
     /* Ad hoc tests for n = -p = -2^(biL-1) as a mbedtls_mpi_sint. We
      * guarantee that mbedtls_mpi_sint is a two's complement type, so this
@@ -1287,14 +1287,17 @@ void most_negative_mpi_sint()
      * - n = -2^(biL-1) (largest negative value in mbedtls_mpi_sint range)
      */
 
+    mbedtls_mpi_uint most_positive_plus_1;
+    mbedtls_mpi_sint most_positive;
+    mbedtls_mpi_sint most_negative;
     mbedtls_mpi A, R, X;
     mbedtls_mpi_init(&A);
     mbedtls_mpi_init(&R);
     mbedtls_mpi_init(&X);
 
-    mbedtls_mpi_uint most_positive_plus_1 = (mbedtls_mpi_uint) 1 << (biL - 1);
-    const mbedtls_mpi_sint most_positive = most_positive_plus_1 - 1;
-    const mbedtls_mpi_sint most_negative = -most_positive - 1;
+    most_positive_plus_1 = (mbedtls_mpi_uint) 1 << (biL - 1);
+    most_positive = most_positive_plus_1 - 1;
+    most_negative = -most_positive - 1;
     TEST_EQUAL((mbedtls_mpi_uint) most_negative,
                (mbedtls_mpi_uint) 1 << (biL - 1));
     TEST_EQUAL((mbedtls_mpi_uint) most_negative << 1, 0);

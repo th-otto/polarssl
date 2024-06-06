@@ -6,12 +6,12 @@
 #include "mbedtls/ctr_drbg.h"
 #include "common.h"
 
-//4 Kb should be enough for every bug ;-)
+/*4 Kb should be enough for every bug ;-) */
 #define MAX_LEN 0x1000
 
 #if defined(MBEDTLS_PK_PARSE_C) && defined(MBEDTLS_CTR_DRBG_C) && defined(MBEDTLS_ENTROPY_C)
 const char *pers = "fuzz_privkey";
-#endif // MBEDTLS_PK_PARSE_C && MBEDTLS_CTR_DRBG_C && MBEDTLS_ENTROPY_C
+#endif /* MBEDTLS_PK_PARSE_C && MBEDTLS_CTR_DRBG_C && MBEDTLS_ENTROPY_C */
 
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
 {
@@ -22,7 +22,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
     mbedtls_entropy_context entropy;
 
     if (Size > MAX_LEN) {
-        //only work on small inputs
+        /*only work on small inputs */
         Size = MAX_LEN;
     }
 
@@ -98,7 +98,7 @@ exit:
 #else
     (void) Data;
     (void) Size;
-#endif // MBEDTLS_PK_PARSE_C && MBEDTLS_CTR_DRBG_C && MBEDTLS_ENTROPY_C
+#endif /* MBEDTLS_PK_PARSE_C && MBEDTLS_CTR_DRBG_C && MBEDTLS_ENTROPY_C */
 
     return 0;
 }

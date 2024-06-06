@@ -58,6 +58,10 @@ int mbedtls_mpi_lt_mpi_ct(const mbedtls_mpi *X,
                           unsigned *ret)
 {
     mbedtls_ct_condition_t different_sign, X_is_negative, Y_is_negative, result;
+    /* This array is used to conditionally swap the pointers in const time */
+    void * p[2];
+	size_t i;
+	mbedtls_ct_condition_t lt;
 
     if (X->n != Y->n) {
         return MBEDTLS_ERR_MPI_BAD_INPUT_DATA;
@@ -75,7 +79,7 @@ int mbedtls_mpi_lt_mpi_ct(const mbedtls_mpi *X,
      * That is if X is negative (X_is_negative == 1), then X < Y is true and it
      * is false if X is positive (X_is_negative == 0).
      */
-    different_sign = mbedtls_ct_bool_ne(X_is_negative, Y_is_negative); // true if different sign
+    different_sign = mbedtls_ct_bool_ne(X_is_negative, Y_is_negative); /* true if different sign */
     result = mbedtls_ct_bool_and(different_sign, X_is_negative);
 
     /*
@@ -85,9 +89,10 @@ int mbedtls_mpi_lt_mpi_ct(const mbedtls_mpi *X,
      */
 
     /* This array is used to conditionally swap the pointers in const time */
-    void * const p[2] = { X->p, Y->p };
-    size_t i = mbedtls_ct_size_if_else_0(X_is_negative, 1);
-    mbedtls_ct_condition_t lt = mbedtls_mpi_core_lt_ct(p[i], p[i ^ 1], X->n);
+    p[0] = X->p;
+    p[1] = Y->p;
+    i = mbedtls_ct_size_if_else_0(X_is_negative, 1);
+    lt = mbedtls_mpi_core_lt_ct(p[i], p[i ^ 1], X->n);
 
     /*
      * Store in result iff the signs are the same (i.e., iff different_sign == false). If
@@ -124,13 +129,15 @@ int mbedtls_mpi_safe_cond_assign(mbedtls_mpi *X,
 
     {
         mbedtls_ct_condition_t do_assign = mbedtls_ct_bool(assign);
+		mbedtls_ct_condition_t do_not_assign;
+		size_t i;
 
         X->s = mbedtls_ct_mpi_sign_if(do_assign, Y->s, X->s);
 
         mbedtls_mpi_core_cond_assign(X->p, Y->p, Y->n, do_assign);
 
-        mbedtls_ct_condition_t do_not_assign = mbedtls_ct_bool_not(do_assign);
-        for (size_t i = Y->n; i < X->n; i++) {
+        do_not_assign = mbedtls_ct_bool_not(do_assign);
+        for (i = Y->n; i < X->n; i++) {
             X->p[i] = mbedtls_ct_mpi_uint_if_else_0(do_not_assign, X->p[i]);
         }
     }
@@ -151,12 +158,13 @@ int mbedtls_mpi_safe_cond_swap(mbedtls_mpi *X,
 {
     int ret = 0;
     int s;
+	mbedtls_ct_condition_t do_swap;
 
     if (X == Y) {
         return 0;
     }
 
-    mbedtls_ct_condition_t do_swap = mbedtls_ct_bool(swap);
+    do_swap = mbedtls_ct_bool(swap);
 
     MBEDTLS_MPI_CHK(mbedtls_mpi_grow(X, Y->n));
     MBEDTLS_MPI_CHK(mbedtls_mpi_grow(Y, X->n));
@@ -453,13 +461,16 @@ size_t mbedtls_mpi_lsb(const mbedtls_mpi *X)
         }
     }
 #else
-    size_t count = 0;
+	{
+    size_t j, count;
+    count = 0;
     for (i = 0; i < X->n; i++) {
-        for (size_t j = 0; j < biL; j++, count++) {
+        for (j = 0; j < biL; j++, count++) {
             if (((X->p[i] >> j) & 1) != 0) {
                 return count;
             }
         }
+    }
     }
 #endif
 
@@ -1251,6 +1262,7 @@ cleanup:
  */
 int mbedtls_mpi_mul_int(mbedtls_mpi *X, const mbedtls_mpi *A, mbedtls_mpi_uint b)
 {
+	int ret;
     size_t n = A->n;
     while (n > 0 && A->p[n - 1] == 0) {
         --n;
@@ -1262,7 +1274,7 @@ int mbedtls_mpi_mul_int(mbedtls_mpi *X, const mbedtls_mpi *A, mbedtls_mpi_uint b
     }
 
     /* Calculate A*b as A + A*(b-1) to take advantage of mbedtls_mpi_core_mla */
-    int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
+    ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
     /* In general, A * b requires 1 limb more than b. If
      * A->p[n - 1] * b / b == A->p[n - 1], then A * b fits in the same
      * number of limbs as A and the call to grow() is not required since
@@ -1615,6 +1627,9 @@ int mbedtls_mpi_exp_mod(mbedtls_mpi *X, const mbedtls_mpi *A,
                         mbedtls_mpi *prec_RR)
 {
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
+	size_t T_limbs;
+    mbedtls_mpi RR;
+	mbedtls_mpi_uint *T;
 
     if (mbedtls_mpi_cmp_int(N, 0) <= 0 || (N->p[0] & 1) == 0) {
         return MBEDTLS_ERR_MPI_BAD_INPUT_DATA;
@@ -1640,13 +1655,12 @@ int mbedtls_mpi_exp_mod(mbedtls_mpi *X, const mbedtls_mpi *A,
     /*
      * Allocate working memory for mbedtls_mpi_core_exp_mod()
      */
-    size_t T_limbs = mbedtls_mpi_core_exp_mod_working_limbs(N->n, E->n);
-    mbedtls_mpi_uint *T = (mbedtls_mpi_uint *) mbedtls_calloc(T_limbs, sizeof(mbedtls_mpi_uint));
+    T_limbs = mbedtls_mpi_core_exp_mod_working_limbs(N->n, E->n);
+    T = (mbedtls_mpi_uint *) mbedtls_calloc(T_limbs, sizeof(mbedtls_mpi_uint));
     if (T == NULL) {
         return MBEDTLS_ERR_MPI_ALLOC_FAILED;
     }
 
-    mbedtls_mpi RR;
     mbedtls_mpi_init(&RR);
 
     /*
@@ -1857,6 +1871,8 @@ int mbedtls_mpi_random(mbedtls_mpi *X,
                        int (*f_rng)(void *, unsigned char *, size_t),
                        void *p_rng)
 {
+	int ret;
+
     if (min < 0) {
         return MBEDTLS_ERR_MPI_BAD_INPUT_DATA;
     }
@@ -1867,7 +1883,7 @@ int mbedtls_mpi_random(mbedtls_mpi *X,
     /* Ensure that target MPI has exactly the same number of limbs
      * as the upper bound, even if the upper bound has leading zeros.
      * This is necessary for mbedtls_mpi_core_random. */
-    int ret = mbedtls_mpi_resize_clear(X, N->n);
+    ret = mbedtls_mpi_resize_clear(X, N->n);
     if (ret != 0) {
         return ret;
     }
@@ -2161,10 +2177,10 @@ int mbedtls_mpi_gen_prime(mbedtls_mpi *X, size_t nbits, int flags,
                           void *p_rng)
 {
 #ifdef MBEDTLS_HAVE_INT64
-// ceil(2^63.5)
+/* ceil(2^63.5) */
 #define CEIL_MAXUINT_DIV_SQRT2 0xb504f333f9de6485ULL
 #else
-// ceil(2^31.5)
+/* ceil(2^31.5) */
 #define CEIL_MAXUINT_DIV_SQRT2 0xb504f334U
 #endif
     int ret = MBEDTLS_ERR_MPI_NOT_ACCEPTABLE;

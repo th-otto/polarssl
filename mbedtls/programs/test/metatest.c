@@ -124,8 +124,8 @@ exit:
 
 void null_pointer_dereference(const char *name)
 {
-    (void) name;
     volatile char *volatile p;
+    (void) name;
     set_to_zero_but_the_compiler_does_not_know(&p, sizeof(p));
     /* Undefined behavior (read from null data pointer) */
     mbedtls_printf("%p -> %u\n", p, (unsigned) *p);
@@ -133,8 +133,8 @@ void null_pointer_dereference(const char *name)
 
 void null_pointer_call(const char *name)
 {
-    (void) name;
     unsigned(*volatile p)(void);
+    (void) name;
     set_to_zero_but_the_compiler_does_not_know(&p, sizeof(p));
     /* Undefined behavior (execute null function pointer) */
     /* The pointer representation may be truncated, but we don't care:
@@ -150,8 +150,8 @@ void null_pointer_call(const char *name)
 
 void read_after_free(const char *name)
 {
-    (void) name;
     volatile char *p = calloc_but_the_compiler_does_not_know(1, 1);
+    (void) name;
     *p = 'a';
     free_but_the_compiler_does_not_know((void *) p);
     /* Undefined behavior (read after free) */
@@ -160,8 +160,8 @@ void read_after_free(const char *name)
 
 void double_free(const char *name)
 {
-    (void) name;
     volatile char *p = calloc_but_the_compiler_does_not_know(1, 1);
+    (void) name;
     *p = 'a';
     free_but_the_compiler_does_not_know((void *) p);
     /* Undefined behavior (double free) */
@@ -170,12 +170,13 @@ void double_free(const char *name)
 
 void read_uninitialized_stack(const char *name)
 {
-    (void) name;
     char buf[1];
+    char *volatile p;
+    (void) name;
     if (false_but_the_compiler_does_not_know) {
         buf[0] = '!';
     }
-    char *volatile p = buf;
+    p = buf;
     if (*p != 0) {
         /* Unspecified result (read from uninitialized memory) */
         mbedtls_printf("%u\n", (unsigned) *p);
@@ -184,8 +185,8 @@ void read_uninitialized_stack(const char *name)
 
 void memory_leak(const char *name)
 {
-    (void) name;
     volatile char *p = calloc_but_the_compiler_does_not_know(1, 1);
+    (void) name;
     mbedtls_printf("%u\n", (unsigned) *p);
     /* Leak of a heap object */
 }
@@ -200,6 +201,11 @@ void test_memory_poison(const char *name)
 {
     size_t start = 0, offset = 0, count = 0;
     char direction = 'r';
+    union {
+        long long ll;
+        unsigned char buf[32];
+    } aligned;
+
     if (sscanf(name,
                "%*[^0-9]%" MBEDTLS_PRINTF_SIZET
                "%*[^0-9]%" MBEDTLS_PRINTF_SIZET
@@ -210,10 +216,6 @@ void test_memory_poison(const char *name)
         return;
     }
 
-    union {
-        long long ll;
-        unsigned char buf[32];
-    } aligned;
     memset(aligned.buf, 'a', sizeof(aligned.buf));
 
     if (start > sizeof(aligned.buf)) {
@@ -435,13 +437,16 @@ static void help(FILE *out, const char *argv0)
 int main(int argc, char *argv[])
 {
     const char *argv0 = argc > 0 ? argv[0] : "metatest";
+    const char *command;
+   	const metatest_t *p;
+
     if (argc != 2) {
         help(stderr, argv0);
         mbedtls_exit(MBEDTLS_EXIT_FAILURE);
     }
 
     /* Support "-help", "--help", "--list", etc. */
-    const char *command = argv[1];
+    command = argv[1];
     while (*command == '-') {
         ++command;
     }
@@ -451,7 +456,7 @@ int main(int argc, char *argv[])
         mbedtls_exit(MBEDTLS_EXIT_SUCCESS);
     }
     if (strcmp(argv[1], "list") == 0) {
-        for (const metatest_t *p = metatests; p->name != NULL; p++) {
+        for (p = metatests; p->name != NULL; p++) {
             mbedtls_printf("%s %s\n", p->name, p->platform);
         }
         mbedtls_exit(MBEDTLS_EXIT_SUCCESS);
@@ -461,14 +466,15 @@ int main(int argc, char *argv[])
     mbedtls_test_mutex_usage_init();
 #endif
 
-    for (const metatest_t *p = metatests; p->name != NULL; p++) {
+    for (p = metatests; p->name != NULL; p++) {
         if (strcmp(argv[1], p->name) == 0) {
+            int result;
             mbedtls_printf("Running metatest %s...\n", argv[1]);
             p->entry_point(argv[1]);
 #if defined(MBEDTLS_TEST_MUTEX_USAGE)
             mbedtls_test_mutex_usage_check();
 #endif
-            int result = (int) mbedtls_test_get_result();
+            result = (int) mbedtls_test_get_result();
 
             mbedtls_printf("Running metatest %s... done, result=%d\n",
                            argv[1], result);

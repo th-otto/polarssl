@@ -159,6 +159,7 @@ static psa_status_t cmac_setup(mbedtls_psa_mac_operation_t *operation,
                                const uint8_t *key_buffer)
 {
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
+    const mbedtls_cipher_info_t *cipher_info;
 
 #if defined(PSA_WANT_KEY_TYPE_DES)
     /* Mbed TLS CMAC does not accept 3DES with only two keys, nor does it accept
@@ -170,7 +171,7 @@ static psa_status_t cmac_setup(mbedtls_psa_mac_operation_t *operation,
     }
 #endif
 
-    const mbedtls_cipher_info_t *cipher_info =
+    cipher_info =
         mbedtls_cipher_info_from_psa(
             PSA_ALG_CMAC,
             psa_get_key_type(attributes),

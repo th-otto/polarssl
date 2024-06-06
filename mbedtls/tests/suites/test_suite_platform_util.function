@@ -7,6 +7,7 @@ void mbedtls_platform_zeroize(int len, int null)
 {
     char buf[130];
     char *p = NULL;
+    int i;
 
     TEST_ASSERT(len <= 128);
 
@@ -17,14 +18,14 @@ void mbedtls_platform_zeroize(int len, int null)
     /* Write non-zero content */
     if (!null) {
         p = &buf[1];
-        for (int i = 0; i < len; i++) {
+        for (i = 0; i < len; i++) {
             p[i] = 1;
         }
     }
 
     /* Check content is non-zero */
     TEST_EQUAL(buf[0], 2);
-    for (int i = 0; i < len; i++) {
+    for (i = 0; i < len; i++) {
         TEST_ASSERT(p[i] == 1);
     }
     TEST_EQUAL(buf[len + 1], 2);
@@ -33,7 +34,7 @@ void mbedtls_platform_zeroize(int len, int null)
 
     /* Check content is zero and sentinels un-changed */
     TEST_EQUAL(buf[0], 2);
-    for (int i = 0; i < len; i++) {
+    for (i = 0; i < len; i++) {
         TEST_ASSERT(p[i] == 0);
     }
     TEST_EQUAL(buf[len + 1], 2);

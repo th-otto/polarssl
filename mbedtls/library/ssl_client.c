@@ -117,6 +117,7 @@ static int ssl_write_alpn_ext(mbedtls_ssl_context *ssl,
                               size_t *out_len)
 {
     unsigned char *p = buf;
+	const char **cur;
 
     *out_len = 0;
 
@@ -142,7 +143,7 @@ static int ssl_write_alpn_ext(mbedtls_ssl_context *ssl,
      *     ProtocolName protocol_name_list<2..2^16-1>
      * } ProtocolNameList;
      */
-    for (const char **cur = ssl->conf->alpn_list; *cur != NULL; cur++) {
+    for (cur = ssl->conf->alpn_list; *cur != NULL; cur++) {
         /*
          * mbedtls_ssl_conf_set_alpn_protocols() checked that the length of
          * protocol names is less than 255.
@@ -325,6 +326,8 @@ static int ssl_write_client_hello_cipher_suites(
     const int *ciphersuite_list;
     unsigned char *cipher_suites; /* Start of the cipher_suites list */
     size_t cipher_suites_len;
+	size_t i;
+    int renegotiating;
 
     *tls12_uses_ec = 0;
     *out_len = 0;
@@ -347,7 +350,7 @@ static int ssl_write_client_hello_cipher_suites(
      * CipherSuite cipher_suites<2..2^16-2>;
      */
     cipher_suites = p;
-    for (size_t i = 0; ciphersuite_list[i] != 0; i++) {
+    for (i = 0; ciphersuite_list[i] != 0; i++) {
         int cipher_suite = ciphersuite_list[i];
         const mbedtls_ssl_ciphersuite_t *ciphersuite_info;
 
@@ -379,7 +382,7 @@ static int ssl_write_client_hello_cipher_suites(
     /*
      * Add TLS_EMPTY_RENEGOTIATION_INFO_SCSV
      */
-    int renegotiating = 0;
+    renegotiating = 0;
 #if defined(MBEDTLS_SSL_RENEGOTIATION)
     renegotiating = (ssl->renego_status != MBEDTLS_SSL_INITIAL_HANDSHAKE);
 #endif
@@ -407,7 +410,7 @@ static int ssl_write_client_hello_cipher_suites(
  * Structure of the TLS 1.3 ClientHello message:
  *
  *    struct {
- *        ProtocolVersion legacy_version = 0x0303;    // TLS v1.2
+ *        ProtocolVersion legacy_version = 0x0303;    / / TLS v1.2
  *        Random random;
  *        opaque legacy_session_id<0..32>;
  *        CipherSuite cipher_suites<2..2^16-2>;
@@ -421,7 +424,7 @@ static int ssl_write_client_hello_cipher_suites(
  *     ProtocolVersion client_version;
  *     Random random;
  *     SessionID session_id;
- *     opaque cookie<0..2^8-1>; // DTLS 1.2 ONLY
+ *     opaque cookie<0..2^8-1>; / / DTLS 1.2 ONLY
  *     CipherSuite cipher_suites<2..2^16-2>;
  *     CompressionMethod compression_methods<1..2^8-1>;
  *     select (extensions_present) {
@@ -446,9 +449,7 @@ static int ssl_write_client_hello_body(mbedtls_ssl_context *ssl,
     size_t output_len;               /* Length of buffer used by function */
     size_t extensions_len;           /* Length of the list of extensions*/
     int tls12_uses_ec = 0;
-
-    *out_len = 0;
-    *binders_len = 0;
+    int write_sig_alg_ext;
 
 #if defined(MBEDTLS_SSL_PROTO_TLS1_2)
     unsigned char propose_tls12 =
@@ -462,6 +463,9 @@ static int ssl_write_client_hello_body(mbedtls_ssl_context *ssl,
         &&
         (MBEDTLS_SSL_VERSION_TLS1_3 <= ssl->tls_version);
 #endif
+
+    *out_len = 0;
+    *binders_len = 0;
 
     /*
      * Write client_version (TLS 1.2) or legacy_version (TLS 1.3)
@@ -634,7 +638,7 @@ static int ssl_write_client_hello_body(mbedtls_ssl_context *ssl,
           MBEDTLS_SSL_TLS1_3_KEY_EXCHANGE_MODE_SOME_EPHEMERAL_ENABLED */
 
 #if defined(MBEDTLS_SSL_HANDSHAKE_WITH_CERT_ENABLED)
-    int write_sig_alg_ext = 0;
+    write_sig_alg_ext = 0;
 #if defined(MBEDTLS_SSL_PROTO_TLS1_3)
     write_sig_alg_ext = write_sig_alg_ext ||
                         (propose_tls13 && mbedtls_ssl_conf_tls13_is_ephemeral_enabled(ssl));
@@ -814,6 +818,8 @@ static int ssl_prepare_client_hello(mbedtls_ssl_context *ssl)
 
 #if defined(MBEDTLS_SSL_PROTO_TLS1_2)
     if (ssl->tls_version == MBEDTLS_SSL_VERSION_TLS1_2) {
+        int renegotiating = 0;
+
         if (session_id_len < 16 || session_id_len > 32 ||
 #if defined(MBEDTLS_SSL_RENEGOTIATION)
             ssl->renego_status != MBEDTLS_SSL_INITIAL_HANDSHAKE ||
@@ -827,7 +833,6 @@ static int ssl_prepare_client_hello(mbedtls_ssl_context *ssl)
          * RFC 5077 section 3.4: "When presenting a ticket, the client MAY
          * generate and include a Session ID in the TLS ClientHello."
          */
-        int renegotiating = 0;
 #if defined(MBEDTLS_SSL_RENEGOTIATION)
         if (ssl->renego_status != MBEDTLS_SSL_INITIAL_HANDSHAKE) {
             renegotiating = 1;

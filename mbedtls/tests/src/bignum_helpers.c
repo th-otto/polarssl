@@ -29,13 +29,17 @@
 int mbedtls_test_read_mpi_core(mbedtls_mpi_uint **pX, size_t *plimbs,
                                const char *input)
 {
+    size_t hex_len;
+    size_t byte_len;
+	unsigned char *byte_start;
+
     /* Sanity check */
     if (*pX != NULL) {
         return MBEDTLS_ERR_MPI_BAD_INPUT_DATA;
     }
 
-    size_t hex_len = strlen(input);
-    size_t byte_len = (hex_len + 1) / 2;
+    hex_len = strlen(input);
+    byte_len = (hex_len + 1) / 2;
     *plimbs = CHARS_TO_LIMBS(byte_len);
 
     /* A core bignum is not allowed to be empty. Forbid it as test data,
@@ -50,7 +54,7 @@ int mbedtls_test_read_mpi_core(mbedtls_mpi_uint **pX, size_t *plimbs,
         return MBEDTLS_ERR_MPI_ALLOC_FAILED;
     }
 
-    unsigned char *byte_start = (unsigned char *) *pX;
+    byte_start = (unsigned char *) *pX;
     if (byte_len % sizeof(mbedtls_mpi_uint) != 0) {
         byte_start += sizeof(mbedtls_mpi_uint) - byte_len % sizeof(mbedtls_mpi_uint);
     }
@@ -116,6 +120,7 @@ void mbedtls_test_mpi_mod_modulus_free_with_limbs(mbedtls_mpi_mod_modulus *N)
 int mbedtls_test_read_mpi(mbedtls_mpi *X, const char *s)
 {
     int negative = 0;
+    int ret;
     /* Always set the sign bit to -1 if the input has a minus sign, even for 0.
      * This creates an invalid representation, which mbedtls_mpi_read_string()
      * avoids but we want to be able to create that in test data. */
@@ -129,7 +134,7 @@ int mbedtls_test_read_mpi(mbedtls_mpi *X, const char *s)
         mbedtls_mpi_free(X);
         return 0;
     }
-    int ret = mbedtls_mpi_read_string(X, 16, s);
+    ret = mbedtls_mpi_read_string(X, 16, s);
     if (ret != 0) {
         return ret;
     }

@@ -75,10 +75,10 @@ void test_callback_buffer_sanity()
 {
     enum { MSGLEN = 10 };
     mbedtls_test_ssl_buffer buf;
-    mbedtls_test_ssl_buffer_init(&buf);
     unsigned char input[MSGLEN];
     unsigned char output[MSGLEN];
 
+    mbedtls_test_ssl_buffer_init(&buf);
     USE_PSA_INIT();
     memset(input, 0, sizeof(input));
 
@@ -1839,14 +1839,14 @@ void ssl_tls13_record_protection(int ciphersuite,
 {
     mbedtls_ssl_key_set keys;
     mbedtls_ssl_transform transform_send;
-    mbedtls_ssl_transform_init(&transform_send);
     mbedtls_ssl_transform transform_recv;
-    mbedtls_ssl_transform_init(&transform_recv);
     mbedtls_record rec;
     unsigned char *buf = NULL;
     size_t buf_len;
     int other_endpoint;
 
+    mbedtls_ssl_transform_init(&transform_send);
+    mbedtls_ssl_transform_init(&transform_recv);
     TEST_ASSERT(endpoint == MBEDTLS_SSL_IS_CLIENT ||
                 endpoint == MBEDTLS_SSL_IS_SERVER);
 
@@ -2519,9 +2519,9 @@ void move_handshake_to_state(int endpoint_type, int tls_version, int state, int 
     enum { BUFFSIZE = 1024 };
     mbedtls_test_ssl_endpoint base_ep, second_ep;
     int ret = -1;
+    mbedtls_test_handshake_test_options options;
     (void) tls_version;
 
-    mbedtls_test_handshake_test_options options;
     mbedtls_test_init_handshake_options(&options);
 
     options.pk_alg = MBEDTLS_PK_RSA;
@@ -3010,6 +3010,8 @@ void conf_curve()
                                        MBEDTLS_SSL_IANA_TLS_GROUP_NONE };
 
     mbedtls_ssl_config conf;
+    mbedtls_ssl_context ssl;
+    size_t i;
     mbedtls_ssl_config_init(&conf);
 #if defined(MBEDTLS_SSL_PROTO_TLS1_2)
     mbedtls_ssl_conf_max_tls_version(&conf, MBEDTLS_SSL_VERSION_TLS1_2);
@@ -3020,7 +3022,6 @@ void conf_curve()
 #endif
     mbedtls_ssl_conf_curves(&conf, curve_list);
 
-    mbedtls_ssl_context ssl;
     mbedtls_ssl_init(&ssl);
     MD_OR_USE_PSA_INIT();
 
@@ -3035,7 +3036,7 @@ void conf_curve()
                group_list[ARRAY_LENGTH(iana_tls_group_list) - 1],
                MBEDTLS_SSL_IANA_TLS_GROUP_NONE);
 
-    for (size_t i = 0; i < ARRAY_LENGTH(iana_tls_group_list); i++) {
+    for (i = 0; i < ARRAY_LENGTH(iana_tls_group_list); i++) {
         TEST_EQUAL(iana_tls_group_list[i], ssl.handshake->group_list[i]);
     }
 

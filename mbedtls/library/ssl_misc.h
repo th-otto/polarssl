@@ -2699,7 +2699,7 @@ int mbedtls_psa_ecjpake_write_round(
     size_t len, size_t *olen,
     mbedtls_ecjpake_rounds_t round);
 
-#endif //MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED && MBEDTLS_USE_PSA_CRYPTO
+#endif /*MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED && MBEDTLS_USE_PSA_CRYPTO */
 
 /**
  * \brief       TLS record protection modes
@@ -2736,9 +2736,10 @@ static inline int mbedtls_ssl_tls13_cipher_suite_is_offered(
     mbedtls_ssl_context *ssl, int cipher_suite)
 {
     const int *ciphersuite_list = ssl->conf->ciphersuite_list;
+	size_t i;
 
     /* Check whether we have offered this ciphersuite */
-    for (size_t i = 0; ciphersuite_list[i] != 0; i++) {
+    for (i = 0; ciphersuite_list[i] != 0; i++) {
         if (ciphersuite_list[i] == cipher_suite) {
             return 1;
         }

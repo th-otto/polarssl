@@ -195,13 +195,14 @@ void mbedtls_sha3_multi(int family, data_t *in, data_t *hash)
     unsigned char *output = NULL;
     mbedtls_sha3_context ctx;
     const unsigned int block_size = 256;
+    size_t l;
 
     TEST_CALLOC(output, hash->len);
 
     mbedtls_sha3_init(&ctx);
     mbedtls_sha3_starts(&ctx, family);
 
-    for (size_t l = 0; l < in->len; l += block_size) {
+    for (l = 0; l < in->len; l += block_size) {
         TEST_ASSERT(mbedtls_sha3_update(&ctx, in->x + l, MIN(in->len - l, block_size)) == 0);
     }
 

@@ -320,9 +320,9 @@ int verify_parse_san(mbedtls_x509_subject_alternative_name *san,
 int parse_crt_ext_cb(void *p_ctx, mbedtls_x509_crt const *crt, mbedtls_x509_buf const *oid,
                      int critical, const unsigned char *cp, const unsigned char *end)
 {
+    mbedtls_x509_buf *new_oid = (mbedtls_x509_buf *) p_ctx;
     (void) crt;
     (void) critical;
-    mbedtls_x509_buf *new_oid = (mbedtls_x509_buf *) p_ctx;
     if (oid->tag == MBEDTLS_ASN1_OID &&
         MBEDTLS_OID_CMP(MBEDTLS_OID_CERTIFICATE_POLICIES, oid) == 0) {
         /* Handle unknown certificate policy */
@@ -960,14 +960,15 @@ void mbedtls_x509_dn_get_next(char *name_str,
     size_t len = 0, out_size;
     mbedtls_asn1_named_data *names = NULL;
     mbedtls_x509_name parsed;
-    memset(&parsed, 0, sizeof(parsed));
     mbedtls_x509_name *parsed_cur;
+
     // Size of buf is maximum required for test cases
     unsigned char buf[80] = { 0 };
     unsigned char *out = NULL;
     unsigned char *c = buf + sizeof(buf);
     const char *short_name;
 
+    memset(&parsed, 0, sizeof(parsed));
     USE_PSA_INIT();
 
     // Additional size required for trailing space
