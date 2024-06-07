@@ -81,6 +81,11 @@ struct _hr_time {
 #include "mbedtls/memory_buffer_alloc.h"
 #endif
 
+#ifdef __MINT__
+/* we can use the fallback here */
+#undef MBEDTLS_TIMING_ALT
+#endif
+
 #ifdef MBEDTLS_TIMING_ALT
 void mbedtls_set_alarm(int seconds);
 unsigned long mbedtls_timing_hardclock(void);

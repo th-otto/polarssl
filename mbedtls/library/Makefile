@@ -118,6 +118,7 @@ OBJS_CRYPTO= \
 	     sha3.o \
 	     threading.o \
 	     timing.o \
+	     timing_alt.o \
 	     version.o \
 	     version_features.o \
 	     # This line is intentionally left blank
@@ -201,7 +202,7 @@ libmbedtls_020.a: $(addprefix build/68020/,$(OBJS_TLS))
 libmbedtls_v4e.a: $(addprefix build/coldfire/,$(OBJS_TLS))
 	$(AM_V_AR)$(AR) $(ARFLAGS) $@ $^
 libmbedtls.a: libmbedtls_000.a
-	ln -s $< $@
+	ln -sf $< $@
 
 # x509
 libmbedx509_000.a: $(addprefix build/68000/,$(OBJS_X509))
@@ -211,7 +212,7 @@ libmbedx509_020.a: $(addprefix build/68020/,$(OBJS_X509))
 libmbedx509_v4e.a: $(addprefix build/coldfire/,$(OBJS_X509))
 	$(AM_V_AR)$(AR) $(ARFLAGS) $@ $^
 libmbedx509.a: libmbedx509_000.a
-	ln -s $< $@
+	ln -sf $< $@
 
 # crypto
 libmbedcrypto_000.a: $(addprefix build/68000/,$(notdir $(OBJS_CRYPTO)))
@@ -221,7 +222,7 @@ libmbedcrypto_020.a: $(addprefix build/68020/,$(notdir $(OBJS_CRYPTO)))
 libmbedcrypto_v4e.a: $(addprefix build/coldfire/,$(notdir $(OBJS_CRYPTO)))
 	$(AM_V_AR)$(AR) $(ARFLAGS) $@ $^
 libmbedcrypto.a: libmbedcrypto_000.a
-	ln -s $< $@
+	ln -sf $< $@
 
 else
 

@@ -45,14 +45,14 @@ libpolarssl_v4e.a: $(addprefix build/coldfire/,$(OBJS))
 	$(AM_V_AR)$(AR) -rcs $@ $^
 
 libpolarssl.a: libpolarssl_000.a
-	ln -s $< $@
+	ln -sf $< $@
 else
 libpolarssl.a: $(addprefix build/host/,$(OBJS))
 	$(AM_V_AR)$(AR) -rcs $@ $^
 endif
 
 libmbedtls.a: libpolarssl.a
-	ln -s $< $@
+	ln -sf $< $@
 
 .dirs:
 	@mkdir -p build/68000

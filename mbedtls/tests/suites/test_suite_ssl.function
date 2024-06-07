@@ -3056,6 +3056,8 @@ void conf_group()
                                        MBEDTLS_SSL_IANA_TLS_GROUP_NONE };
 
     mbedtls_ssl_config conf;
+    mbedtls_ssl_context ssl;
+    size_t i;
     mbedtls_ssl_config_init(&conf);
 
     mbedtls_ssl_conf_rng(&conf, mbedtls_test_random, NULL);
@@ -3064,7 +3066,6 @@ void conf_group()
 
     mbedtls_ssl_conf_groups(&conf, iana_tls_group_list);
 
-    mbedtls_ssl_context ssl;
     mbedtls_ssl_init(&ssl);
     MD_OR_USE_PSA_INIT();
 
@@ -3076,7 +3077,7 @@ void conf_group()
                group_list[ARRAY_LENGTH(iana_tls_group_list) - 1],
                MBEDTLS_SSL_IANA_TLS_GROUP_NONE);
 
-    for (size_t i = 0; i < ARRAY_LENGTH(iana_tls_group_list); i++) {
+    for (i = 0; i < ARRAY_LENGTH(iana_tls_group_list); i++) {
         TEST_EQUAL(iana_tls_group_list[i], ssl.conf->group_list[i]);
     }
 
@@ -4702,8 +4703,9 @@ void tls13_cli_max_early_data_size(int max_early_data_size_arg)
 
     while (written_early_data_size < max_early_data_size) {
         uint32_t remaining = max_early_data_size - written_early_data_size;
+        size_t i;
 
-        for (size_t i = 0; i < buf_size; i++) {
+        for (i = 0; i < buf_size; i++) {
             buf[i] = (unsigned char) (written_early_data_size + i);
         }
 
@@ -4734,6 +4736,7 @@ void tls13_cli_max_early_data_size(int max_early_data_size_arg)
      * and we cannot test multiple calls to the API is this writing window.
      */
     while (read_early_data_size < max_early_data_size) {
+        size_t i;
         ret = mbedtls_ssl_handshake(&(server_ep.ssl));
         TEST_EQUAL(ret, MBEDTLS_ERR_SSL_RECEIVED_EARLY_DATA);
 
@@ -4742,7 +4745,7 @@ void tls13_cli_max_early_data_size(int max_early_data_size_arg)
                                           buf_size);
         TEST_ASSERT(ret > 0);
 
-        for (size_t i = 0; i < (size_t) ret; i++) {
+        for (i = 0; i < (size_t) ret; i++) {
             TEST_EQUAL(buf[i], (unsigned char) (read_early_data_size + i));
         }
 
@@ -4909,6 +4912,7 @@ void tls13_srv_max_early_data_size(int scenario, int max_early_data_size_arg, in
      */
     do {
         uint32_t read_early_data_size = 0;
+        size_t i;
 
         /*
          * The contents of the early data are not very important, write a
@@ -4931,7 +4935,7 @@ void tls13_srv_max_early_data_size(int scenario, int max_early_data_size_arg, in
             break;
         }
 
-        for (size_t i = 0; i < write_size; i++) {
+        for (i = 0; i < write_size; i++) {
             buf_write[i] = (unsigned char) (written_early_data_size + i);
         }
 

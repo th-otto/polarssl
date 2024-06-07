@@ -1,7 +1,7 @@
-#if !defined(POLARSSL_CONFIG_FILE)
-#include "polarssl/config.h"
+#if !defined(MBEDTLS_CONFIG_FILE)
+#include "mbedtls/mbedtls_config.h"
 #else
-#include POLARSSL_CONFIG_FILE
+#include MBEDTLS_CONFIG_FILE
 #endif
 
 #include <string.h>
@@ -17,14 +17,16 @@
 #include <mint/sysbind.h>
 #include <gem.h>
 
-#if defined(POLARSSL_DEBUG_C)
-#include "polarssl/debug.h"
+#define MBEDTLS_ALLOW_PRIVATE_ACCESS
+#if defined(MBEDTLS_DEBUG_C)
+#include "mbedtls/debug.h"
 #endif
-#include "polarssl/platform.h"
-#include "polarssl/ssl.h"
-#include "polarssl/entropy.h"
-#include "polarssl/ctr_drbg.h"
-#include "polarssl/version.h"
+#include "mbedtls/platform.h"
+#include "mbedtls/ssl.h"
+#include "mbedtls/entropy.h"
+#include "mbedtls/ctr_drbg.h"
+#include "mbedtls/net_sockets.h"
+#include "mbedtls/version.h"
 
 #include "transprt.h"
 #include "ldg.h"
@@ -47,14 +49,15 @@ static const uint16_t STIK_SEND_MAXSIZE = 1920;
 static short *ldg_aes_global;
 static short ldg_aes_global_init = 0;
 
-
 /* debug functions */
 
-#if defined(POLARSSL_DEBUG_C)
-static void CDECL my_debug(void *ctx, int level, const char *str)
+#if defined(MBEDTLS_DEBUG_C)
+static void CDECL my_debug(void *ctx, int level, const char *filename, int line, const char *str)
 {
 	(void) ctx;
 	(void) level;
+	(void) filename;
+	(void) line;
 	(void) Cconws(str);
 	(void) Cconws("\r\n");
 }
@@ -124,10 +127,10 @@ static int my_stick_send(void *ctx, const unsigned char *buf, size_t len)
 	{
 		if (ret == E_REFUSE || ret == E_RRESET)
 		{
-			return POLARSSL_ERR_NET_CONN_RESET;
+			return MBEDTLS_ERR_NET_CONN_RESET;
 		}
 
-		return POLARSSL_ERR_NET_SEND_FAILED;
+		return MBEDTLS_ERR_NET_SEND_FAILED;
 	} else if (ret != E_NORMAL)
 	{
 		return ret;
@@ -184,10 +187,10 @@ static int my_stick_recv(void *ctx, unsigned char *buf, size_t len)
 	{
 		if (ret == E_REFUSE || ret == E_RRESET)
 		{
-			return POLARSSL_ERR_NET_CONN_RESET;
+			return MBEDTLS_ERR_NET_CONN_RESET;
 		}
 
-		return POLARSSL_ERR_NET_RECV_FAILED;
+		return MBEDTLS_ERR_NET_RECV_FAILED;
 	}
 
 	return rec;
@@ -203,15 +206,15 @@ static int my_mintnet_recv(void *ctx, unsigned char *buf, size_t len)
 	{
 		if (errno == EAGAIN || errno == EINTR)
 		{
-			return POLARSSL_ERR_NET_WANT_READ;
+			return MBEDTLS_ERR_SSL_WANT_READ;
 		}
 
 		if (errno == EPIPE || errno == ECONNRESET)
 		{
-			return POLARSSL_ERR_NET_CONN_RESET;
+			return MBEDTLS_ERR_NET_CONN_RESET;
 		}
 
-		return POLARSSL_ERR_NET_RECV_FAILED;
+		return MBEDTLS_ERR_NET_RECV_FAILED;
 	}
 
 	return ret;
@@ -226,15 +229,15 @@ static int my_mintnet_send(void *ctx, const unsigned char *buf, size_t len)
 	{
 		if (errno == EAGAIN || errno == EINTR)
 		{
-			return POLARSSL_ERR_NET_WANT_WRITE;
+			return MBEDTLS_ERR_SSL_WANT_WRITE;
 		}
 
 		if (errno == EPIPE || errno == ECONNRESET)
 		{
-			return POLARSSL_ERR_NET_CONN_RESET;
+			return MBEDTLS_ERR_NET_CONN_RESET;
 		}
 
-		return POLARSSL_ERR_NET_SEND_FAILED;
+		return MBEDTLS_ERR_NET_SEND_FAILED;
 	}
 
 	return ret;
@@ -244,7 +247,7 @@ static int my_mintnet_send(void *ctx, const unsigned char *buf, size_t len)
 
 static const char *CDECL get_version(void)
 {
-	return POLARSSL_VERSION_STRING;
+	return MBEDTLS_VERSION_STRING;
 }
 
 static void CDECL set_aes_global(short *aes_global)
@@ -257,167 +260,259 @@ static void CDECL set_aes_global(short *aes_global)
 
 static unsigned long CDECL get_sizeof_x509_crt_struct(void)
 {
-	return (unsigned long) sizeof(x509_crt);
+	return sizeof(mbedtls_x509_crt);
 }
 
-static void CDECL ldg_x509_crt_init(x509_crt *crt)
+static void CDECL ldg_x509_crt_init(mbedtls_x509_crt *crt)
 {
-	x509_crt_init(crt);
+	mbedtls_x509_crt_init(crt);
 }
 
-static int CDECL ldg_x509_crt_parse(x509_crt *chain, const unsigned char *buf, size_t len)
+static int CDECL ldg_x509_crt_parse(mbedtls_x509_crt *chain, const unsigned char *buf, size_t len)
 {
-	return x509_crt_parse(chain, buf, len);
+	return mbedtls_x509_crt_parse(chain, buf, len);
 }
 
-static int CDECL ldg_x509_crt_info(char *buf, size_t size, const x509_crt *crt)
+static int CDECL ldg_x509_crt_info(char *buf, size_t size, const mbedtls_x509_crt *crt)
 {
-	return x509_crt_info(buf, size, "", crt);
+	return mbedtls_x509_crt_info(buf, size, "", crt);
 }
 
-static void CDECL ldg_x509_crt_free(x509_crt *crt)
+static void CDECL ldg_x509_crt_free(mbedtls_x509_crt *crt)
 {
-	x509_crt_free(crt);
+	mbedtls_x509_crt_free(crt);
 }
 
 /* private key functions */
 
+/** A context for random number generation (RNG).
+ */
+typedef struct {
+	mbedtls_entropy_context entropy;
+#if defined(MBEDTLS_CTR_DRBG_C)
+	mbedtls_ctr_drbg_context drbg;
+#elif defined(MBEDTLS_HMAC_DRBG_C)
+	mbedtls_hmac_drbg_context drbg;
+#else
+#error "No DRBG available"
+#endif
+} rng_context_t;
+
+typedef struct {
+	mbedtls_pk_context pk;
+	rng_context_t rng;
+} my_pk_context;
+
 static unsigned long CDECL get_sizeof_pk_context_struct(void)
 {
-	return (unsigned long) sizeof(pk_context);
+	return sizeof(my_pk_context);
 }
 
-static void CDECL ldg_pk_init(pk_context *pk)
+static void CDECL ldg_pk_init(my_pk_context *pk)
 {
-	pk_init(pk);
+	mbedtls_pk_init(&pk->pk);
 }
 
-static int CDECL ldg_pk_parse(pk_context *pk, const unsigned char *key, size_t keylen)
+static void rng_init(rng_context_t *rng)
 {
-	return pk_parse_key(pk, key, keylen, NULL, 0);
+#if defined(MBEDTLS_CTR_DRBG_C)
+	mbedtls_ctr_drbg_init(&rng->drbg);
+#elif defined(MBEDTLS_HMAC_DRBG_C)
+	mbedtls_hmac_drbg_init(&rng->drbg);
+#endif
+
+	mbedtls_entropy_init(&rng->entropy);
 }
 
-static void CDECL ldg_pk_free(pk_context *pk)
+static int rng_get(void *p_rng, unsigned char *output, size_t output_len)
 {
-	pk_free(pk);
+	rng_context_t *rng = p_rng;
+
+#if defined(MBEDTLS_CTR_DRBG_C)
+	return mbedtls_ctr_drbg_random(&rng->drbg, output, output_len);
+#elif defined(MBEDTLS_HMAC_DRBG_C)
+	return mbedtls_hmac_drbg_random(&rng->drbg, output, output_len);
+#endif
+}
+
+static int CDECL ldg_pk_parse(my_pk_context *pk, const unsigned char *key, size_t keylen)
+{
+	rng_init(&pk->rng);
+	return mbedtls_pk_parse_key(&pk->pk, key, keylen, NULL, 0, rng_get, &pk->rng);
+}
+
+static void CDECL ldg_pk_free(my_pk_context *pk)
+{
+	mbedtls_pk_free(&pk->pk);
 }
 
 /* entropy functions */
 
 static unsigned long CDECL get_sizeof_entropy_context_struct(void)
 {
-	return (unsigned long) sizeof(entropy_context);
+	return sizeof(mbedtls_entropy_context);
 }
 
 static unsigned long CDECL get_sizeof_ctr_drbg_context_struct(void)
 {
-	return (unsigned long) sizeof(ctr_drbg_context);
+	return sizeof(mbedtls_ctr_drbg_context);
 }
 
-static int ldg_entropy_init(entropy_context *ctx, ctr_drbg_context *ctr, const char *app_name)
+static int ldg_entropy_init(mbedtls_entropy_context *ctx, mbedtls_ctr_drbg_context *ctr, const char *app_name)
 {
 	int ret;
 
-	entropy_init(ctx);
+	mbedtls_entropy_init(ctx);
+	mbedtls_ctr_drbg_init(ctr);
+	
+#if defined(MBEDTLS_USE_PSA_CRYPTO)
+	if (psa_crypto_init() != PSA_SUCCESS)
+	{
+		return MBEDTLS_ERR_SSL_HW_ACCEL_FAILED;
+	}
+#endif
 
-	ret = ctr_drbg_init(ctr, entropy_func, ctx, (const unsigned char *) app_name, strlen(app_name));
+	ret = mbedtls_ctr_drbg_seed(ctr, mbedtls_entropy_func, ctx, (const unsigned char *) app_name, strlen(app_name));
 
 	return ret;
 }
 
-static void CDECL ldg_entropy_free(entropy_context *ctx, ctr_drbg_context *ctr)
+static void CDECL ldg_entropy_free(mbedtls_entropy_context *ctx, mbedtls_ctr_drbg_context *ctr)
 {
 	if (ctr != NULL)
 	{
-		ctr_drbg_free(ctr);
+		mbedtls_ctr_drbg_free(ctr);
 	}
 	if (ctx != NULL)
 	{
-		entropy_free(ctx);
+		mbedtls_entropy_free(ctx);
 	}
+#if defined(MBEDTLS_USE_PSA_CRYPTO)
+	mbedtls_psa_crypto_free();
+#endif
 }
 
 /* ssl layer functions */
 
+typedef struct {
+	mbedtls_ssl_context ssl;
+	mbedtls_ssl_config conf;
+} my_ssl_context;
+
 static unsigned long CDECL get_sizeof_ssl_context_struct(void)
 {
-	return (unsigned long) sizeof(ssl_context);
+	return sizeof(my_ssl_context);
 }
 
-static int CDECL ldg_ssl_init(ssl_context *ssl, ctr_drbg_context *ctr, int *server_fd, const char *servername,
-					   x509_crt *cacert, x509_crt *cert, pk_context *pk)
+static int CDECL ldg_ssl_init(my_ssl_context *ssl, mbedtls_ctr_drbg_context *ctr, int *server_fd, const char *servername,
+					   mbedtls_x509_crt *cacert, mbedtls_x509_crt *cert, my_pk_context *pk)
 {
-	int ret = 0;
+	int ret;
+	
+	mbedtls_ssl_init(&ssl->ssl);
+	mbedtls_ssl_config_init(&ssl->conf);
+	ret = mbedtls_ssl_config_defaults(&ssl->conf,
+		MBEDTLS_SSL_IS_CLIENT,
+		MBEDTLS_SSL_TRANSPORT_STREAM,
+		MBEDTLS_SSL_PRESET_DEFAULT);
+	if (ret != 0)
+		goto exit;
 
-	if ((ret = ssl_init(ssl)) == 0)
+	mbedtls_ssl_conf_authmode(&ssl->conf, cacert == NULL ? MBEDTLS_SSL_VERIFY_NONE : MBEDTLS_SSL_VERIFY_OPTIONAL);
+
+	mbedtls_ssl_conf_rng(&ssl->conf, mbedtls_ctr_drbg_random, ctr);
+#if defined(MBEDTLS_DEBUG_C)
+	mbedtls_ssl_conf_dbg(&ssl->conf, my_debug, stdout);
+#endif
+	if (used_tcp_layer == TCP_LAYER_STIK)
 	{
-		ssl_set_endpoint(ssl, SSL_IS_CLIENT);
-		ssl_set_authmode(ssl, (cacert == NULL) ? SSL_VERIFY_NONE : SSL_VERIFY_OPTIONAL);
-
-		ssl_set_rng(ssl, ctr_drbg_random, ctr);
-#if defined(POLARSSL_DEBUG_C)
-		ssl_set_dbg(ssl, my_debug, stdout);
-#endif
-		if (used_tcp_layer == TCP_LAYER_STIK)
-		{
-			ssl_set_bio(ssl, my_stick_recv, server_fd, my_stick_send, server_fd);
-		} else
-		{
-			ssl_set_bio(ssl, my_mintnet_recv, server_fd, my_mintnet_send, server_fd);
-		}
-		ssl_set_ca_chain(ssl, cacert, NULL, servername);
-		if (cert != NULL && pk != NULL)
-		{
-			ssl_set_own_cert(ssl, cert, pk);
-		}
-#if defined(POLARSSL_SSL_SERVER_NAME_INDICATION)
-		ssl_set_hostname(ssl, servername);
-#endif
+		mbedtls_ssl_set_bio(&ssl->ssl, server_fd, my_stick_send, my_stick_recv, NULL);
+	} else
+	{
+		mbedtls_ssl_set_bio(&ssl->ssl, server_fd, my_mintnet_send, my_mintnet_recv, NULL);
 	}
+	mbedtls_ssl_conf_ca_chain(&ssl->conf, cacert, NULL);
+	if (cert != NULL && pk != NULL)
+	{
+		ret = mbedtls_ssl_conf_own_cert(&ssl->conf, cert, &pk->pk);
+		if (ret != 0)
+			goto exit;
+	}
+#if defined(MBEDTLS_SSL_SERVER_NAME_INDICATION)
+	ret = mbedtls_ssl_set_hostname(&ssl->ssl, servername);
+	if (ret != 0)
+		goto exit;
+#endif
 
+	return 0;
+
+exit:
+	mbedtls_ssl_free(&ssl->ssl);
+	mbedtls_ssl_config_free(&ssl->conf);
 	return ret;
 }
 
-static void CDECL ldg_ssl_set_minmax_version(ssl_context *ssl, int minor_min, int minor_max)
+#ifndef MBEDTLS_SSL_MAJOR_VERSION_3
+#define MBEDTLS_SSL_MAJOR_VERSION_3             3
+#endif
+#ifndef MBEDTLS_SSL_MINOR_VERSION_3
+#define MBEDTLS_SSL_MINOR_VERSION_3 (MBEDTLS_SSL_VERSION_TLS1_2 & 0xff)
+#endif
+#ifndef MBEDTLS_SSL_MINOR_VERSION_4
+#define MBEDTLS_SSL_MINOR_VERSION_4 (MBEDTLS_SSL_VERSION_TLS1_3 & 0xff)
+#endif
+
+static void CDECL ldg_ssl_set_minmax_version(my_ssl_context *ssl, int minor_min, int minor_max)
 {
-	if (minor_min < SSL_MINOR_VERSION_0)
+#ifdef MBEDTLS_SSL_MINOR_VERSION_0
+	if (minor_min < MBEDTLS_SSL_MINOR_VERSION_0) /* TLS v1.0 */
 	{
-		minor_min = SSL_MINOR_VERSION_0;
+		minor_min = MBEDTLS_SSL_MINOR_VERSION_0;
 	}
-	if (minor_max > SSL_MINOR_VERSION_3)
+#else
+	if (minor_min < MBEDTLS_SSL_MINOR_VERSION_3) /* TLS v1.2 */
 	{
-		minor_max = SSL_MINOR_VERSION_3;
+		minor_min = MBEDTLS_SSL_MINOR_VERSION_3;
+	}
+#endif
+	if (minor_max > MBEDTLS_SSL_MINOR_VERSION_4) /* TLS v1.3 */
+	{
+		minor_max = MBEDTLS_SSL_MINOR_VERSION_4;
 	}
 	if (minor_min > minor_max)
 	{
 		minor_min = minor_max;
 	}
 
-	ssl_set_min_version(ssl, SSL_MAJOR_VERSION_3, minor_min);
-	ssl_set_max_version(ssl, SSL_MAJOR_VERSION_3, minor_max);
+	mbedtls_ssl_conf_min_tls_version(&ssl->conf, (MBEDTLS_SSL_MAJOR_VERSION_3 << 8) | minor_min);
+	mbedtls_ssl_conf_max_tls_version(&ssl->conf, (MBEDTLS_SSL_MAJOR_VERSION_3 << 8) | minor_max);
 }
 
-static void CDECL ldg_ssl_set_ciphersuite(ssl_context *ssl, const int *wished_ciphersuites)
+static void CDECL ldg_ssl_set_ciphersuite(my_ssl_context *ssl, const int *wished_ciphersuites)
 {
-	ssl_set_ciphersuites(ssl, wished_ciphersuites);
+	mbedtls_ssl_conf_ciphersuites(&ssl->conf, wished_ciphersuites);
 }
 
-static int CDECL ldg_ssl_handshake(ssl_context *ssl)
+static int CDECL ldg_ssl_handshake(my_ssl_context *ssl)
 {
-	int ret = 0;
+	int ret;
 	struct timeval timer;
 
+	ret = mbedtls_ssl_setup(&ssl->ssl, &ssl->conf);
+	if (ret != 0)
+		return ret;
+	
 	if (used_tcp_layer == TCP_LAYER_MINTNET)
 	{
 		timer.tv_sec = 30;
 		timer.tv_usec = 0;
 
-		setsockopt((int) (ssl->p_recv), SOL_SOCKET, SO_RCVTIMEO, (void *) &timer, sizeof(timer));
+		setsockopt((int) (ssl->ssl.p_bio), SOL_SOCKET, SO_RCVTIMEO, (void *) &timer, sizeof(timer));
 	}
 
-	while ((ret = ssl_handshake(ssl)) != 0)
+	while ((ret = mbedtls_ssl_handshake(&ssl->ssl)) != 0)
 	{
-		if (ret != POLARSSL_ERR_NET_WANT_READ && ret != POLARSSL_ERR_NET_WANT_WRITE)
+		if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
 		{
 			break;
 		}
@@ -428,50 +523,51 @@ static int CDECL ldg_ssl_handshake(ssl_context *ssl)
 		timer.tv_sec = 0;
 		timer.tv_usec = 0;
 
-		setsockopt((int) (ssl->p_recv), SOL_SOCKET, SO_RCVTIMEO, (void *) &timer, sizeof(timer));
+		setsockopt((int) (ssl->ssl.p_bio), SOL_SOCKET, SO_RCVTIMEO, (void *) &timer, sizeof(timer));
 	}
 
 	return ret;
 }
 
-static const char *CDECL ldg_ssl_get_version(ssl_context *ssl)
+static const char *CDECL ldg_ssl_get_version(my_ssl_context *ssl)
 {
-	return ssl_get_version(ssl);
+	return mbedtls_ssl_get_version(&ssl->ssl);
 }
 
-static const char *CDECL ldg_ssl_get_ciphersuite(ssl_context *ssl)
+static const char *CDECL ldg_ssl_get_ciphersuite(my_ssl_context *ssl)
 {
-	return ssl_get_ciphersuite(ssl);
+	return mbedtls_ssl_get_ciphersuite(&ssl->ssl);
 }
 
-static int CDECL ldg_ssl_get_verify_result(ssl_context *ssl)
+static int CDECL ldg_ssl_get_verify_result(my_ssl_context *ssl)
 {
-	return ssl_get_verify_result(ssl);
+	return mbedtls_ssl_get_verify_result(&ssl->ssl);
 }
 
-static const x509_crt *CDECL ldg_ssl_get_peer_cert(ssl_context *ssl)
+static const mbedtls_x509_crt *CDECL ldg_ssl_get_peer_cert(my_ssl_context *ssl)
 {
-	return ssl_get_peer_cert(ssl);
+	return mbedtls_ssl_get_peer_cert(&ssl->ssl);
 }
 
-static int CDECL ldg_ssl_read(ssl_context *ssl, unsigned char *buf, size_t len)
+static int CDECL ldg_ssl_read(my_ssl_context *ssl, unsigned char *buf, size_t len)
 {
-	return ssl_read(ssl, buf, len);
+	return mbedtls_ssl_read(&ssl->ssl, buf, len);
 }
 
-static int CDECL ldg_ssl_write(ssl_context *ssl, const unsigned char *buf, size_t len)
+static int CDECL ldg_ssl_write(my_ssl_context *ssl, const unsigned char *buf, size_t len)
 {
-	return ssl_write(ssl, buf, len);
+	return mbedtls_ssl_write(&ssl->ssl, buf, len);
 }
 
-static int CDECL ldg_ssl_close_notify(ssl_context *ssl)
+static int CDECL ldg_ssl_close_notify(my_ssl_context *ssl)
 {
-	return ssl_close_notify(ssl);
+	return mbedtls_ssl_close_notify(&ssl->ssl);
 }
 
-static void CDECL ldg_ssl_free(ssl_context *ssl)
+static void CDECL ldg_ssl_free(my_ssl_context *ssl)
 {
-	ssl_free(ssl);
+	mbedtls_ssl_free(&ssl->ssl);
+	mbedtls_ssl_config_free(&ssl->conf);
 }
 
 /* net functions */
@@ -603,12 +699,16 @@ static void CDECL ldg_freehostname(char *hostname)
 
 static int ldg_get_min_tls_version(void)
 {
-	return SSL_MINOR_VERSION_0;
+#ifdef MBEDTLS_SSL_MINOR_VERSION_0
+	return MBEDTLS_SSL_MINOR_VERSION_0;
+#else
+	return MBEDTLS_SSL_MINOR_VERSION_3;
+#endif
 }
 
 static int ldg_get_max_tls_version(void)
 {
-	return SSL_MINOR_VERSION_3;
+	return MBEDTLS_SSL_MINOR_VERSION_4;
 }
 
 /* ldg functions table */
@@ -650,7 +750,7 @@ static PROC const LibFunc[] = {
 	{ "ldg_ssl_close_notify", "int ldg_ssl_close_notify(ssl_context *ssl);", ldg_ssl_close_notify },
 	{ "ldg_ssl_free", "void ldg_ssl_free(ssl_context *ssl);", ldg_ssl_free },
 
-    /* new in Release 9 */
+	/* new in Release 9 */
 	{ "ldg_gethostbyname", "int ldg_gethostbyname(const char *hostname, char **realname, uint32_t *alist, size_t lsize);", ldg_gethostbyname },
 	{ "ldg_freehostname", "void ldg_freehostname(char *hostname);", ldg_freehostname },
 	{ "ldg_get_min_tls_version", "int ldg_get_min_tls_version();", ldg_get_min_tls_version },
@@ -667,20 +767,20 @@ static void search_tcp_layer(void)
 
 	if (xget_cookie(0x4D694E54L, NULL))	/* 'MiNT' */
 	{
-#if defined(POLARSSL_DEBUG_C)
+#if defined(MBEDTLS_DEBUG_C)
 		(void) Cconws("MiNTnet detected\n\r");
 #endif
 		timing_set_system(0);
 		used_tcp_layer = TCP_LAYER_MINTNET;
 	} else if (xget_cookie(0x4D616758L, NULL) && xget_cookie(0x53434B4DL, NULL))	/* 'MagX' and 'SCKM' */
 	{
-#if defined(POLARSSL_DEBUG_C)
+#if defined(MBEDTLS_DEBUG_C)
 		(void) Cconws("MagiCNet detected\n\r");
 #endif
 		used_tcp_layer = TCP_LAYER_MINTNET;
 	} else if (xget_cookie(0x5354694BL, NULL))	/* 'STiK' */
 	{
-#if defined(POLARSSL_DEBUG_C)
+#if defined(MBEDTLS_DEBUG_C)
 		(void) Cconws("STinG/STiK detected\n\r");
 #endif
 		used_tcp_layer = TCP_LAYER_STIK;
@@ -693,7 +793,7 @@ static short stick_init(void)
 
 	if (xget_cookie(0x5354694BL, &cookieval) == 0)	/* 'STiK' */
 	{
-#if defined(POLARSSL_DEBUG_C)
+#if defined(MBEDTLS_DEBUG_C)
 		(void) Cconws("STinG/STiK is not loaded or enabled!\n\r");
 #endif
 		return -1;
@@ -703,7 +803,7 @@ static short stick_init(void)
 
 	if (strcmp(drivers->magic, STIK_DRVR_MAGIC) != 0)
 	{
-#if defined(POLARSSL_DEBUG_C)
+#if defined(MBEDTLS_DEBUG_C)
 		(void) Cconws("STinG/STiK structures corrupted!\n\r");
 #endif
 		return -1;
@@ -713,7 +813,7 @@ static short stick_init(void)
 
 	if (tpl == (TPL *) NULL)
 	{
-#if defined(POLARSSL_DEBUG_C)
+#if defined(MBEDTLS_DEBUG_C)
 		(void) Cconws("Transport Driver not found!\n\r");
 #endif
 		return -1;
@@ -732,13 +832,10 @@ int main(void)
 	platform_set_malloc_free((void *) ldg_Malloc, (void *) ldg_Free);
 #endif
 
-#if defined(POLARSSL_DEBUG_C)
-	(void) Cconws("Polarssl.ldg (");
+#if defined(MBEDTLS_DEBUG_C)
+	(void) Cconws("MbedTLS.ldg (");
 	(void) Cconws(get_version());
 	(void) Cconws(") debug mode enabled\n\r");
-
-	debug_set_log_mode(POLARSSL_DEBUG_LOG_FULL);
-	debug_set_threshold(0);				/* 0 = nothing -> 3 = full */
 #endif
 
 	search_tcp_layer();

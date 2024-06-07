@@ -725,7 +725,7 @@
 #endif
 
 #if defined(MBEDTLS_PSA_ITS_FILE_C) && \
-    !defined(MBEDTLS_FS_IO)
+    !defined(MBEDTLS_FS_IO) && 0
 #error "MBEDTLS_PSA_ITS_FILE_C defined, but not all prerequisites"
 #endif
 

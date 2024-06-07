@@ -15,9 +15,9 @@
 #endif
 #include <mint/sysbind.h>
 
-int used_system = 0;
-const int SYSTEM_MINT = 0;  // MiNT
-const int SYSTEM_OTHER = 1; // Other than MiNT (TOS, MagiC)
+static int used_system = 0;
+#define SYSTEM_MINT  0  /* MiNT */
+#define SYSTEM_OTHER 1  /* Other than MiNT (TOS, MagiC) */
 
 void timing_set_system(int value)
 {

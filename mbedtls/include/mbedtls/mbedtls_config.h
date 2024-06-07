@@ -4209,3 +4209,28 @@
 /*#define MBEDTLS_X509_MAX_FILE_PATH_LEN     512 */ /**< Maximum length of a path/filename string in bytes including the null terminator character ('\0'). */
 
 /** \} name SECTION: Module configuration options */
+
+#ifdef __MINT__
+#undef MBEDTLS_HAVE_IPV6
+#undef MBEDTLS_ERROR_STRERROR_DUMMY
+#undef MBEDTLS_FS_IO
+/* #undef MBEDTLS_PSA_ITS_FILE_C would require reimplementation of psa_its_*() functions */
+#define MBEDTLS_NO_PLATFORM_ENTROPY
+#undef MBEDTLS_SELF_TEST
+#undef MBEDTLS_DEBUG_C
+#undef MBEDTLS_ERROR_C
+#undef MBEDTLS_NET_C
+#undef MBEDTLS_PEM_WRITE_C
+#undef MBEDTLS_PK_WRITE_C
+#undef MBEDTLS_SSL_SRV_C
+#undef MBEDTLS_X509_CREATE_C
+#undef MBEDTLS_X509_CRT_WRITE_C
+#undef MBEDTLS_X509_CSR_WRITE_C
+#define MBEDTLS_PLATFORM_MEMORY
+#define MBEDTLS_DEPRECATED_WARNING
+#define MBEDTLS_DEPRECATED_REMOVED
+#define MBEDTLS_TIMING_ALT
+#define MBEDTLS_AES_ROM_TABLES
+#define MBEDTLS_CAMELLIA_SMALL_MEMORY
+#define MBEDTLS_NO_PLATFORM_ENTROPY
+#endif
