@@ -570,12 +570,14 @@ int mbedtls_ctr_drbg_seed(mbedtls_ctr_drbg_context *ctx,
         return ret;
     }
 #else
+	{
     psa_status_t status;
 
     status = ctr_drbg_setup_psa_context(&ctx->psa_ctx, key, MBEDTLS_CTR_DRBG_KEYSIZE);
     if (status != PSA_SUCCESS) {
         ret = psa_generic_status_to_mbedtls(status);
-        return status;
+        return ret;
+    }
     }
 #endif
 
