@@ -19,6 +19,22 @@ LOCAL_CFLAGS += -DRECORD_PSA_STATUS_COVERAGE_LOG
 endif
 
 .PHONY: generated_files
+ifneq ($(CROSSPREFIX),)
+GENERATED_BIGNUM_DATA_FILES := \
+	suites/test_suite_bignum.generated.data \
+	suites/test_suite_bignum_core.generated.data \
+	suites/test_suite_bignum_mod.generated.data \
+	suites/test_suite_bignum_mod_raw.generated.data
+GENERATED_ECP_DATA_FILES := \
+	suites/test_suite_ecp.generated.data 
+GENERATED_PSA_DATA_FILES := \
+	suites/test_suite_psa_crypto_generate_key.generated.data \
+	suites/test_suite_psa_crypto_low_hash.generated.data \
+	suites/test_suite_psa_crypto_not_supported.generated.data \
+	suites/test_suite_psa_crypto_op_fail.generated.data \
+	suites/test_suite_psa_crypto_storage_format.current.data \
+	suites/test_suite_psa_crypto_storage_format.v0.data
+else
 GENERATED_BIGNUM_DATA_FILES := $(patsubst tests/%,%,$(shell \
 	$(PYTHON) scripts/generate_bignum_tests.py --list || \
 	echo FAILED \
@@ -39,6 +55,7 @@ GENERATED_PSA_DATA_FILES := $(patsubst tests/%,%,$(shell \
 ))
 ifeq ($(GENERATED_PSA_DATA_FILES),FAILED)
 $(error "$(PYTHON) scripts/generate_psa_tests.py --list" failed)
+endif
 endif
 GENERATED_FILES := $(GENERATED_PSA_DATA_FILES) $(GENERATED_ECP_DATA_FILES) $(GENERATED_BIGNUM_DATA_FILES)
 generated_files: $(GENERATED_FILES)
