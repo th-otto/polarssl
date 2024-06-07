@@ -13,7 +13,7 @@
  * for function arguments.
  */
 #if defined(__STDC_VERSION__)
-# if __STDC_VERSION__ >= 199901L
+# if (__STDC_VERSION__ >= 199901L) && !defined(__MINT__)
 #  include <complex.h>
 # endif
 #endif

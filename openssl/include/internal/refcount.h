@@ -17,7 +17,7 @@
 # endif
 
 # if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L \
-     && !defined(__STDC_NO_ATOMICS__)
+     && !defined(__STDC_NO_ATOMICS__) && !defined(__MINT__)
 #  include <stdatomic.h>
 #  define HAVE_C11_ATOMICS
 # endif
@@ -53,7 +53,7 @@ static inline int CRYPTO_DOWN_REF(_Atomic int *val, int *ret, void *lock)
     return 1;
 }
 
-# elif defined(__GNUC__) && defined(__ATOMIC_RELAXED) && __GCC_ATOMIC_INT_LOCK_FREE > 0
+# elif defined(__GNUC__) && defined(__ATOMIC_RELAXED) && __GCC_ATOMIC_INT_LOCK_FREE > 0 && !defined(__MINT__)
 
 #  define HAVE_ATOMICS 1
 

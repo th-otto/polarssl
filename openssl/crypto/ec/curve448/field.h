@@ -31,6 +31,10 @@
 #  define RESTRICT
 #  define ALIGNED
 # endif
+#ifdef __MINT__
+#undef ALIGNED
+#define ALIGNED
+#endif
 
 typedef struct gf_s {
     word_t limb[NLIMBS];

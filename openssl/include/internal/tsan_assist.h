@@ -48,7 +48,7 @@
  */
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L \
-    && !defined(__STDC_NO_ATOMICS__)
+    && !defined(__STDC_NO_ATOMICS__) && !defined(__MINT__)
 # include <stdatomic.h>
 
 # if defined(ATOMIC_POINTER_LOCK_FREE) \
@@ -62,7 +62,7 @@
 #  define tsan_st_rel(ptr, val) atomic_store_explicit((ptr), (val), memory_order_release)
 # endif
 
-#elif defined(__GNUC__) && defined(__ATOMIC_RELAXED)
+#elif defined(__GNUC__) && defined(__ATOMIC_RELAXED) && !defined(__MINT__)
 
 # if defined(__GCC_ATOMIC_POINTER_LOCK_FREE) \
           && __GCC_ATOMIC_POINTER_LOCK_FREE >= 2

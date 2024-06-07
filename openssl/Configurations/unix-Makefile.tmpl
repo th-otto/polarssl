@@ -183,8 +183,7 @@ LIBDIR={- our $libdir = $config{libdir};
               # directory, then assume that it's not searched by linker
               # automatically, in which case adding $target{multilib} suffix
               # causes more grief than we're ready to tolerate, so don't...
-              our $multilib =
-                  -d "$prefix/lib$target{multilib}" ? $target{multilib} : "";
+              our $multilib = $target{multilib};
               $libdir = "lib$multilib";
           }
           file_name_is_absolute($libdir) ? "" : $libdir -}
@@ -964,7 +963,7 @@ libcrypto.pc:
 	    echo 'Name: OpenSSL-libcrypto'; \
 	    echo 'Description: OpenSSL cryptography library'; \
 	    echo 'Version: '$(VERSION); \
-	    echo 'Libs: -L$${libdir} -lcrypto'; \
+	    echo 'Libs: -L$${libdir} -lcrypto $(LIB_EX_LIBS)'; \
 	    echo 'Libs.private: $(LIB_EX_LIBS)'; \
 	    echo 'Cflags: -I$${includedir}' ) > libcrypto.pc
 
