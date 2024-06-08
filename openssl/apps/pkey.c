@@ -44,7 +44,7 @@ const OPTIONS pkey_options[] = {
 #endif
     {"check", OPT_CHECK, '-', "Check key consistency"},
     {"pubcheck", OPT_PUB_CHECK, '-', "Check public key consistency"},
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int pkey_main(int argc, char **argv)

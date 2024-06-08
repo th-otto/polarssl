@@ -262,6 +262,9 @@ static long tls_dump_ctrl(BIO *bio, int cmd, long num, void *ptr)
 
 static int tls_dump_gets(BIO *bio, char *buf, int size)
 {
+    (void)bio;
+    (void)buf;
+    (void)size;
     /* We don't support this - not needed anyway */
     return -1;
 }
@@ -557,6 +560,7 @@ static long mempacket_test_ctrl(BIO *bio, int cmd, long num, void *ptr)
     MEMPACKET_TEST_CTX *ctx = BIO_get_data(bio);
     MEMPACKET *thispkt;
 
+    (void)ptr;
     switch (cmd) {
     case BIO_CTRL_EOF:
         ret = (long)(sk_MEMPACKET_num(ctx->pkts) == 0);
@@ -605,6 +609,9 @@ static long mempacket_test_ctrl(BIO *bio, int cmd, long num, void *ptr)
 
 static int mempacket_test_gets(BIO *bio, char *buf, int size)
 {
+    (void)bio;
+    (void)buf;
+    (void)size;
     /* We don't support this - not needed anyway */
     return -1;
 }
@@ -666,12 +673,16 @@ static int always_retry_free(BIO *bio)
 
 static int always_retry_read(BIO *bio, char *out, int outl)
 {
+    (void)out;
+    (void)outl;
     BIO_set_retry_read(bio);
     return -1;
 }
 
 static int always_retry_write(BIO *bio, const char *in, int inl)
 {
+    (void)in;
+    (void)inl;
     BIO_set_retry_write(bio);
     return -1;
 }
@@ -680,6 +691,8 @@ static long always_retry_ctrl(BIO *bio, int cmd, long num, void *ptr)
 {
     long ret = 1;
 
+    (void)num;
+    (void)ptr;
     switch (cmd) {
     case BIO_CTRL_FLUSH:
         BIO_set_retry_write(bio);
@@ -698,12 +711,15 @@ static long always_retry_ctrl(BIO *bio, int cmd, long num, void *ptr)
 
 static int always_retry_gets(BIO *bio, char *buf, int size)
 {
+    (void)buf;
+    (void)size;
     BIO_set_retry_read(bio);
     return -1;
 }
 
 static int always_retry_puts(BIO *bio, const char *str)
 {
+    (void)str;
     BIO_set_retry_write(bio);
     return -1;
 }

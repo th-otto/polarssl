@@ -40,7 +40,7 @@ const OPTIONS engine_options[] = {
     {"post", OPT_POST, 's', "Run command against the ENGINE after loading it"},
     {OPT_MORE_STR, OPT_EOF, 1,
      "Commands are like \"SO_PATH:/lib/libdriver.so\""},
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 static int append_buf(char **buf, int *size, const char *s)
@@ -232,6 +232,7 @@ static void util_do_cmds(ENGINE *e, STACK_OF(OPENSSL_STRING) *cmds,
 {
     int loop, res, num = sk_OPENSSL_STRING_num(cmds);
 
+    (void)indent;
     if (num < 0) {
         BIO_printf(out, "[Error]: internal stack error\n");
         return;

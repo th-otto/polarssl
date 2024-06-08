@@ -469,6 +469,7 @@ static int ssl_servername_cb(SSL *s, int *ad, void *arg)
     tlsextctx *p = (tlsextctx *) arg;
     const char *servername = SSL_get_servername(s, TLSEXT_NAMETYPE_host_name);
 
+    (void)ad;
     if (servername != NULL && p->biodebug != NULL) {
         const char *cp = servername;
         unsigned char uc;
@@ -505,7 +506,7 @@ typedef struct tlsextstatusctx_st {
     int verbose;
 } tlsextstatusctx;
 
-static tlsextstatusctx tlscstatp = { -1 };
+static tlsextstatusctx tlscstatp = { -1, 0, 0, 0, 0, 0, 0 };
 
 #ifndef OPENSSL_NO_OCSP
 
@@ -682,6 +683,7 @@ static int next_proto_cb(SSL *s, const unsigned char **data,
 {
     tlsextnextprotoctx *next_proto = arg;
 
+    (void)s;
     *data = next_proto->data;
     *len = next_proto->len;
 
@@ -700,6 +702,7 @@ static int alpn_cb(SSL *s, const unsigned char **out, unsigned char *outlen,
 {
     tlsextalpnctx *alpn_ctx = arg;
 
+    (void)s;
     if (!s_quiet) {
         /* We can assume that |in| is syntactically valid. */
         unsigned int i;
@@ -731,6 +734,7 @@ static int alpn_cb(SSL *s, const unsigned char **out, unsigned char *outlen,
 static int not_resumable_sess_cb(SSL *s, int is_forward_secure)
 {
     /* disable resumption for sessions with forward secure ciphers */
+    (void)s;
     return is_forward_secure;
 }
 
@@ -2281,6 +2285,7 @@ static int sv_body(int s, int stype, int prot, unsigned char *context)
 # endif
 #endif
 
+    (void)prot;
     buf = app_malloc(bufsize, "server buffer");
     if (s_nbio) {
         if (!BIO_socket_nbio(s, 1))
@@ -3006,6 +3011,8 @@ static int www_body(int s, int stype, int prot, unsigned char *context)
     int width;
     fd_set readfds;
 
+    (void)prot;
+    (void)stype;
     /* Set width for a select call if needed */
     width = s + 1;
 
@@ -3393,6 +3400,8 @@ static int rev_body(int s, int stype, int prot, unsigned char *context)
     SSL *con;
     BIO *io, *ssl_bio, *sbio;
 
+    (void)stype;
+    (void)prot;
     buf = app_malloc(bufsize, "server rev buffer");
     io = BIO_new(BIO_f_buffer());
     ssl_bio = BIO_new(BIO_f_ssl());
@@ -3588,6 +3597,7 @@ static int add_session(SSL *ssl, SSL_SESSION *session)
     simple_ssl_session *sess = app_malloc(sizeof(*sess), "get session");
     unsigned char *p;
 
+    (void)ssl;
     SSL_SESSION_get_id(session, &sess->idlen);
     sess->derlen = i2d_SSL_SESSION(session, NULL);
     if (sess->derlen < 0) {
@@ -3626,6 +3636,7 @@ static SSL_SESSION *get_session(SSL *ssl, const unsigned char *id, int idlen,
                                 int *do_copy)
 {
     simple_ssl_session *sess;
+    (void)ssl;
     *do_copy = 0;
     for (sess = first; sess; sess = sess->next) {
         if (idlen == (int)sess->idlen && !memcmp(sess->id, id, idlen)) {
@@ -3643,6 +3654,7 @@ static void del_session(SSL_CTX *sctx, SSL_SESSION *session)
     simple_ssl_session *sess, *prev = NULL;
     const unsigned char *id;
     unsigned int idlen;
+    (void)sctx;
     id = SSL_SESSION_get_id(session, &idlen);
     for (sess = first; sess; sess = sess->next) {
         if (idlen == sess->idlen && !memcmp(sess->id, id, idlen)) {

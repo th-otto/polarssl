@@ -12,7 +12,7 @@
 #ifdef DSO_NONE
 
 static DSO_METHOD dso_meth_null = {
-    "NULL shared library method"
+    "NULL shared library method", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 DSO_METHOD *DSO_METHOD_openssl(void)

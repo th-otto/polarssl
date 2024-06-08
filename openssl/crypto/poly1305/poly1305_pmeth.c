@@ -107,6 +107,7 @@ static int poly1305_signctx(EVP_PKEY_CTX *ctx, unsigned char *sig, size_t *sigle
 {
     POLY1305_PKEY_CTX *pctx = ctx->data;
 
+    (void)mctx;
     *siglen = POLY1305_DIGEST_SIZE;
     if (sig != NULL)
         Poly1305_Final(&pctx->ctx, sig);
@@ -190,5 +191,6 @@ const EVP_PKEY_METHOD poly1305_pkey_meth = {
     0, 0,
 
     pkey_poly1305_ctrl,
-    pkey_poly1305_ctrl_str
+    pkey_poly1305_ctrl_str,
+    0, 0, 0, 0, 0, 0
 };

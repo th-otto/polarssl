@@ -107,6 +107,7 @@ static int ndef_prefix(BIO *b, unsigned char **pbuf, int *plen, void *parg)
     unsigned char *p;
     int derlen;
 
+    (void)b;
     if (!parg)
         return 0;
 
@@ -137,6 +138,7 @@ static int ndef_prefix_free(BIO *b, unsigned char **pbuf, int *plen,
 {
     NDEF_SUPPORT *ndef_aux;
 
+    (void)b;
     if (!parg)
         return 0;
 
@@ -172,6 +174,7 @@ static int ndef_suffix(BIO *b, unsigned char **pbuf, int *plen, void *parg)
     const ASN1_AUX *aux;
     ASN1_STREAM_ARG sarg;
 
+    (void)b;
     if (!parg)
         return 0;
 

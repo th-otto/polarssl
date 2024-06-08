@@ -148,7 +148,7 @@ const OPTIONS x509_options[] = {
     {"engine", OPT_ENGINE, 's', "Use engine, possibly a hardware device"},
 #endif
     {"preserve_dates", OPT_PRESERVE_DATES, '-', "preserve existing dates when signing"},
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int x509_main(int argc, char **argv)

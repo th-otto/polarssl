@@ -46,6 +46,7 @@ static const EVP_MD mdc2_md = {
     NULL,
     MDC2_BLOCK,
     sizeof(EVP_MD *) + sizeof(MDC2_CTX),
+    0
 };
 
 const EVP_MD *EVP_mdc2(void)

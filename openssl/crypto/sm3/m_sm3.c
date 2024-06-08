@@ -42,6 +42,7 @@ static const EVP_MD sm3_md = {
     NULL,
     SM3_CBLOCK,
     sizeof(EVP_MD *) + sizeof(SM3_CTX),
+    0
 };
 
 const EVP_MD *EVP_sm3(void)

@@ -462,18 +462,21 @@ static int dh_pub_cmp(const EVP_PKEY *a, const EVP_PKEY *b)
 static int dh_param_print(BIO *bp, const EVP_PKEY *pkey, int indent,
                           ASN1_PCTX *ctx)
 {
+    (void)ctx;
     return do_dh_print(bp, pkey->pkey.dh, indent, 0);
 }
 
 static int dh_public_print(BIO *bp, const EVP_PKEY *pkey, int indent,
                            ASN1_PCTX *ctx)
 {
+    (void)ctx;
     return do_dh_print(bp, pkey->pkey.dh, indent, 1);
 }
 
 static int dh_private_print(BIO *bp, const EVP_PKEY *pkey, int indent,
                             ASN1_PCTX *ctx)
 {
+    (void)ctx;
     return do_dh_print(bp, pkey->pkey.dh, indent, 2);
 }
 
@@ -489,6 +492,7 @@ static int dh_cms_encrypt(CMS_RecipientInfo *ri);
 
 static int dh_pkey_ctrl(EVP_PKEY *pkey, int op, long arg1, void *arg2)
 {
+    (void)pkey;
     switch (op) {
 #ifndef OPENSSL_NO_CMS
 
@@ -564,7 +568,8 @@ const EVP_PKEY_ASN1_METHOD dh_asn1_meth = {
 
     0,
     dh_pkey_public_check,
-    dh_pkey_param_check
+    dh_pkey_param_check,
+    0, 0, 0, 0
 };
 
 const EVP_PKEY_ASN1_METHOD dhx_asn1_meth = {
@@ -603,7 +608,8 @@ const EVP_PKEY_ASN1_METHOD dhx_asn1_meth = {
 
     0,
     dh_pkey_public_check,
-    dh_pkey_param_check
+    dh_pkey_param_check,
+    0, 0, 0, 0
 };
 
 #ifndef OPENSSL_NO_CMS

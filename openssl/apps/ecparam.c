@@ -54,20 +54,20 @@ const OPTIONS ecparam_options[] = {
 #ifndef OPENSSL_NO_ENGINE
     {"engine", OPT_ENGINE, 's', "Use engine, possibly a hardware device"},
 #endif
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 static OPT_PAIR forms[] = {
     {"compressed", POINT_CONVERSION_COMPRESSED},
     {"uncompressed", POINT_CONVERSION_UNCOMPRESSED},
     {"hybrid", POINT_CONVERSION_HYBRID},
-    {NULL}
+    {NULL, 0}
 };
 
 static OPT_PAIR encodings[] = {
     {"named_curve", OPENSSL_EC_NAMED_CURVE},
     {"explicit", 0},
-    {NULL}
+    {NULL, 0}
 };
 
 int ecparam_main(int argc, char **argv)

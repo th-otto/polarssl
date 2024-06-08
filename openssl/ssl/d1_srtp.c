@@ -36,7 +36,7 @@ static SRTP_PROTECTION_PROFILE srtp_known_profiles[] = {
      "SRTP_AEAD_AES_256_GCM",
      SRTP_AEAD_AES_256_GCM,
      },
-    {0}
+    {0,0}
 };
 
 static int find_profile_by_name(char *profile_name,

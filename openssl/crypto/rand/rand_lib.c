@@ -239,6 +239,7 @@ size_t rand_drbg_get_nonce(RAND_DRBG *drbg,
         int count;
     } data;
 
+    (void)entropy;
     memset(&data, 0, sizeof(data));
     pool = rand_pool_new(0, 0, min_len, max_len);
     if (pool == NULL)
@@ -269,6 +270,7 @@ size_t rand_drbg_get_nonce(RAND_DRBG *drbg,
 void rand_drbg_cleanup_nonce(RAND_DRBG *drbg,
                              unsigned char *out, size_t outlen)
 {
+    (void)drbg;
     OPENSSL_clear_free(out, outlen);
 }
 

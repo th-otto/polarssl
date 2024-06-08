@@ -22,6 +22,7 @@ char *default_config_file = NULL;
 /* Old style PEM password callback */
 static int test_pem_password_cb(char *buf, int size, int rwflag, void *userdata)
 {
+    (void)rwflag;
     OPENSSL_strlcpy(buf, (char *)userdata, (size_t)size);
     return strlen(buf);
 }

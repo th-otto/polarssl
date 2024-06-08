@@ -113,6 +113,7 @@ static int file_get_pem_pass(char *buf, int num, int w, void *data)
     char *pass = file_get_pass(pass_data->ui_method, buf, num,
                                pass_data->prompt_info, pass_data->data);
 
+    (void)w;
     return pass == NULL ? 0 : strlen(pass);
 }
 
@@ -203,6 +204,7 @@ static OSSL_STORE_INFO *try_decode_PKCS12(const char *pem_name,
     OSSL_STORE_INFO *store_info = NULL;
     STACK_OF(OSSL_STORE_INFO) *ctx = *pctx;
 
+    (void)pem_header;
     if (ctx == NULL) {
         /* Initial parsing */
         PKCS12 *p12;
@@ -338,6 +340,8 @@ static OSSL_STORE_INFO *try_decode_PKCS8Encrypted(const char *pem_name,
     unsigned char *new_data = NULL;
     int new_data_len;
 
+    (void)pem_header;
+    (void)pctx;
     if (pem_name != NULL) {
         if (strcmp(pem_name, PEM_STRING_PKCS8) != 0)
             return NULL;
@@ -388,7 +392,8 @@ static OSSL_STORE_INFO *try_decode_PKCS8Encrypted(const char *pem_name,
 
 static FILE_HANDLER PKCS8Encrypted_handler = {
     "PKCS8Encrypted",
-    try_decode_PKCS8Encrypted
+    try_decode_PKCS8Encrypted,
+    0, 0, 0
 };
 
 /*
@@ -409,6 +414,10 @@ static OSSL_STORE_INFO *try_decode_PrivateKey(const char *pem_name,
     EVP_PKEY *pkey = NULL;
     const EVP_PKEY_ASN1_METHOD *ameth = NULL;
 
+    (void)pem_header;
+    (void)pctx;
+    (void)ui_method;
+    (void)ui_data;
     if (pem_name != NULL) {
         if (strcmp(pem_name, PEM_STRING_PKCS8INF) == 0) {
             PKCS8_PRIV_KEY_INFO *p8inf =
@@ -503,7 +512,8 @@ static OSSL_STORE_INFO *try_decode_PrivateKey(const char *pem_name,
 
 static FILE_HANDLER PrivateKey_handler = {
     "PrivateKey",
-    try_decode_PrivateKey
+    try_decode_PrivateKey,
+    0, 0, 0
 };
 
 /*
@@ -520,6 +530,10 @@ static OSSL_STORE_INFO *try_decode_PUBKEY(const char *pem_name,
     OSSL_STORE_INFO *store_info = NULL;
     EVP_PKEY *pkey = NULL;
 
+    (void)pem_header;
+    (void)pctx;
+    (void)ui_method;
+    (void)ui_data;
     if (pem_name != NULL) {
         if (strcmp(pem_name, PEM_STRING_PUBLIC) != 0)
             /* No match */
@@ -537,7 +551,8 @@ static OSSL_STORE_INFO *try_decode_PUBKEY(const char *pem_name,
 
 static FILE_HANDLER PUBKEY_handler = {
     "PUBKEY",
-    try_decode_PUBKEY
+    try_decode_PUBKEY,
+    0, 0, 0
 };
 
 /*
@@ -557,6 +572,10 @@ static OSSL_STORE_INFO *try_decode_params(const char *pem_name,
     const EVP_PKEY_ASN1_METHOD *ameth = NULL;
     int ok = 0;
 
+    (void)pem_header;
+    (void)pctx;
+    (void)ui_method;
+    (void)ui_data;
     if (pem_name != NULL) {
         if ((slen = pem_check_suffix(pem_name, "PARAMETERS")) == 0)
             return NULL;
@@ -620,7 +639,8 @@ static OSSL_STORE_INFO *try_decode_params(const char *pem_name,
 
 static FILE_HANDLER params_handler = {
     "params",
-    try_decode_params
+    try_decode_params,
+    0, 0, 0
 };
 
 /*
@@ -646,6 +666,10 @@ static OSSL_STORE_INFO *try_decode_X509Certificate(const char *pem_name,
      */
     int ignore_trusted = 1;
 
+    (void)pem_header;
+    (void)pctx;
+    (void)ui_method;
+    (void)ui_data;
     if (pem_name != NULL) {
         if (strcmp(pem_name, PEM_STRING_X509_TRUSTED) == 0)
             ignore_trusted = 0;
@@ -670,7 +694,8 @@ static OSSL_STORE_INFO *try_decode_X509Certificate(const char *pem_name,
 
 static FILE_HANDLER X509Certificate_handler = {
     "X509Certificate",
-    try_decode_X509Certificate
+    try_decode_X509Certificate,
+    0, 0, 0
 };
 
 /*
@@ -687,6 +712,10 @@ static OSSL_STORE_INFO *try_decode_X509CRL(const char *pem_name,
     OSSL_STORE_INFO *store_info = NULL;
     X509_CRL *crl = NULL;
 
+    (void)pem_header;
+    (void)pctx;
+    (void)ui_method;
+    (void)ui_data;
     if (pem_name != NULL) {
         if (strcmp(pem_name, PEM_STRING_X509_CRL) != 0)
             /* No match */
@@ -707,7 +736,8 @@ static OSSL_STORE_INFO *try_decode_X509CRL(const char *pem_name,
 
 static FILE_HANDLER X509CRL_handler = {
     "X509CRL",
-    try_decode_X509CRL
+    try_decode_X509CRL,
+    0, 0, 0
 };
 
 /*
@@ -809,6 +839,9 @@ static OSSL_STORE_LOADER_CTX *file_open(const OSSL_STORE_LOADER *loader,
     path_data[path_data_n].check_absolute = 0;
     path_data[path_data_n++].path = uri;
 
+    (void)loader;
+    (void)ui_method;
+    (void)ui_data;
     /*
      * Second step, if the URI appears to start with the 'file' scheme,
      * extract the path and make that the second path to check.

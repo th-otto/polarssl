@@ -454,6 +454,7 @@ static long dgram_ctrl(BIO *b, int cmd, long num, void *ptr)
         break;
         /* (Linux)kernel sets DF bit on outgoing IP packets */
     case BIO_CTRL_DGRAM_MTU_DISCOVER:
+    	(void)sockopt_val;
 # if defined(OPENSSL_SYS_LINUX) && defined(IP_MTU_DISCOVER) && defined(IP_PMTUDISC_DO)
         addr_len = (socklen_t) sizeof(addr);
         memset(&addr, 0, sizeof(addr));

@@ -440,18 +440,21 @@ static int eckey_param_encode(const EVP_PKEY *pkey, unsigned char **pder)
 static int eckey_param_print(BIO *bp, const EVP_PKEY *pkey, int indent,
                              ASN1_PCTX *ctx)
 {
+    (void)ctx;
     return do_EC_KEY_print(bp, pkey->pkey.ec, indent, EC_KEY_PRINT_PARAM);
 }
 
 static int eckey_pub_print(BIO *bp, const EVP_PKEY *pkey, int indent,
                            ASN1_PCTX *ctx)
 {
+    (void)ctx;
     return do_EC_KEY_print(bp, pkey->pkey.ec, indent, EC_KEY_PRINT_PUBLIC);
 }
 
 static int eckey_priv_print(BIO *bp, const EVP_PKEY *pkey, int indent,
                             ASN1_PCTX *ctx)
 {
+    (void)ctx;
     return do_EC_KEY_print(bp, pkey->pkey.ec, indent, EC_KEY_PRINT_PRIVATE);
 }
 
@@ -622,14 +625,16 @@ const EVP_PKEY_ASN1_METHOD eckey_asn1_meth = {
 
     ec_pkey_check,
     ec_pkey_public_check,
-    ec_pkey_param_check
+    ec_pkey_param_check,
+    0, 0, 0, 0
 };
 
 #if !defined(OPENSSL_NO_SM2)
 const EVP_PKEY_ASN1_METHOD sm2_asn1_meth = {
    EVP_PKEY_SM2,
    EVP_PKEY_EC,
-   ASN1_PKEY_ALIAS
+   ASN1_PKEY_ALIAS,
+   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 #endif
 

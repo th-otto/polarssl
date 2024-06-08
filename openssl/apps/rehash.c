@@ -467,7 +467,7 @@ const OPTIONS rehash_options[] = {
     {"old", OPT_OLD, '-', "Use old-style hash to generate links"},
     {"n", OPT_N, '-', "Do not remove existing links"},
     {"v", OPT_VERBOSE, '-', "Verbose output"},
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 

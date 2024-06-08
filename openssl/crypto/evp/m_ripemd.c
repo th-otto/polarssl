@@ -46,6 +46,7 @@ static const EVP_MD ripemd160_md = {
     NULL,
     RIPEMD160_CBLOCK,
     sizeof(EVP_MD *) + sizeof(RIPEMD160_CTX),
+    0
 };
 
 const EVP_MD *EVP_ripemd160(void)

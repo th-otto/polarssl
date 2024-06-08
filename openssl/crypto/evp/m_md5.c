@@ -46,6 +46,7 @@ static const EVP_MD md5_md = {
     NULL,
     MD5_CBLOCK,
     sizeof(EVP_MD *) + sizeof(MD5_CTX),
+    0
 };
 
 const EVP_MD *EVP_md5(void)

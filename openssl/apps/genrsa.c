@@ -48,7 +48,7 @@ const OPTIONS genrsa_options[] = {
     {"engine", OPT_ENGINE, 's', "Use engine, possibly a hardware device"},
 #endif
     {"primes", OPT_PRIMES, 'p', "Specify number of primes"},
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int genrsa_main(int argc, char **argv)
@@ -182,6 +182,7 @@ static int genrsa_cb(int p, int n, BN_GENCB *cb)
 {
     char c = '*';
 
+    (void)n;
     if (p == 0)
         c = '.';
     if (p == 1)

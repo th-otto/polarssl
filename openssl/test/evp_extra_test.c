@@ -911,10 +911,10 @@ static int test_evp_updated_iv(int idx)
 }
 
 static APK_DATA keydata[] = {
-    {kExampleRSAKeyDER, sizeof(kExampleRSAKeyDER), EVP_PKEY_RSA},
-    {kExampleRSAKeyPKCS8, sizeof(kExampleRSAKeyPKCS8), EVP_PKEY_RSA},
+    {kExampleRSAKeyDER, sizeof(kExampleRSAKeyDER), EVP_PKEY_RSA, 0, 0, 0, 0},
+    {kExampleRSAKeyPKCS8, sizeof(kExampleRSAKeyPKCS8), EVP_PKEY_RSA, 0, 0, 0, 0},
 #ifndef OPENSSL_NO_EC
-    {kExampleECKeyDER, sizeof(kExampleECKeyDER), EVP_PKEY_EC}
+    {kExampleECKeyDER, sizeof(kExampleECKeyDER), EVP_PKEY_EC, 0, 0, 0, 0}
 #endif
 };
 
@@ -1484,16 +1484,19 @@ static int test_set_get_raw_keys(int tst)
 
 static int pkey_custom_check(EVP_PKEY *pkey)
 {
+    (void)pkey;
     return 0xbeef;
 }
 
 static int pkey_custom_pub_check(EVP_PKEY *pkey)
 {
+    (void)pkey;
     return 0xbeef;
 }
 
 static int pkey_custom_param_check(EVP_PKEY *pkey)
 {
+    (void)pkey;
     return 0xbeef;
 }
 

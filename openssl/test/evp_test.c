@@ -1872,6 +1872,9 @@ static void keypair_test_cleanup(EVP_TEST *t)
  */
 static int void_test_parse(EVP_TEST *t, const char *keyword, const char *value)
 {
+    (void)t;
+    (void)keyword;
+    (void)value;
     return 0;
 }
 

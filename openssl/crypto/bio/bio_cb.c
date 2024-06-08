@@ -23,6 +23,8 @@ long BIO_debug_callback(BIO *bio, int cmd, const char *argp,
     long r = 1;
     int len, left;
 
+    (void)argp;
+    (void)argl;
     if (BIO_CB_RETURN & cmd)
         r = ret;
 

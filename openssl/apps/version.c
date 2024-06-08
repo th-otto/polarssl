@@ -47,7 +47,7 @@ const OPTIONS version_options[] = {
     {"p", OPT_P, '-', "Show target build platform"},
     {"r", OPT_R, '-', "Show random seeding options"},
     {"v", OPT_V, '-', "Show library version"},
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 #if defined(OPENSSL_RAND_SEED_DEVRANDOM) || defined(OPENSSL_RAND_SEED_EGD)

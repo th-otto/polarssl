@@ -786,7 +786,8 @@ const EVP_PKEY_METHOD rsa_pkey_meth = {
     0, 0,
 
     pkey_rsa_ctrl,
-    pkey_rsa_ctrl_str
+    pkey_rsa_ctrl_str,
+    0, 0, 0, 0, 0, 0
 };
 
 /*
@@ -857,5 +858,6 @@ const EVP_PKEY_METHOD rsa_pss_pkey_meth = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
     pkey_rsa_ctrl,
-    pkey_rsa_ctrl_str
+    pkey_rsa_ctrl_str,
+    0, 0, 0, 0, 0, 0
 };

@@ -153,6 +153,7 @@ static const EVP_MD sha224_md = {
     NULL,
     SHA256_CBLOCK,
     sizeof(EVP_MD *) + sizeof(SHA256_CTX),
+    0
 };
 
 const EVP_MD *EVP_sha224(void)
@@ -172,6 +173,7 @@ static const EVP_MD sha256_md = {
     NULL,
     SHA256_CBLOCK,
     sizeof(EVP_MD *) + sizeof(SHA256_CTX),
+    0
 };
 
 const EVP_MD *EVP_sha256(void)
@@ -232,6 +234,7 @@ static const EVP_MD sha512_224_md = {
     NULL,
     SHA512_CBLOCK,
     sizeof(EVP_MD *) + sizeof(SHA512_CTX),
+    0
 };
 
 const EVP_MD *EVP_sha512_224(void)
@@ -251,6 +254,7 @@ static const EVP_MD sha512_256_md = {
     NULL,
     SHA512_CBLOCK,
     sizeof(EVP_MD *) + sizeof(SHA512_CTX),
+    0
 };
 
 const EVP_MD *EVP_sha512_256(void)
@@ -270,6 +274,7 @@ static const EVP_MD sha384_md = {
     NULL,
     SHA512_CBLOCK,
     sizeof(EVP_MD *) + sizeof(SHA512_CTX),
+    0
 };
 
 const EVP_MD *EVP_sha384(void)
@@ -289,6 +294,7 @@ static const EVP_MD sha512_md = {
     NULL,
     SHA512_CBLOCK,
     sizeof(EVP_MD *) + sizeof(SHA512_CTX),
+    0
 };
 
 const EVP_MD *EVP_sha512(void)

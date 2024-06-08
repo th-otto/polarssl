@@ -23,6 +23,8 @@ typedef struct {
 static int sm4_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
                         const unsigned char *iv, int enc)
 {
+    (void)iv;
+    (void)enc;
     SM4_set_key(key, EVP_CIPHER_CTX_get_cipher_data(ctx));
     return 1;
 }

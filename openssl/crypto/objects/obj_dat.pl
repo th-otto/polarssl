@@ -1,4 +1,4 @@
-#! /usr/bin/env perl
+#! /usr/bin/perl
 # Copyright 1995-2019 The OpenSSL Project Authors. All Rights Reserved.
 #
 # Licensed under the OpenSSL license (the "License").  You may not use
@@ -110,7 +110,7 @@ my %obj_der;
 my %obj_len;
 for (my $i = 0; $i < $n; $i++) {
     if (!defined $nid{$i}) {
-        push(@out, "    { NULL, NULL, NID_undef },\n");
+        push(@out, "    { NULL, NULL, NID_undef, 0, 0, 0 },\n");
         next;
     }
 
@@ -146,8 +146,10 @@ for (my $i = 0; $i < $n; $i++) {
                 $z, $lvalues, $obj{$nid{$i}}));
         $out .= ", $length, &so[$lvalues]";
         $lvalues += $length;
+    } else {
+    	$out .= ", 0, 0"
     }
-    $out .= "},\n";
+    $out .= ", 0},\n";
     push(@out, $out);
 }
 

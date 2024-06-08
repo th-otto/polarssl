@@ -46,6 +46,8 @@ ASN1_NDEF_SEQUENCE(CMS_EncapsulatedContentInfo) = {
 static int cms_si_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
                      void *exarg)
 {
+    (void)it;
+    (void)exarg;
     if (operation == ASN1_OP_FREE_POST) {
         CMS_SignerInfo *si = (CMS_SignerInfo *)*pval;
         EVP_PKEY_free(si->pkey);
@@ -122,6 +124,8 @@ static int cms_rek_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
                       void *exarg)
 {
     CMS_RecipientEncryptedKey *rek = (CMS_RecipientEncryptedKey *)*pval;
+    (void)it;
+    (void)exarg;
     if (operation == ASN1_OP_FREE_POST) {
         EVP_PKEY_free(rek->pkey);
     }
@@ -148,6 +152,8 @@ static int cms_kari_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
                        void *exarg)
 {
     CMS_KeyAgreeRecipientInfo *kari = (CMS_KeyAgreeRecipientInfo *)*pval;
+    (void)it;
+    (void)exarg;
     if (operation == ASN1_OP_NEW_POST) {
         kari->ctx = EVP_CIPHER_CTX_new();
         if (kari->ctx == NULL)
@@ -198,6 +204,8 @@ ASN1_SEQUENCE(CMS_OtherRecipientInfo) = {
 static int cms_ri_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
                      void *exarg)
 {
+    (void)it;
+    (void)exarg;
     if (operation == ASN1_OP_FREE_PRE) {
         CMS_RecipientInfo *ri = (CMS_RecipientInfo *)*pval;
         if (ri->type == CMS_RECIPINFO_TRANS) {
@@ -283,6 +291,7 @@ static int cms_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
 {
     ASN1_STREAM_ARG *sarg = exarg;
     CMS_ContentInfo *cms = NULL;
+    (void)it;
     if (pval)
         cms = (CMS_ContentInfo *)*pval;
     else

@@ -53,7 +53,7 @@ const OPTIONS dsa_options[] = {
 #ifndef OPENSSL_NO_ENGINE
     {"engine", OPT_ENGINE, 's', "Use engine e, possibly a hardware device"},
 #endif
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int dsa_main(int argc, char **argv)

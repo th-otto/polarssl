@@ -396,6 +396,7 @@ int ERR_load_strings_const(const ERR_STRING_DATA *str)
 
 int ERR_unload_strings(int lib, ERR_STRING_DATA *str)
 {
+    (void)lib;
 #ifndef OPENSSL_NO_ERR
     if (!RUN_ONCE(&err_string_init, do_err_strings_init))
         return 0;
@@ -729,12 +730,14 @@ void err_delete_thread_state(void)
 #if OPENSSL_API_COMPAT < 0x10100000L
 void ERR_remove_thread_state(void *dummy)
 {
+    (void)dummy;
 }
 #endif
 
 #if OPENSSL_API_COMPAT < 0x10000000L
 void ERR_remove_state(unsigned long pid)
 {
+    (void)pid;
 }
 #endif
 

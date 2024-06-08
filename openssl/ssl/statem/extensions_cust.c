@@ -36,6 +36,9 @@ static int custom_ext_add_old_cb_wrap(SSL *s, unsigned int ext_type,
 {
     custom_ext_add_cb_wrap *add_cb_wrap = (custom_ext_add_cb_wrap *)add_arg;
 
+    (void)context;
+    (void)x;
+    (void)chainidx;
     if (add_cb_wrap->add_cb == NULL)
         return 1;
 
@@ -49,6 +52,7 @@ static void custom_ext_free_old_cb_wrap(SSL *s, unsigned int ext_type,
 {
     custom_ext_add_cb_wrap *add_cb_wrap = (custom_ext_add_cb_wrap *)add_arg;
 
+    (void)context;
     if (add_cb_wrap->free_cb == NULL)
         return;
 
@@ -64,6 +68,9 @@ static int custom_ext_parse_old_cb_wrap(SSL *s, unsigned int ext_type,
     custom_ext_parse_cb_wrap *parse_cb_wrap =
         (custom_ext_parse_cb_wrap *)parse_arg;
 
+    (void)context;
+    (void)x;
+    (void)chainidx;
     if (parse_cb_wrap->parse_cb == NULL)
         return 1;
 

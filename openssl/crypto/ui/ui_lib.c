@@ -101,6 +101,7 @@ static UI_STRING *general_allocate_prompt(UI *ui, const char *prompt,
 {
     UI_STRING *ret = NULL;
 
+    (void)ui;
     if (prompt == NULL) {
         UIerr(UI_F_GENERAL_ALLOCATE_PROMPT, ERR_R_PASSED_NULL_PARAMETER);
     } else if ((type == UIT_PROMPT || type == UIT_VERIFY
@@ -459,6 +460,7 @@ static int print_error(const char *str, size_t len, UI *ui)
 {
     UI_STRING uis;
 
+    (void)len;
     memset(&uis, 0, sizeof(uis));
     uis.type = UIT_ERROR;
     uis.out_string = str;
@@ -550,6 +552,9 @@ int UI_process(UI *ui)
 
 int UI_ctrl(UI *ui, int cmd, long i, void *p, void (*f) (void))
 {
+    (void)p;
+    (void)f;
+
     if (ui == NULL) {
         UIerr(UI_F_UI_CTRL, ERR_R_PASSED_NULL_PARAMETER);
         return -1;

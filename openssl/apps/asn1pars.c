@@ -48,7 +48,7 @@ const OPTIONS asn1parse_options[] = {
     {"strictpem", OPT_STRICTPEM, 0,
      "do not attempt base64 decode outside PEM markers"},
     {"item", OPT_ITEM, 's', "item to parse and print"},
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 static int do_generate(char *genstr, const char *genconf, BUF_MEM *buf);

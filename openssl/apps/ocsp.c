@@ -219,7 +219,7 @@ const OPTIONS ocsp_options[] = {
     {"header", OPT_HEADER, 's', "key=value header to add"},
     {"", OPT_MD, '-', "Any supported digest algorithm (sha1,sha256, ... )"},
     OPT_V_OPTIONS,
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int ocsp_main(int argc, char **argv)
@@ -1351,6 +1351,7 @@ static int urldecode(char *p)
 #ifdef OCSP_DAEMON
 static void socket_timeout(int signum)
 {
+    (void)signum;
     if (acfd != (int)INVALID_SOCKET)
         (void)shutdown(acfd, SHUT_RD);
 }

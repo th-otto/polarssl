@@ -146,7 +146,7 @@ const OPTIONS req_options[] = {
     {"keygen_engine", OPT_KEYGEN_ENGINE, 's',
      "Specify engine to be used for key generation operations"},
 #endif
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 

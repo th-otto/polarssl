@@ -103,6 +103,8 @@ static int hostname_cb(SSL *s, int *al, void *arg)
 {
     const char *hostname = SSL_get_servername(s, TLSEXT_NAMETYPE_host_name);
 
+    (void)al;
+    (void)arg;
     if (hostname != NULL && (strcmp(hostname, "goodhost") == 0
                              || strcmp(hostname, "altgoodhost") == 0))
         return  SSL_TLSEXT_ERR_OK;
@@ -114,6 +116,7 @@ static void client_keylog_callback(const SSL *ssl, const char *line)
 {
     int line_length = strlen(line);
 
+    (void)ssl;
     /* If the log doesn't fit, error out. */
     if (client_log_buffer_index + line_length > sizeof(client_log_buffer) - 1) {
         TEST_info("Client log too full");
@@ -130,6 +133,7 @@ static void server_keylog_callback(const SSL *ssl, const char *line)
 {
     int line_length = strlen(line);
 
+    (void)ssl;
     /* If the log doesn't fit, error out. */
     if (server_log_buffer_index + line_length > sizeof(server_log_buffer) - 1) {
         TEST_info("Server log too full");
@@ -318,7 +322,7 @@ static int test_keylog(void)
     SSL_CTX *cctx = NULL, *sctx = NULL;
     SSL *clientssl = NULL, *serverssl = NULL;
     int testresult = 0;
-    struct sslapitest_log_counts expected = {0};
+    struct sslapitest_log_counts expected = {0,0,0,0,0,0,0,0,0};
 
     /* Clean up logging space */
     memset(client_log_buffer, 0, sizeof(client_log_buffer));
@@ -399,7 +403,7 @@ static int test_keylog_no_master_key(void)
     SSL *clientssl = NULL, *serverssl = NULL;
     SSL_SESSION *sess = NULL;
     int testresult = 0;
-    struct sslapitest_log_counts expected = {0};
+    struct sslapitest_log_counts expected = {0,0,0,0,0,0,0,0,0};
     unsigned char buf[1];
     size_t readbytes, written;
 
@@ -528,6 +532,7 @@ static int full_client_hello_callback(SSL *s, int *al, void *arg)
                                        35, 22, 23, 13};
     size_t len;
 
+    (void)al;
     /* Make sure we can defer processing and get called back. */
     if ((*ctr)++ == 0)
         return SSL_CLIENT_HELLO_RETRY;
@@ -990,6 +995,7 @@ static int new_called, remove_called, get_called;
 
 static int new_session_cb(SSL *ssl, SSL_SESSION *sess)
 {
+    (void)ssl;
     new_called++;
     /*
      * sess has been up-refed for us, but we don't actually need it so free it
@@ -1001,6 +1007,8 @@ static int new_session_cb(SSL *ssl, SSL_SESSION *sess)
 
 static void remove_session_cb(SSL_CTX *ctx, SSL_SESSION *sess)
 {
+    (void)ctx;
+    (void)sess;
     remove_called++;
 }
 
@@ -1009,6 +1017,9 @@ static SSL_SESSION *get_sess_val = NULL;
 static SSL_SESSION *get_session_cb(SSL *ssl, const unsigned char *id, int len,
                                    int *copy)
 {
+    (void)ssl;
+    (void)id;
+    (void)len;
     get_called++;
     *copy = 1;
     return get_sess_val;
@@ -1347,6 +1358,7 @@ static int do_cache;
 
 static int new_cachesession_cb(SSL *ssl, SSL_SESSION *sess)
 {
+    (void)ssl;
     if (do_cache) {
         sesscache[new_called] = sess;
     } else {
@@ -2011,6 +2023,7 @@ static int psk_server_cb_cnt = 0;
 static int use_session_cb(SSL *ssl, const EVP_MD *md, const unsigned char **id,
                           size_t *idlen, SSL_SESSION **sess)
 {
+    (void)ssl;
     switch (++use_session_cb_cnt) {
     case 1:
         /* The first call should always have a NULL md */
@@ -2047,6 +2060,8 @@ static unsigned int psk_client_cb(SSL *ssl, const char *hint, char *id,
 {
     unsigned int psklen = 0;
 
+    (void)ssl;
+    (void)hint;
     psk_client_cb_cnt++;
 
     if (strlen(pskid) + 1 > max_id_len)
@@ -2074,6 +2089,7 @@ static int find_session_cb(SSL *ssl, const unsigned char *identity,
 {
     find_session_cb_cnt++;
 
+    (void)ssl;
     /* We should only ever be called a maximum of twice per connection */
     if (find_session_cb_cnt > 2)
         return 0;
@@ -2101,6 +2117,7 @@ static unsigned int psk_server_cb(SSL *ssl, const char *identity,
 {
     unsigned int psklen = 0;
 
+    (void)ssl;
     psk_server_cb_cnt++;
 
     /* We should only ever be called a maximum of twice per connection */
@@ -2474,6 +2491,7 @@ static int allow_early_data_cb(SSL *s, void *arg)
 {
     int *usecb = (int *)arg;
 
+    (void)s;
     allow_ed_cb_called++;
 
     if (*usecb == 1)
@@ -2874,6 +2892,8 @@ static int alpn_select_cb(SSL *ssl, const unsigned char **out,
     unsigned int protlen = 0;
     const unsigned char *prot;
 
+    (void)ssl;
+    (void)arg;
     for (prot = in; prot < in + inlen; prot += protlen) {
         protlen = *prot++;
         if (in + inlen < prot + protlen)
@@ -3878,6 +3898,7 @@ static int generate_cookie_callback(SSL *ssl, unsigned char *cookie,
      * Not suitable as a real cookie generation function but good enough for
      * testing!
      */
+    (void)ssl;
     memcpy(cookie, cookie_magic_value, sizeof(cookie_magic_value) - 1);
     *cookie_len = sizeof(cookie_magic_value) - 1;
 
@@ -3887,6 +3908,7 @@ static int generate_cookie_callback(SSL *ssl, unsigned char *cookie,
 static int verify_cookie_callback(SSL *ssl, const unsigned char *cookie,
                                   unsigned int cookie_len)
 {
+    (void)ssl;
     if (cookie_len == sizeof(cookie_magic_value) - 1
         && memcmp(cookie, cookie_magic_value, cookie_len) == 0)
         return 1;
@@ -4013,6 +4035,8 @@ static int old_add_cb(SSL *s, unsigned int ext_type, const unsigned char **out,
     int *server = (int *)add_arg;
     unsigned char *data;
 
+    (void)ext_type;
+    (void)al;
     if (SSL_is_server(s))
         srvaddoldcb++;
     else
@@ -4031,6 +4055,9 @@ static int old_add_cb(SSL *s, unsigned int ext_type, const unsigned char **out,
 static void old_free_cb(SSL *s, unsigned int ext_type, const unsigned char *out,
                         void *add_arg)
 {
+    (void)s;
+    (void)ext_type;
+    (void)add_arg;
     OPENSSL_free((unsigned char *)out);
 }
 
@@ -4039,6 +4066,8 @@ static int old_parse_cb(SSL *s, unsigned int ext_type, const unsigned char *in,
 {
     int *server = (int *)parse_arg;
 
+    (void)ext_type;
+    (void)al;
     if (SSL_is_server(s))
         srvparseoldcb++;
     else
@@ -4059,6 +4088,11 @@ static int new_add_cb(SSL *s, unsigned int ext_type, unsigned int context,
     int *server = (int *)add_arg;
     unsigned char *data;
 
+    (void)ext_type;
+    (void)context;
+    (void)x;
+    (void)chainidx;
+    (void)al;
     if (SSL_is_server(s))
         srvaddnewcb++;
     else
@@ -4077,6 +4111,10 @@ static int new_add_cb(SSL *s, unsigned int ext_type, unsigned int context,
 static void new_free_cb(SSL *s, unsigned int ext_type, unsigned int context,
                         const unsigned char *out, void *add_arg)
 {
+    (void)s;
+    (void)ext_type;
+    (void)context;
+    (void)add_arg;
     OPENSSL_free((unsigned char *)out);
 }
 
@@ -4086,6 +4124,11 @@ static int new_parse_cb(SSL *s, unsigned int ext_type, unsigned int context,
 {
     int *server = (int *)parse_arg;
 
+    (void)ext_type;
+    (void)context;
+    (void)x;
+    (void)chainidx;
+    (void)al;
     if (SSL_is_server(s))
         srvparsenewcb++;
     else
@@ -4112,6 +4155,8 @@ static int sni_cb(SSL *s, int *al, void *arg)
 
 static int verify_cb(int preverify_ok, X509_STORE_CTX *x509_ctx)
 {
+    (void)preverify_ok;
+    (void)x509_ctx;
     return 1;
 }
 
@@ -4847,7 +4892,7 @@ static int get_MFL_from_client_hello(BIO *bio, int *mfl_codemfl_code)
 {
     long len;
     unsigned char *data;
-    PACKET pkt = {0}, pkt2 = {0}, pkt3 = {0};
+    PACKET pkt = {0, 0}, pkt2 = {0, 0}, pkt3 = {0, 0};
     unsigned int MFL_code = 0, type = 0;
 
     if (!TEST_uint_gt( len = BIO_get_mem_data( bio, (char **) &data ), 0 ) )
@@ -5017,6 +5062,7 @@ static int ssl_srp_cb(SSL *s, int *ad, void *arg)
     char *username;
     SRP_user_pwd *user = NULL;
 
+    (void)arg;
     username = SSL_get_srp_username(s);
     if (username == NULL) {
         *ad = SSL_AD_INTERNAL_ERROR;
@@ -5671,6 +5717,7 @@ static int gen_tick_cb(SSL *s, void *arg)
 {
     gen_tick_called = 1;
 
+    (void)arg;
     return SSL_SESSION_set1_ticket_appdata(SSL_get_session(s), appdata,
                                            strlen(appdata));
 }
@@ -5684,6 +5731,10 @@ static SSL_TICKET_RETURN dec_tick_cb(SSL *s, SSL_SESSION *ss,
     void *tickdata;
     size_t tickdlen;
 
+    (void)s;
+    (void)keyname;
+    (void)keyname_length;
+    (void)arg;
     dec_tick_called = 1;
 
     if (status == SSL_TICKET_EMPTY)
@@ -5726,6 +5777,7 @@ static int tick_key_cb(SSL *s, unsigned char key_name[16],
     const unsigned char tick_aes_key[16] = "0123456789abcdef";
     const unsigned char tick_hmac_key[16] = "0123456789abcdef";
 
+    (void)s;
     tick_key_cb_called = 1;
     memset(iv, 0, AES_BLOCK_SIZE);
     memset(key_name, 0, 16);

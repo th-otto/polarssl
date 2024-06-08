@@ -31,7 +31,7 @@ const OPTIONS pkeyparam_options[] = {
     {"engine", OPT_ENGINE, 's', "Use engine, possibly a hardware device"},
 #endif
     {"check", OPT_CHECK, '-', "Check key param consistency"},
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int pkeyparam_main(int argc, char **argv)

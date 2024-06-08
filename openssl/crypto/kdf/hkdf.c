@@ -251,7 +251,8 @@ const EVP_PKEY_METHOD hkdf_pkey_meth = {
     pkey_hkdf_derive_init,
     pkey_hkdf_derive,
     pkey_hkdf_ctrl,
-    pkey_hkdf_ctrl_str
+    pkey_hkdf_ctrl_str,
+    0, 0, 0, 0, 0, 0
 };
 
 static unsigned char *HKDF(const EVP_MD *evp_md,

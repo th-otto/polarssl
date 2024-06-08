@@ -685,7 +685,7 @@ static int str_copy(CONF *conf, char *section, char **pto, char *from)
 static BIO *process_include(char *include, OPENSSL_DIR_CTX **dirctx,
                             char **dirpath)
 {
-    struct stat st = { 0 };
+    struct stat st;
     BIO *next;
 
     if (stat(include, &st) < 0) {
@@ -889,5 +889,6 @@ static int def_is_number(const CONF *conf, char c)
 
 static int def_to_int(const CONF *conf, char c)
 {
+    (void)conf;
     return c - '0';
 }

@@ -169,7 +169,8 @@ const EVP_PKEY_METHOD tls1_prf_pkey_meth = {
     0,
     pkey_tls1_prf_derive,
     pkey_tls1_prf_ctrl,
-    pkey_tls1_prf_ctrl_str
+    pkey_tls1_prf_ctrl_str,
+    0, 0, 0, 0, 0, 0
 };
 
 static int tls1_prf_P_hash(const EVP_MD *md,

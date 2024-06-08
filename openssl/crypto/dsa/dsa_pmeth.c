@@ -269,5 +269,6 @@ const EVP_PKEY_METHOD dsa_pkey_meth = {
     0, 0,
 
     pkey_dsa_ctrl,
-    pkey_dsa_ctrl_str
+    pkey_dsa_ctrl_str,
+    0, 0, 0, 0, 0, 0
 };

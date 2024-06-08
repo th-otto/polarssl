@@ -55,7 +55,7 @@ const OPTIONS pkcs8_options[] = {
     {"scrypt_r", OPT_SCRYPT_R, 's', "Set scrypt r parameter"},
     {"scrypt_p", OPT_SCRYPT_P, 's', "Set scrypt p parameter"},
 #endif
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int pkcs8_main(int argc, char **argv)

@@ -35,7 +35,7 @@ const OPTIONS crl2pkcs7_options[] = {
     {"nocrl", OPT_NOCRL, '-', "No crl to load, just certs from '-certfile'"},
     {"certfile", OPT_CERTFILE, '<',
      "File of chain of certs to a trusted CA; can be repeated"},
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int crl2pkcs7_main(int argc, char **argv)

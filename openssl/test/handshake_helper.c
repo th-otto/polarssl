@@ -222,16 +222,21 @@ static int client_hello_select_server_ctx(SSL *s, void *arg, int ignore)
  */
 static int servername_ignore_cb(SSL *s, int *ad, void *arg)
 {
+    (void)ad;
+    (void)arg;
     return select_server_ctx(s, arg, 1);
 }
 
 static int servername_reject_cb(SSL *s, int *ad, void *arg)
 {
+    (void)arg;
+    (void)ad;
     return select_server_ctx(s, arg, 0);
 }
 
 static int client_hello_ignore_cb(SSL *s, int *al, void *arg)
 {
+    (void)al;
     if (!client_hello_select_server_ctx(s, arg, 1)) {
         *al = SSL_AD_UNRECOGNIZED_NAME;
         return SSL_CLIENT_HELLO_ERROR;
@@ -301,6 +306,7 @@ static int client_ocsp_cb(SSL *s, void *arg)
     const unsigned char *resp;
     int len;
 
+    (void)arg;
     len = SSL_get_tlsext_status_ocsp_resp(s, &resp);
     if (len != 1 || *resp != dummy_ocsp_resp_good_val)
         return 0;
@@ -309,17 +315,26 @@ static int client_ocsp_cb(SSL *s, void *arg)
 }
 
 static int verify_reject_cb(X509_STORE_CTX *ctx, void *arg) {
+    (void)arg;
     X509_STORE_CTX_set_error(ctx, X509_V_ERR_APPLICATION_VERIFICATION);
     return 0;
 }
 
 static int verify_accept_cb(X509_STORE_CTX *ctx, void *arg) {
+    (void)ctx;
+    (void)arg;
     return 1;
 }
 
 static int broken_session_ticket_cb(SSL *s, unsigned char *key_name, unsigned char *iv,
                                     EVP_CIPHER_CTX *ctx, HMAC_CTX *hctx, int enc)
 {
+    (void)s;
+    (void)key_name;
+    (void)iv;
+    (void)ctx;
+    (void)hctx;
+    (void)enc;
     return 0;
 }
 
@@ -330,6 +345,11 @@ static int do_not_call_session_ticket_cb(SSL *s, unsigned char *key_name,
 {
     HANDSHAKE_EX_DATA *ex_data =
         (HANDSHAKE_EX_DATA*)(SSL_get_ex_data(s, ex_data_idx));
+    (void)key_name;
+    (void)iv;
+    (void)ctx;
+    (void)hctx;
+    (void)enc;
     ex_data->session_ticket_do_not_call = 1;
     return 0;
 }
@@ -390,6 +410,7 @@ static int client_npn_cb(SSL *s, unsigned char **out, unsigned char *outlen,
     CTX_DATA *ctx_data = (CTX_DATA*)(arg);
     int ret;
 
+    (void)s;
     ret = SSL_select_next_proto(out, outlen, in, inlen,
                                 ctx_data->npn_protocols,
                                 ctx_data->npn_protocols_len);
@@ -402,6 +423,8 @@ static int server_npn_cb(SSL *s, const unsigned char **data,
                          unsigned int *len, void *arg)
 {
     CTX_DATA *ctx_data = (CTX_DATA*)(arg);
+
+    (void)s;
     *data = ctx_data->npn_protocols;
     *len = ctx_data->npn_protocols_len;
     return SSL_TLSEXT_ERR_OK;
@@ -424,6 +447,7 @@ static int server_alpn_cb(SSL *s, const unsigned char **out,
     /* SSL_select_next_proto isn't const-correct... */
     unsigned char *tmp_out;
 
+    (void)s;
     /*
      * The result points either to |in| or to |ctx_data->alpn_protocols|.
      * The callback is allowed to point to |in| or to a long-lived buffer,
@@ -443,6 +467,7 @@ static int server_alpn_cb(SSL *s, const unsigned char **out,
 static char *client_srp_cb(SSL *s, void *arg)
 {
     CTX_DATA *ctx_data = (CTX_DATA*)(arg);
+    (void)s;
     return OPENSSL_strdup(ctx_data->srp_password);
 }
 
@@ -479,6 +504,11 @@ static int decrypt_session_ticket_cb(SSL *s, SSL_SESSION *ss,
                                      SSL_TICKET_STATUS status,
                                      void *arg)
 {
+    (void)s;
+    (void)ss;
+    (void)keyname;
+    (void)keyname_len;
+    (void)arg;
     switch (status) {
     case SSL_TICKET_EMPTY:
     case SSL_TICKET_NO_DECRYPT:
@@ -728,6 +758,7 @@ err:
 static void configure_handshake_ssl(SSL *server, SSL *client,
                                     const SSL_TEST_EXTRA_CONF *extra)
 {
+    (void)server;
     if (extra->client.servername != SSL_TEST_SERVERNAME_NONE)
         SSL_set_tlsext_host_name(client,
                                  ssl_servername_name(extra->client.servername));

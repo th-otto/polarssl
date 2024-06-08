@@ -93,6 +93,7 @@ static int long_i2c(ASN1_VALUE **pval, unsigned char *cont, int *putype,
     unsigned long utmp, sign;
     int clen, pad, i;
 
+    (void)putype;
     memcpy(&ltmp, pval, COPY_SIZE(*pval, ltmp));
     if (ltmp == it->size)
         return -1;
@@ -136,6 +137,8 @@ static int long_c2i(ASN1_VALUE **pval, const unsigned char *cont, int len,
     long ltmp;
     unsigned long utmp = 0, sign = 0x100;
 
+    (void)utype;
+    (void)free_cont;
     if (len > 1) {
         /*
          * Check possible pad byte.  Worst case, we're skipping past actual
@@ -195,6 +198,9 @@ static int long_print(BIO *out, ASN1_VALUE **pval, const ASN1_ITEM *it,
 {
     long l;
 
+    (void)it;
+    (void)indent;
+    (void)pctx;
     memcpy(&l, pval, COPY_SIZE(*pval, l));
     return BIO_printf(out, "%ld\n", l);
 }

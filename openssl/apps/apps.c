@@ -122,6 +122,7 @@ int chopup_args(ARGS *arg, char *buf)
 #ifndef APP_INIT
 int app_init(long mesgwin)
 {
+    (void)mesgwin;
     return 1;
 }
 #endif
@@ -2090,6 +2091,7 @@ static STACK_OF(X509_CRL) *crls_http_cb(X509_STORE_CTX *ctx, X509_NAME *nm)
     X509_CRL *crl;
     STACK_OF(DIST_POINT) *crldp;
 
+    (void)nm;
     crls = sk_X509_CRL_new_null();
     if (!crls)
         return NULL;

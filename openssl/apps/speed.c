@@ -213,6 +213,7 @@ static const int aead_lengths_list[] = {
 
 static void alarmed(int sig)
 {
+    (void)sig;
     signal(SIGALRM, alarmed);
     run = 0;
 }
@@ -335,7 +336,7 @@ const OPTIONS speed_options[] = {
      "Run [non-PKI] benchmarks on custom-sized buffer"},
     {"misalign", OPT_MISALIGN, 'p',
      "Use specified offset to mis-align buffers"},
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 #define D_MD2           0
@@ -3392,6 +3393,7 @@ int speed_main(int argc, char **argv)
 
 static void print_message(const char *s, long num, int length, int tm)
 {
+	(void)num;
 #ifdef SIGALRM
     BIO_printf(bio_err,
                mr ? "+DT:%s:%d:%d\n"
@@ -3410,6 +3412,7 @@ static void print_message(const char *s, long num, int length, int tm)
 static void pkey_print_message(const char *str, const char *str2, long num,
                                unsigned int bits, int tm)
 {
+	(void)num;
 #ifdef SIGALRM
     BIO_printf(bio_err,
                mr ? "+DTP:%d:%s:%s:%d\n"

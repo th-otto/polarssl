@@ -65,7 +65,7 @@ AM_V_OBJCLD    = $(am__v_OBJCLD_$(V))
 
 
 am__v_GEN_0    = @echo "  GEN     " $@;
-am__v_GEN_1    = @echo generating $@;
+am__v_GEN_1    = 
 am__v_GEN_     = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 AM_V_GEN       = $(am__v_GEN_$(V))
 

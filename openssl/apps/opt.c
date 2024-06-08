@@ -172,7 +172,7 @@ static OPT_PAIR formats[] = {
     {"text", OPT_FMT_TEXT},
     {"http", OPT_FMT_HTTP},
     {"pvk", OPT_FMT_PVK},
-    {NULL}
+    {NULL, 0}
 };
 
 /* Print an error message about a failed format parse. */

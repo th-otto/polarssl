@@ -43,7 +43,7 @@ const OPTIONS dsaparam_options[] = {
 #ifndef OPENSSL_NO_ENGINE
     {"engine", OPT_ENGINE, 's', "Use engine e, possibly a hardware device"},
 #endif
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int dsaparam_main(int argc, char **argv)
@@ -247,6 +247,7 @@ static int dsa_cb(int p, int n, BN_GENCB *cb)
     static const char symbols[] = ".+*\n";
     char c = (p >= 0 && (size_t)p < sizeof(symbols) - 1) ? symbols[p] : '?';
 
+    (void)n;
     BIO_write(BN_GENCB_get_arg(cb), &c, 1);
     (void)BIO_flush(BN_GENCB_get_arg(cb));
     return 1;

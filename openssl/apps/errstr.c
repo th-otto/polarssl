@@ -24,7 +24,7 @@ const OPTIONS errstr_options[] = {
     {OPT_HELP_STR, 1, '-', "Usage: %s [options] errnum...\n"},
     {OPT_HELP_STR, 1, '-', "  errnum  Error number\n"},
     {"help", OPT_HELP, '-', "Display this summary"},
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int errstr_main(int argc, char **argv)

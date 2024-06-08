@@ -415,12 +415,14 @@ static int pkey_rsa_print(BIO *bp, const EVP_PKEY *pkey, int off, int priv)
 static int rsa_pub_print(BIO *bp, const EVP_PKEY *pkey, int indent,
                          ASN1_PCTX *ctx)
 {
+    (void)ctx;
     return pkey_rsa_print(bp, pkey, indent, 0);
 }
 
 static int rsa_priv_print(BIO *bp, const EVP_PKEY *pkey, int indent,
                           ASN1_PCTX *ctx)
 {
+    (void)ctx;
     return pkey_rsa_print(bp, pkey, indent, 1);
 }
 
@@ -448,6 +450,7 @@ static RSA_PSS_PARAMS *rsa_pss_decode(const X509_ALGOR *alg)
 static int rsa_sig_print(BIO *bp, const X509_ALGOR *sigalg,
                          const ASN1_STRING *sig, int indent, ASN1_PCTX *pctx)
 {
+    (void)pctx;
     if (OBJ_obj2nid(sigalg->algorithm) == EVP_PKEY_RSA_PSS) {
         int rv;
         RSA_PSS_PARAMS *pss = rsa_pss_decode(sigalg);
@@ -783,6 +786,9 @@ static int rsa_item_verify(EVP_MD_CTX *ctx, const ASN1_ITEM *it, void *asn,
                            X509_ALGOR *sigalg, ASN1_BIT_STRING *sig,
                            EVP_PKEY *pkey)
 {
+    (void)it;
+    (void)asn;
+    (void)sig;
     /* Sanity check: make sure it is PSS */
     if (OBJ_obj2nid(sigalg->algorithm) != EVP_PKEY_RSA_PSS) {
         RSAerr(RSA_F_RSA_ITEM_VERIFY, RSA_R_UNSUPPORTED_SIGNATURE_TYPE);
@@ -830,6 +836,9 @@ static int rsa_item_sign(EVP_MD_CTX *ctx, const ASN1_ITEM *it, void *asn,
     int pad_mode;
     EVP_PKEY_CTX *pkctx = EVP_MD_CTX_pkey_ctx(ctx);
 
+    (void)it;
+    (void)asn;
+    (void)sig;
     if (EVP_PKEY_CTX_get_rsa_padding(pkctx, &pad_mode) <= 0)
         return 0;
     if (pad_mode == RSA_PKCS1_PADDING)
@@ -865,6 +874,7 @@ static int rsa_sig_info_set(X509_SIG_INFO *siginf, const X509_ALGOR *sigalg,
     const EVP_MD *mgf1md = NULL, *md = NULL;
     RSA_PSS_PARAMS *pss;
 
+    (void)sig;
     /* Sanity check: make sure it is PSS */
     if (OBJ_obj2nid(sigalg->algorithm) != EVP_PKEY_RSA_PSS)
         return 0;
@@ -1086,13 +1096,14 @@ const EVP_PKEY_ASN1_METHOD rsa_asn1_meths[2] = {
      rsa_item_verify,
      rsa_item_sign,
      rsa_sig_info_set,
-     rsa_pkey_check
+     rsa_pkey_check,
+     0, 0, 0, 0, 0, 0
     },
 
     {
      EVP_PKEY_RSA2,
      EVP_PKEY_RSA,
-     ASN1_PKEY_ALIAS}
+     ASN1_PKEY_ALIAS, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 };
 
 const EVP_PKEY_ASN1_METHOD rsa_pss_asn1_meth = {
@@ -1125,5 +1136,6 @@ const EVP_PKEY_ASN1_METHOD rsa_pss_asn1_meth = {
      rsa_item_verify,
      rsa_item_sign,
      0,
-     rsa_pkey_check
+     rsa_pkey_check,
+     0, 0, 0, 0, 0, 0
 };

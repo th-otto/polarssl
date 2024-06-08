@@ -29,7 +29,7 @@ const OPTIONS prime_options[] = {
     {"safe", OPT_SAFE, '-',
      "When used with -generate, generate a safe prime"},
     {"checks", OPT_CHECKS, 'p', "Number of checks"},
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int prime_main(int argc, char **argv)

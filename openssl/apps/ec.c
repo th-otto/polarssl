@@ -22,13 +22,13 @@ static OPT_PAIR conv_forms[] = {
     {"compressed", POINT_CONVERSION_COMPRESSED},
     {"uncompressed", POINT_CONVERSION_UNCOMPRESSED},
     {"hybrid", POINT_CONVERSION_HYBRID},
-    {NULL}
+    {NULL, 0}
 };
 
 static OPT_PAIR param_enc[] = {
     {"named_curve", OPENSSL_EC_NAMED_CURVE},
     {"explicit", 0},
-    {NULL}
+    {NULL, 0}
 };
 
 typedef enum OPTION_choice {
@@ -61,7 +61,7 @@ const OPTIONS ec_options[] = {
 #ifndef OPENSSL_NO_ENGINE
     {"engine", OPT_ENGINE, 's', "Use engine, possibly a hardware device"},
 #endif
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int ec_main(int argc, char **argv)

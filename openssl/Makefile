@@ -268,39 +268,31 @@ doc-nits:
 #coverage: $(PROGRAMS) $(TESTPROGRAMS)
 #	...
 
-generate_crypto_bn:
-	( cd $(SRCDIR); $(PERL) crypto/bn/bn_prime.pl > crypto/bn/bn_prime.h )
+generate_crypto_bn: crypto/bn/bn_prime.h
+crypto/bn/bn_prime.h: crypto/bn/bn_prime.pl
+	$(AM_V_GEN)$(PERL) crypto/bn/bn_prime.pl > $@
 
-generate_crypto_objects:
-	( cd $(SRCDIR); $(PERL) crypto/objects/objects.pl -n \
-				crypto/objects/objects.txt \
-				crypto/objects/obj_mac.num \
-				> crypto/objects/obj_mac.new && \
-	    mv crypto/objects/obj_mac.new crypto/objects/obj_mac.num )
-	( cd $(SRCDIR); $(PERL) crypto/objects/objects.pl \
-				crypto/objects/objects.txt \
-				crypto/objects/obj_mac.num \
-				> include/openssl/obj_mac.h )
-	( cd $(SRCDIR); $(PERL) crypto/objects/obj_dat.pl \
-				include/openssl/obj_mac.h \
-				> crypto/objects/obj_dat.h )
-	( cd $(SRCDIR); $(PERL) crypto/objects/objxref.pl \
-				crypto/objects/obj_mac.num \
-				crypto/objects/obj_xref.txt \
-				> crypto/objects/obj_xref.h )
+generate_crypto_objects: crypto/objects/obj_mac.num include/openssl/obj_mac.h crypto/objects/obj_dat.h crypto/objects/obj_xref.h
+crypto/objects/obj_mac.num: crypto/objects/objects.pl crypto/objects/objects.txt
+	$(AM_V_GEN)$(PERL) crypto/objects/objects.pl -n crypto/objects/objects.txt crypto/objects/obj_mac.num > $$$$.tmp && mv $$$$.tmp $@ || { $(RM) $$$$.tmp; exit 1; }
+include/openssl/obj_mac.h: crypto/objects/objects.pl crypto/objects/objects.txt crypto/objects/obj_mac.num
+	$(AM_V_GEN)$(PERL) crypto/objects/objects.pl crypto/objects/objects.txt crypto/objects/obj_mac.num > $@
+crypto/objects/obj_dat.h: crypto/objects/obj_dat.pl include/openssl/obj_mac.h
+	$(AM_V_GEN)$(PERL) crypto/objects/obj_dat.pl include/openssl/obj_mac.h > $@
+crypto/objects/obj_xref.h: crypto/objects/objxref.pl crypto/objects/obj_mac.num crypto/objects/obj_xref.txt
+	$(AM_V_GEN)$(PERL) crypto/objects/objxref.pl crypto/objects/obj_mac.num crypto/objects/obj_xref.txt > $@
 
-generate_crypto_conf:
-	( cd $(SRCDIR); $(PERL) crypto/conf/keysets.pl \
-			        > crypto/conf/conf_def.h )
+generate_crypto_conf: crypto/conf/conf_def.h
+crypto/conf/conf_def.h: crypto/conf/keysets.pl
+	$(AM_V_GEN)(PERL) crypto/conf/keysets.pl > $@
 
-generate_crypto_asn1:
-	( cd $(SRCDIR); $(PERL) crypto/asn1/charmap.pl \
-			        > crypto/asn1/charmap.h )
+generate_crypto_asn1: crypto/asn1/charmap.h
+crypto/asn1/charmap.h: crypto/asn1/charmap.pl
+	$(AM_V_GEN)$(PERL) crypto/asn1/charmap.pl > $@
 
-generate_fuzz_oids:
-	( cd $(SRCDIR); $(PERL) fuzz/mkfuzzoids.pl \
-				crypto/objects/obj_dat.h \
-				> fuzz/oids.txt )
+generate_fuzz_oids: fuzz/oids.txt
+fuzz/oids.txt: fuzz/mkfuzzoids.pl crypto/objects/obj_dat.h
+	$(AM_V_GEN)$(PERL) fuzz/mkfuzzoids.pl crypto/objects/obj_dat.h > $@
 
 # Set to -force to force a rebuild
 ERROR_REBUILD=

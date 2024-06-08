@@ -63,6 +63,7 @@ static int aria_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
     int ret;
     int mode = EVP_CIPHER_CTX_mode(ctx);
 
+    (void)iv;
     if (enc || (mode != EVP_CIPH_ECB_MODE && mode != EVP_CIPH_CBC_MODE))
         ret = aria_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8,
                                         EVP_CIPHER_CTX_get_cipher_data(ctx));
@@ -117,6 +118,7 @@ static void aria_cfb8_encrypt(const unsigned char *in, unsigned char *out,
 static void aria_ecb_encrypt(const unsigned char *in, unsigned char *out,
                              const ARIA_KEY *key, const int enc)
 {
+    (void)enc;
     aria_encrypt(in, out, key);
 }
 
@@ -210,6 +212,7 @@ static int aria_gcm_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
     int ret;
     EVP_ARIA_GCM_CTX *gctx = EVP_C_DATA(EVP_ARIA_GCM_CTX,ctx);
 
+    (void)enc;
     if (!iv && !key)
         return 1;
     if (key) {
@@ -506,6 +509,7 @@ static int aria_ccm_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
     int ret;
     EVP_ARIA_CCM_CTX *cctx = EVP_C_DATA(EVP_ARIA_CCM_CTX,ctx);
 
+    (void)enc;
     if (!iv && !key)
         return 1;
 

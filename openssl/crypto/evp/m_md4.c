@@ -46,6 +46,7 @@ static const EVP_MD md4_md = {
     NULL,
     MD4_CBLOCK,
     sizeof(EVP_MD *) + sizeof(MD4_CTX),
+    0
 };
 
 const EVP_MD *EVP_md4(void)

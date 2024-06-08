@@ -79,7 +79,7 @@ const OPTIONS dgst_options[] = {
     {"engine_impl", OPT_ENGINE_IMPL, '-',
      "Also use engine given by -engine for digest operations"},
 #endif
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int dgst_main(int argc, char **argv)

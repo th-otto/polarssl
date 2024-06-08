@@ -91,6 +91,7 @@ static int x509_name_ex_new(ASN1_VALUE **val, const ASN1_ITEM *it)
 {
     X509_NAME *ret = OPENSSL_zalloc(sizeof(*ret));
 
+    (void)it;
     if (ret == NULL)
         goto memerr;
     if ((ret->entries = sk_X509_NAME_ENTRY_new_null()) == NULL)
@@ -114,6 +115,7 @@ static void x509_name_ex_free(ASN1_VALUE **pval, const ASN1_ITEM *it)
 {
     X509_NAME *a;
 
+    (void)it;
     if (!pval || !*pval)
         return;
     a = (X509_NAME *)*pval;
@@ -160,6 +162,7 @@ static int x509_name_ex_d2i(ASN1_VALUE **val,
         len = X509_NAME_MAX;
     q = p;
 
+    (void)it;
     /* Get internal representation of Name */
     ret = ASN1_item_ex_d2i(&intname.a,
                            &p, len, ASN1_ITEM_rptr(X509_NAME_INTERNAL),
@@ -212,6 +215,10 @@ static int x509_name_ex_i2d(ASN1_VALUE **val, unsigned char **out,
 {
     int ret;
     X509_NAME *a = (X509_NAME *)*val;
+
+    (void)it;
+    (void)tag;
+    (void)aclass;
     if (a->modified) {
         ret = x509_name_encode(a);
         if (ret < 0)
@@ -281,6 +288,7 @@ static int x509_name_ex_print(BIO *out, ASN1_VALUE **pval,
                               int indent,
                               const char *fname, const ASN1_PCTX *pctx)
 {
+    (void)fname;
     if (X509_NAME_print_ex(out, (const X509_NAME *)*pval,
                            indent, pctx->nm_flags) <= 0)
         return 0;

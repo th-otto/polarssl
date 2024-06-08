@@ -28,6 +28,8 @@ static int gbl_result;
 static void exnew(void *parent, void *ptr, CRYPTO_EX_DATA *ad,
           int idx, long argl, void *argp)
 {
+    (void)parent;
+    (void)ad;
     if (!TEST_int_eq(idx, saved_idx)
         || !TEST_long_eq(argl, saved_argl)
         || !TEST_ptr_eq(argp, saved_argp)
@@ -38,6 +40,8 @@ static void exnew(void *parent, void *ptr, CRYPTO_EX_DATA *ad,
 static int exdup(CRYPTO_EX_DATA *to, const CRYPTO_EX_DATA *from,
           void *from_d, int idx, long argl, void *argp)
 {
+    (void)to;
+    (void)from;
     if (!TEST_int_eq(idx, saved_idx)
         || !TEST_long_eq(argl, saved_argl)
         || !TEST_ptr_eq(argp, saved_argp)
@@ -49,6 +53,9 @@ static int exdup(CRYPTO_EX_DATA *to, const CRYPTO_EX_DATA *from,
 static void exfree(void *parent, void *ptr, CRYPTO_EX_DATA *ad,
             int idx, long argl, void *argp)
 {
+    (void)parent;
+    (void)ptr;
+    (void)ad;
     if (!TEST_int_eq(idx, saved_idx)
         || !TEST_long_eq(argl, saved_argl)
         || !TEST_ptr_eq(argp, saved_argp))
@@ -71,6 +78,8 @@ static void exnew2(void *parent, void *ptr, CRYPTO_EX_DATA *ad,
           int idx, long argl, void *argp)
 {
     MYOBJ_EX_DATA *ex_data = OPENSSL_zalloc(sizeof(*ex_data));
+
+    (void)parent;
     if (!TEST_int_eq(idx, saved_idx2)
         || !TEST_long_eq(argl, saved_argl)
         || !TEST_ptr_eq(argp, saved_argp)
@@ -89,6 +98,8 @@ static int exdup2(CRYPTO_EX_DATA *to, const CRYPTO_EX_DATA *from,
 {
     MYOBJ_EX_DATA **update_ex_data = (MYOBJ_EX_DATA**)from_d;
     MYOBJ_EX_DATA *ex_data = CRYPTO_get_ex_data(to, saved_idx2);
+
+    (void)from;
     if (!TEST_int_eq(idx, saved_idx2)
         || !TEST_long_eq(argl, saved_argl)
         || !TEST_ptr_eq(argp, saved_argp)
@@ -112,6 +123,9 @@ static void exfree2(void *parent, void *ptr, CRYPTO_EX_DATA *ad,
             int idx, long argl, void *argp)
 {
     MYOBJ_EX_DATA *ex_data = CRYPTO_get_ex_data(ad, saved_idx2);
+
+    (void)parent;
+    (void)ptr;
     OPENSSL_free(ex_data);
     if (!TEST_int_eq(idx, saved_idx2)
         || !TEST_long_eq(argl, saved_argl)

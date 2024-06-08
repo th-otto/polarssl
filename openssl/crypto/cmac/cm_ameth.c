@@ -20,6 +20,7 @@
 
 static int cmac_size(const EVP_PKEY *pkey)
 {
+    (void)pkey;
     return EVP_MAX_BLOCK_LENGTH;
 }
 
@@ -47,5 +48,5 @@ const EVP_PKEY_ASN1_METHOD cmac_asn1_meth = {
 
     cmac_key_free,
     0,
-    0, 0
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };

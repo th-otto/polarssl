@@ -53,6 +53,7 @@ static STACK_OF(CONF_VALUE) *i2v_POLICY_MAPPINGS(const X509V3_EXT_METHOD
     char obj_tmp1[80];
     char obj_tmp2[80];
 
+    (void)method;
     for (i = 0; i < sk_POLICY_MAPPING_num(pmaps); i++) {
         pmap = sk_POLICY_MAPPING_value(pmaps, i);
         i2t_ASN1_OBJECT(obj_tmp1, 80, pmap->issuerDomainPolicy);
@@ -72,6 +73,8 @@ static void *v2i_POLICY_MAPPINGS(const X509V3_EXT_METHOD *method,
     const int num = sk_CONF_VALUE_num(nval);
     int i;
 
+    (void)method;
+    (void)ctx;
     if ((pmaps = sk_POLICY_MAPPING_new_reserve(NULL, num)) == NULL) {
         X509V3err(X509V3_F_V2I_POLICY_MAPPINGS, ERR_R_MALLOC_FAILURE);
         return NULL;

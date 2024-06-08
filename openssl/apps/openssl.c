@@ -376,7 +376,7 @@ const OPTIONS list_options[] = {
      "List missing detailed help strings"},
     {"options", OPT_OPTIONS, 's',
      "List options for specified command"},
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int list_main(int argc, char **argv)
@@ -451,7 +451,7 @@ const OPTIONS help_options[] = {
     {OPT_HELP_STR, 1, '-', "Usage: help [options]\n"},
     {OPT_HELP_STR, 1, '-', "       help [command]\n"},
     {"help", OPT_hHELP, '-', "Display this summary"},
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 
@@ -524,7 +524,7 @@ static void list_type(FUNC_TYPE ft, int one)
 {
     FUNCTION *fp;
     int i = 0;
-    DISPLAY_COLUMNS dc = {0};
+    DISPLAY_COLUMNS dc = {0, 0};
 
     if (!one)
         calculate_columns(&dc);

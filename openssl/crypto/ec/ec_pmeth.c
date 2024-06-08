@@ -472,5 +472,6 @@ const EVP_PKEY_METHOD ec_pkey_meth = {
     0,
 #endif
     pkey_ec_ctrl,
-    pkey_ec_ctrl_str
+    pkey_ec_ctrl_str,
+    0, 0, 0, 0, 0, 0
 };

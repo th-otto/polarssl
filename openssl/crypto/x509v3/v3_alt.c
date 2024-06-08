@@ -83,6 +83,7 @@ STACK_OF(CONF_VALUE) *i2v_GENERAL_NAME(X509V3_EXT_METHOD *method,
     char oline[256], htmp[5];
     int i;
 
+    (void)method;
     switch (gen->type) {
     case GEN_OTHERNAME:
         if (!X509V3_add_value("othername", "<unsupported>", &ret))
@@ -435,6 +436,7 @@ GENERAL_NAME *a2i_GENERAL_NAME(GENERAL_NAME *out,
     char is_string = 0;
     GENERAL_NAME *gen = NULL;
 
+    (void)method;
     if (!value) {
         X509V3err(X509V3_F_A2I_GENERAL_NAME, X509V3_R_MISSING_VALUE);
         return NULL;

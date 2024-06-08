@@ -45,6 +45,7 @@ static const EVP_MD whirlpool_md = {
     NULL,
     WHIRLPOOL_BBLOCK / 8,
     sizeof(EVP_MD *) + sizeof(WHIRLPOOL_CTX),
+    0
 };
 
 const EVP_MD *EVP_whirlpool(void)

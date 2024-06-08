@@ -131,6 +131,7 @@ static int shake_ctrl(EVP_MD_CTX *evp_ctx, int cmd, int p1, void *p2)
 {
     KECCAK1600_CTX *ctx = evp_ctx->md_data;
 
+    (void)p2;
     switch (cmd) {
     case EVP_MD_CTRL_XOF_LEN:
         ctx->md_size = p1;
@@ -375,6 +376,7 @@ const EVP_MD *EVP_sha3_##bitlen(void)           \
         NULL,                                   \
         (KECCAK1600_WIDTH - bitlen * 2) / 8,    \
         sizeof(KECCAK1600_CTX),                 \
+        0                                       \
     };                                          \
     return &sha3_##bitlen##_md;                 \
 }

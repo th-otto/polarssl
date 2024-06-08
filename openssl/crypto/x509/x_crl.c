@@ -49,6 +49,8 @@ static int crl_inf_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
 {
     X509_CRL_INFO *a = (X509_CRL_INFO *)*pval;
 
+    (void)it;
+    (void)exarg;
     if (!a || !a->revoked)
         return 1;
     switch (operation) {
@@ -161,6 +163,8 @@ static int crl_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
     X509_EXTENSION *ext;
     int idx, i;
 
+    (void)it;
+    (void)exarg;
     switch (operation) {
     case ASN1_OP_D2I_PRE:
         if (crl->meth->crl_free) {

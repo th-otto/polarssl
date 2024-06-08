@@ -57,7 +57,7 @@ const OPTIONS crl_options[] = {
 #ifndef OPENSSL_NO_MD5
     {"hash_old", OPT_HASH_OLD, '-', "Print old-style (MD5) hash value"},
 #endif
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int crl_main(int argc, char **argv)

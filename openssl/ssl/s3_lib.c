@@ -3272,6 +3272,7 @@ const SSL_CIPHER *ssl3_get_cipher(unsigned int u)
 
 int ssl3_set_handshake_header(SSL *s, WPACKET *pkt, int htype)
 {
+    (void)s;
     /* No header in the event of a CCS */
     if (htype == SSL3_MT_CHANGE_CIPHER_SPEC)
         return 1;
@@ -3381,6 +3382,7 @@ int ssl3_clear(SSL *s)
 #ifndef OPENSSL_NO_SRP
 static char *srp_password_from_info_cb(SSL *s, void *arg)
 {
+    (void)arg;
     return OPENSSL_strdup(s->srp_ctx.info);
 }
 #endif

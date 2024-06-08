@@ -77,7 +77,7 @@ const OPTIONS s_time_options[] = {
 #ifndef OPENSSL_NO_SSL3
     {"ssl3", OPT_SSL3, '-', "Just use SSLv3"},
 #endif
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 #define START   0

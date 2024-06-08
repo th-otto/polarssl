@@ -41,11 +41,16 @@ const BIO_METHOD *BIO_s_null(void)
 
 static int null_read(BIO *b, char *out, int outl)
 {
+    (void)b;
+    (void)out;
+    (void)outl;
     return 0;
 }
 
 static int null_write(BIO *b, const char *in, int inl)
 {
+    (void)b;
+    (void)in;
     return inl;
 }
 
@@ -53,6 +58,9 @@ static long null_ctrl(BIO *b, int cmd, long num, void *ptr)
 {
     long ret = 1;
 
+    (void)b;
+    (void)num;
+    (void)ptr;
     switch (cmd) {
     case BIO_CTRL_RESET:
     case BIO_CTRL_EOF:
@@ -76,11 +84,15 @@ static long null_ctrl(BIO *b, int cmd, long num, void *ptr)
 
 static int null_gets(BIO *bp, char *buf, int size)
 {
+    (void)bp;
+    (void)buf;
+    (void)size;
     return 0;
 }
 
 static int null_puts(BIO *bp, const char *str)
 {
+    (void)bp;
     if (str == NULL)
         return 0;
     return strlen(str);

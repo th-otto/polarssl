@@ -50,7 +50,7 @@ const OPTIONS storeutl_options[] = {
     {"engine", OPT_ENGINE, 's', "Use engine, possibly a hardware device"},
 #endif
     {"r", OPT_RECURSIVE, '-', "Recurse through names"},
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int storeutl_main(int argc, char *argv[])

@@ -106,7 +106,7 @@ const OPTIONS smime_options[] = {
 #ifndef OPENSSL_NO_ENGINE
     {"engine", OPT_ENGINE, 's', "Use engine, possibly a hardware device"},
 #endif
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int smime_main(int argc, char **argv)

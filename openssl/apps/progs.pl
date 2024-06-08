@@ -118,7 +118,7 @@ foreach my $cmd (
     "mdc2", "rmd160", "blake2b512", "blake2s256",
     "sm3"
 ) {
-    my $str = "    {FT_md, \"$cmd\", dgst_main},\n";
+    my $str = "    {FT_md, \"$cmd\", dgst_main, 0},\n";
     if (grep { $cmd eq $_ } @disablables) {
         print "#ifndef OPENSSL_NO_" . uc($cmd) . "\n${str}#endif\n";
     } elsif (my $disabler = $md_disabler{$cmd}) {
@@ -177,5 +177,5 @@ foreach my $cmd (
     }
 }
 
-print "    {0, NULL, NULL}\n};\n";
+print "    {0, NULL, NULL, 0}\n};\n";
 print "#endif\n";

@@ -35,7 +35,7 @@ static int get_sni_from_client_hello(BIO *bio, char **sni)
 {
     long len;
     unsigned char *data;
-    PACKET pkt = {0}, pkt2 = {0}, pkt3 = {0}, pkt4 = {0}, pkt5 = {0};
+    PACKET pkt = {0, 0}, pkt2 = {0, 0}, pkt3 = {0, 0}, pkt4 = {0, 0}, pkt5 = {0, 0};
     unsigned int servname_type = 0, type = 0;
     int ret = 0;
 

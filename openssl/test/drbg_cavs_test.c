@@ -37,6 +37,10 @@ static size_t kat_entropy(RAND_DRBG *drbg, unsigned char **pout,
 {
     TEST_CTX *t = (TEST_CTX *)RAND_DRBG_get_ex_data(drbg, app_data_index);
 
+    (void)entropy;
+    (void)min_len;
+    (void)max_len;
+    (void)prediction_resistance;
     t->entropycnt++;
     *pout = (unsigned char *)t->entropy;
     return t->entropylen;
@@ -47,6 +51,9 @@ static size_t kat_nonce(RAND_DRBG *drbg, unsigned char **pout,
 {
     TEST_CTX *t = (TEST_CTX *)RAND_DRBG_get_ex_data(drbg, app_data_index);
 
+    (void)entropy;
+    (void)min_len;
+    (void)max_len;
     t->noncecnt++;
     *pout = (unsigned char *)t->nonce;
     return t->noncelen;

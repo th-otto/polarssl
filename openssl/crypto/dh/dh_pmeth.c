@@ -509,7 +509,8 @@ const EVP_PKEY_METHOD dh_pkey_meth = {
     pkey_dh_derive,
 
     pkey_dh_ctrl,
-    pkey_dh_ctrl_str
+    pkey_dh_ctrl_str,
+    0, 0, 0, 0, 0, 0
 };
 
 const EVP_PKEY_METHOD dhx_pkey_meth = {
@@ -543,5 +544,6 @@ const EVP_PKEY_METHOD dhx_pkey_meth = {
     pkey_dh_derive,
 
     pkey_dh_ctrl,
-    pkey_dh_ctrl_str
+    pkey_dh_ctrl_str,
+    0, 0, 0, 0, 0, 0
 };

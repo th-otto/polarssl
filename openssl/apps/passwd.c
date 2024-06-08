@@ -77,7 +77,7 @@ const OPTIONS passwd_options[] = {
     {"crypt", OPT_CRYPT, '-', "Standard Unix password algorithm (default)"},
 #endif
     OPT_R_OPTIONS,
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int passwd_main(int argc, char **argv)

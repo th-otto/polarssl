@@ -260,7 +260,8 @@ const EVP_PKEY_METHOD scrypt_pkey_meth = {
     0,
     pkey_scrypt_derive,
     pkey_scrypt_ctrl,
-    pkey_scrypt_ctrl_str
+    pkey_scrypt_ctrl_str,
+    0, 0, 0, 0, 0, 0
 };
 
 #endif

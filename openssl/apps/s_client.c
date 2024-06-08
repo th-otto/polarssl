@@ -125,6 +125,7 @@ static unsigned int psk_client_cb(SSL *ssl, const char *hint, char *identity,
     long key_len;
     unsigned char *key;
 
+    (void)ssl;
     if (c_debug)
         BIO_printf(bio_c_out, "psk_client_cb\n");
     if (!hint) {
@@ -250,6 +251,7 @@ static int ssl_servername_cb(SSL *s, int *ad, void *arg)
 {
     tlsextctx *p = (tlsextctx *) arg;
     const char *hn = SSL_get_servername(s, TLSEXT_NAMETYPE_host_name);
+    (void)ad;
     if (SSL_get_servername_type(s) != -1)
         p->ack = !SSL_session_reused(s) && hn != NULL;
     else
@@ -355,6 +357,7 @@ static char *ssl_give_srp_client_pwd_cb(SSL *s, void *arg)
     PW_CB_DATA cb_tmp;
     int l;
 
+    (void)s;
     cb_tmp.password = (char *)srp_arg->srppassin;
     cb_tmp.prompt_info = "SRP user";
     if ((l = password_callback(pass, PWD_STRLEN, 0, &cb_tmp)) < 0) {
@@ -385,6 +388,7 @@ static int next_proto_cb(SSL *s, unsigned char **out, unsigned char *outlen,
 {
     tlsextnextprotoctx *ctx = arg;
 
+    (void)s;
     if (!c_quiet) {
         /* We can assume that |in| is syntactically valid. */
         unsigned i;
@@ -411,6 +415,9 @@ static int serverinfo_cli_parse_cb(SSL *s, unsigned int ext_type,
     char pem_name[100];
     unsigned char ext_buf[4 + 65536];
 
+    (void)s;
+    (void)al;
+    (void)arg;
     /* Reconstruct the type/len fields prior to extension data */
     inlen &= 0xffff; /* for formal memcmpy correctness */
     ext_buf[0] = (unsigned char)(ext_type >> 8);
@@ -514,7 +521,7 @@ static int tlsa_import_rr(SSL *con, const char *rrdata)
         { &selector, "selector", checked_uint8 },
         { &mtype, "mtype", checked_uint8 },
         { &data, "data", hexdecode },
-        { NULL, }
+        { NULL, 0, 0}
     };
     struct tlsa_field *f;
     int ret;

@@ -254,7 +254,7 @@ static int tlsa_import_rr(SSL *ssl, const char *rrdata)
         { &selector, "selector", checked_uint8 },
         { &mtype, "mtype", checked_uint8 },
         { &data, "data", hexdecode },
-        { NULL, }
+        { NULL, 0, 0}
     };
     int ret;
     struct tlsa_field *f;
@@ -298,6 +298,7 @@ static int test_tlsafile(SSL_CTX *ctx, const char *base_name,
     int ret = 1;
     SSL *ssl;
 
+    (void)path;
     while (ret > 0 && (line = read_to_eol(f)) != NULL) {
         STACK_OF(X509) *chain;
         int ntlsa;

@@ -90,6 +90,8 @@ int CRYPTO_secure_malloc_init(size_t size, int minsize)
 
     return ret;
 #else
+    (void)size;
+    (void)minsize;
     return 0;
 #endif /* OPENSSL_SECURE_MEMORY */
 }
@@ -208,6 +210,7 @@ int CRYPTO_secure_allocated(const void *ptr)
     CRYPTO_THREAD_unlock(sec_malloc_lock);
     return ret;
 #else
+    (void)ptr;
     return 0;
 #endif /* OPENSSL_SECURE_MEMORY */
 }
@@ -231,6 +234,7 @@ size_t CRYPTO_secure_actual_size(void *ptr)
     CRYPTO_THREAD_unlock(sec_malloc_lock);
     return actual_size;
 #else
+    (void)ptr;
     return 0;
 #endif
 }

@@ -20,7 +20,7 @@
 #include <openssl/rsa.h>
 #include <stdlib.h>
 
-int main(int argc, char *argv[])
+int main(void)
 {
     /* There are explicitly no run time checks for this one */
     return EXIT_SUCCESS;

@@ -20,6 +20,7 @@ int ossl_ecdsa_sign(int type, const unsigned char *dgst, int dlen,
 {
     ECDSA_SIG *s;
 
+    (void)type;
     s = ECDSA_do_sign_ex(dgst, dlen, kinv, r, eckey);
     if (s == NULL) {
         *siglen = 0;
@@ -298,6 +299,7 @@ int ossl_ecdsa_verify(int type, const unsigned char *dgst, int dgst_len,
     int derlen = -1;
     int ret = -1;
 
+    (void)type;
     s = ECDSA_SIG_new();
     if (s == NULL)
         return ret;

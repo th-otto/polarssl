@@ -24,7 +24,7 @@ const OPTIONS nseq_options[] = {
     {"toseq", OPT_TOSEQ, '-', "Output NS Sequence file"},
     {"in", OPT_IN, '<', "Input file"},
     {"out", OPT_OUT, '>', "Output file"},
-    {NULL}
+    {NULL, 0, 0, 0}
 };
 
 int nseq_main(int argc, char **argv)

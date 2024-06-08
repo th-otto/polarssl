@@ -1034,6 +1034,7 @@ WORK_STATE tls_finish_handshake(SSL *s, WORK_STATE wst, int clearbufs, int stop)
     void (*cb) (const SSL *ssl, int type, int val) = NULL;
     int cleanuphand = s->statem.cleanuphand;
 
+    (void)wst;
     if (clearbufs) {
         if (!SSL_IS_DTLS(s)
 #ifndef OPENSSL_NO_SCTP
