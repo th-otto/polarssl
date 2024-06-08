@@ -1,5 +1,3 @@
-/Makefile
-apps/CA.pl
 apps/app_rand.d
 apps/apps.d
 apps/asn1pars.d
@@ -1054,6 +1052,8 @@ test/cipherlist_test
 test/cipherlist_test.d
 test/ciphername_test
 test/ciphername_test.d
+test/cipher_overhead_test
+test/cipher_overhead_test.d
 test/clienthellotest
 test/clienthellotest.d
 test/cmactest
@@ -1254,5 +1254,4 @@ test/x509_time_test
 test/x509_time_test.d
 test/x509aux
 test/x509aux.d
-tools/c_rehash
 util/shlib_wrap.sh

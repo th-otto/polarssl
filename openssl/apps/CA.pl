@@ -1,4 +1,4 @@
-#!{- $config{HASHBANGPERL} -}
+#!/usr/bin/env
 # Copyright 2000-2018 The OpenSSL Project Authors. All Rights Reserved.
 #
 # Licensed under the OpenSSL license (the "License").  You may not use
@@ -9,7 +9,6 @@
 #
 # Wrapper around the ca to make it easier to use
 #
-# {- join("\n# ", @autowarntext) -}
 
 use strict;
 use warnings;
