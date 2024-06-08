@@ -10,12 +10,7 @@ OBJS = aes.o aesni.o arc4.o asn1parse.o asn1write.o base64.o bignum.o blowfish.o
       x509.o x509_create.o x509_crl.o x509_crt.o x509_csr.o x509write_crt.o x509write_csr.o xtea.o \
       timing_alt.o
 
-LIBS = libpolarssl.a libmbedtls.a
-ifneq ($(CROSSPREFIX),)
-LIBS += libpolarssl_000.a libpolarssl_020.a libpolarssl_v4e.a
-endif
-
-all: $(LIBS)
+all::
 
 ifneq ($(CROSSPREFIX),)
 define CC_TEMPLATE
@@ -26,33 +21,32 @@ build/68020/$(1).o: .dirs $(1).c
 build/coldfire/$(1).o: .dirs $(1).c
 	$(AM_V_CC)$(CC) $(LOCAL_CFLAGS) $(CFLAGS_coldire) -c $(1).c -o $$@
 endef
+define AR_TEMPLATE
+build/68000/$(1): $$(addprefix build/68000/,$$(notdir $(2)))
+	$(AM_V_AR)$(AR) $(ARFLAGS) $$@ $$^
+build/68020/$(1): $$(addprefix build/68020/,$$(notdir $(2)))
+	$(AM_V_AR)$(AR) $(ARFLAGS) $$@ $$^
+build/coldfire/$(1): $$(addprefix build/coldfire/,$$(notdir $(2)))
+	$(AM_V_AR)$(AR) $(ARFLAGS) $$@ $$^
+LIBS += build/68000/$(1) build/68020/$(1) build/coldfire/$(1)
+endef
 else
 define CC_TEMPLATE
 build/host/$(1).o: .dirs $(1).c
 	$(AM_V_CC)$(CC) $(LOCAL_CFLAGS) -c $(1).c -o $$@
 endef
+define AR_TEMPLATE
+build/host/$(1): $$(addprefix build/host/,$$(notdir $(2)))
+	$(AM_V_AR)$(AR) $(ARFLAGS) $$@ $$^
+LIBS += build/host/$(1)
+endef
 endif
 $(foreach f,$(OBJS:.o=),$(eval $(call CC_TEMPLATE,$(f))))
 
-ifneq ($(CROSSPREFIX),)
-libpolarssl_000.a: $(addprefix build/68000/,$(OBJS))
-	$(AM_V_AR)$(AR) -rcs $@ $^
+$(eval $(call AR_TEMPLATE,libpolarssl.a,$(OBJS)))
 
-libpolarssl_020.a: $(addprefix build/68020/,$(OBJS))
-	$(AM_V_AR)$(AR) -rcs $@ $^
+all:: $(LIBS)
 
-libpolarssl_v4e.a: $(addprefix build/coldfire/,$(OBJS))
-	$(AM_V_AR)$(AR) -rcs $@ $^
-
-libpolarssl.a: libpolarssl_000.a
-	ln -sf $< $@
-else
-libpolarssl.a: $(addprefix build/host/,$(OBJS))
-	$(AM_V_AR)$(AR) -rcs $@ $^
-endif
-
-libmbedtls.a: libpolarssl.a
-	ln -sf $< $@
 
 .dirs:
 	@mkdir -p build/68000
@@ -62,9 +56,9 @@ libmbedtls.a: libpolarssl.a
 	@touch $@
 
 install: $(LIBS)
-	cp libpolarssl_000.a $(DESTDIR)/usr/lib/libpolarssl.a
-	cp libpolarssl_020.a $(DESTDIR)/usr/lib/m68020-60/libpolarssl.a
-	cp libpolarssl_v4e.a $(DESTDIR)/usr/lib/m5475/libpolarssl.a
+	cp build/68000/libpolarssl.a $(DESTDIR)/usr/lib/libpolarssl.a
+	cp build/68020/libpolarssl.a $(DESTDIR)/usr/lib/m68020-60/libpolarssl.a
+	cp build/coldfire/libpolarssl.a $(DESTDIR)/usr/lib/m5475/libpolarssl.a
 
 uninstall::
 

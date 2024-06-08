@@ -6,10 +6,16 @@ endif
 
 include $(MBEDTLS_PATH)/framework/exported.make
 
+ifneq ($(CROSSPREFIX),)
+CPU_DIR = 68000
+else
+CPU_DIR = host
+endif
+
 LOCAL_CFLAGS = $(WARNING_CFLAGS) -I$(MBEDTLS_TEST_PATH)/include -I$(MBEDTLS_PATH)/include
 LOCAL_CXXFLAGS = $(CFLAGS) $(WARNING_CXXFLAGS) -I$(MBEDTLS_PATH)/include -I$(MBEDTLS_PATH)/tests/include
 LOCAL_LDFLAGS = ${MBEDTLS_TEST_OBJS} 		\
-		-L$(MBEDTLS_PATH)/library			\
+		-L$(MBEDTLS_PATH)/library/build/$(CPU_DIR)			\
 		-lmbedtls$(SHARED_SUFFIX)	\
 		-lmbedx509$(SHARED_SUFFIX)	\
 		-lmbedcrypto$(SHARED_SUFFIX)
@@ -17,7 +23,7 @@ LOCAL_LDFLAGS = ${MBEDTLS_TEST_OBJS} 		\
 include $(MBEDTLS_PATH)/3rdparty/Makefile.inc
 LOCAL_CFLAGS+=$(THIRDPARTY_INCLUDES)
 
-MBEDLIBS=$(MBEDTLS_PATH)/library/libmbedcrypto.a $(MBEDTLS_PATH)/library/libmbedx509.a $(MBEDTLS_PATH)/library/libmbedtls.a
+MBEDLIBS=$(MBEDTLS_PATH)/library/build/$(CPU_DIR)/libmbedcrypto.a $(MBEDTLS_PATH)/library/build/$(CPU_DIR)/libmbedx509.a $(MBEDTLS_PATH)/library/build/$(CPU_DIR)/libmbedtls.a
 
 ifdef DEBUG
 LOCAL_CFLAGS += -g3

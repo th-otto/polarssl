@@ -14,13 +14,16 @@ ECHO_E=/bin/echo -e
 endif
 endif
 
+# AM_V_CC and AM_V_AR are invoked from templates,
+# and must therefore double-quote make variables
+
 am__v_CC_0     = @$(ECHO_E) "  $(am__v_color_cc)CC$(am__v_color_off)      " $$@;
 am__v_AS_0     = @$(ECHO_E) "  $(am__v_color_cc)AS$(am__v_color_off)      " $@;
 am__v_CPPAS_0  = @$(ECHO_E) "  $(am__v_color_cc)CPPAS$(am__v_color_off)   " $@;
-am__v_CXX_0    = @$(ECHO_E) "  $(am__v_color_cc)CXX$(am__v_color_off)     " $@;
+am__v_CXX_0    = @$(ECHO_E) "  $(am__v_color_cc)CXX$(am__v_color_off)     " $$@;
 am__v_OBJC_0   = @$(ECHO_E) "  $(am__v_color_cc)OBJC$(am__v_color_off)    " $@;
 am__v_CCLD_0   = @$(ECHO_E) "  $(am__v_color_ld)CCLD$(am__v_color_off)    " $@;
-am__v_AR_0     = @$(ECHO_E) "  $(am__v_color_ld)AR$(am__v_color_off)      " $@;
+am__v_AR_0     = @$(ECHO_E) "  $(am__v_color_ld)AR$(am__v_color_off)      " $$@;
 am__v_CXXLD_0  = @$(ECHO_E) "  $(am__v_color_ld)CXXLD$(am__v_color_off)   " $@;
 am__v_OBJCLD_0 = @$(ECHO_E) "  $(am__v_color_ld)OBJCLD$(am__v_color_off)  " $@;
 

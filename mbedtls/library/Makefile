@@ -160,19 +160,9 @@ OBJS_TLS= \
 	  ssl_tls13_generic.o \
 	  # This line is intentionally left blank
 
-.PHONY: all static clean
+.PHONY: all clean
 
-LIBS = libmbedcrypto.a libmbedx509.a libmbedtls.a \
-
-ifneq ($(CROSSPREFIX),)
-LIBS += \
-	libmbedcrypto_000.a libmbedx509_000.a libmbedtls_000.a \
-	libmbedcrypto_020.a libmbedx509_020.a libmbedtls_020.a \
-	libmbedcrypto_v4e.a libmbedx509_v4e.a libmbedtls_v4e.a \
-	$(empty)
-endif
-
-all: static
+all::
 
 ifneq ($(CROSSPREFIX),)
 define CC_TEMPLATE
@@ -183,57 +173,37 @@ build/68020/$$(notdir $(1).o): .dirs $(1).c
 build/coldfire/$$(notdir $(1).o): .dirs $(1).c
 	$(AM_V_CC)$(CC) $(CFLAGS_coldfire) $(LOCAL_CFLAGS) -c $(1).c -o $$@
 endef
+define AR_TEMPLATE
+build/68000/$(1): $$(addprefix build/68000/,$$(notdir $(2)))
+	$(AM_V_AR)$(AR) $(ARFLAGS) $$@ $$^
+build/68020/$(1): $$(addprefix build/68020/,$$(notdir $(2)))
+	$(AM_V_AR)$(AR) $(ARFLAGS) $$@ $$^
+build/coldfire/$(1): $$(addprefix build/coldfire/,$$(notdir $(2)))
+	$(AM_V_AR)$(AR) $(ARFLAGS) $$@ $$^
+LIBS += build/68000/$(1) build/68020/$(1) build/coldfire/$(1)
+endef
 else
 define CC_TEMPLATE
 build/host/$$(notdir $(1).o): .dirs $(1).c
 	$(AM_V_CC)$(CC) $(LOCAL_CFLAGS) -c $(1).c -o $$@
 endef
+define AR_TEMPLATE
+build/host/$(1): $$(addprefix build/host/,$$(notdir $(2)))
+	$(AM_V_AR)$(AR) $(ARFLAGS) $$@ $$^
+LIBS += build/host/$(1)
+endef
 endif
 $(foreach f,$(OBJS_TLS:.o=) $(OBJS_X509:.o=) $(OBJS_CRYPTO:.o=),$(eval $(call CC_TEMPLATE,$(f))))
 
-static: $(LIBS)
-
 # tls
-ifneq ($(CROSSPREFIX),)
-libmbedtls_000.a: $(addprefix build/68000/,$(OBJS_TLS))
-	$(AM_V_AR)$(AR) $(ARFLAGS) $@ $^
-libmbedtls_020.a: $(addprefix build/68020/,$(OBJS_TLS))
-	$(AM_V_AR)$(AR) $(ARFLAGS) $@ $^
-libmbedtls_v4e.a: $(addprefix build/coldfire/,$(OBJS_TLS))
-	$(AM_V_AR)$(AR) $(ARFLAGS) $@ $^
-libmbedtls.a: libmbedtls_000.a
-	ln -sf $< $@
-
+$(eval $(call AR_TEMPLATE,libmbedtls.a,$(OBJS_TLS)))
 # x509
-libmbedx509_000.a: $(addprefix build/68000/,$(OBJS_X509))
-	$(AM_V_AR)$(AR) $(ARFLAGS) $@ $^
-libmbedx509_020.a: $(addprefix build/68020/,$(OBJS_X509))
-	$(AM_V_AR)$(AR) $(ARFLAGS) $@ $^
-libmbedx509_v4e.a: $(addprefix build/coldfire/,$(OBJS_X509))
-	$(AM_V_AR)$(AR) $(ARFLAGS) $@ $^
-libmbedx509.a: libmbedx509_000.a
-	ln -sf $< $@
-
+$(eval $(call AR_TEMPLATE,libmbedx509.a,$(OBJS_X509)))
 # crypto
-libmbedcrypto_000.a: $(addprefix build/68000/,$(notdir $(OBJS_CRYPTO)))
-	$(AM_V_AR)$(AR) $(ARFLAGS) $@ $^
-libmbedcrypto_020.a: $(addprefix build/68020/,$(notdir $(OBJS_CRYPTO)))
-	$(AM_V_AR)$(AR) $(ARFLAGS) $@ $^
-libmbedcrypto_v4e.a: $(addprefix build/coldfire/,$(notdir $(OBJS_CRYPTO)))
-	$(AM_V_AR)$(AR) $(ARFLAGS) $@ $^
-libmbedcrypto.a: libmbedcrypto_000.a
-	ln -sf $< $@
+$(eval $(call AR_TEMPLATE,libmbedcrypto.a,$(OBJS_CRYPTO)))
 
-else
 
-libmbedtls.a: $(addprefix build/host/,$(OBJS_TLS))
-	$(AM_V_AR)$(AR) $(ARFLAGS) $@ $^
-libmbedx509.a: $(addprefix build/host/,$(OBJS_X509))
-	$(AM_V_AR)$(AR) $(ARFLAGS) $@ $^
-libmbedcrypto.a: $(addprefix build/host/,$(notdir $(OBJS_CRYPTO)))
-	$(AM_V_AR)$(AR) $(ARFLAGS) $@ $^
-
-endif
+all:: $(LIBS)
 
 
 
@@ -296,5 +266,5 @@ clean:
 	rm -f *.o libmbed*
 	rm -rf build .dirs
 
-neat: clean
+distclean: clean
 	rm -f $(GENERATED_FILES)

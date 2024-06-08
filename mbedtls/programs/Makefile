@@ -97,11 +97,11 @@ EXES = $(patsubst %,%$(EXEXT),$(APPS))
 
 .PHONY: all clean list fuzz
 
-all: $(EXES)
+all:: $(EXES)
 # APPS doesn't include the fuzzing programs, which aren't "normal"
 # sample or test programs, and don't build with MSVC which is
 # warning about fopen
-all: fuzz
+all:: fuzz
 
 fuzz: ${MBEDTLS_TEST_OBJS}
 	$(MAKE) -C fuzz

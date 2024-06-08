@@ -7,19 +7,19 @@ include ../../silent.mak
 
 LDFLAGS ?=
 
+ifneq ($(CROSSPREFIX),)
+CPU_DIR = 68000
+else
+CPU_DIR = host
+endif
+
 LOCAL_CFLAGS = $(CFLAGS) $(WARNING_CFLAGS) -Wno-unused-function -Wno-unused-value -I../include
-LOCAL_LDFLAGS = -L../library -lmbedtls$(SHARED_SUFFIX)
-DLEXT=so
+LOCAL_LDFLAGS = -L../library/build/$(CPU_DIR) -lpolarssl$(SHARED_SUFFIX)
 
 PERL ?= perl
 
-ifndef SHARED
-DEP=../library/libmbedtls.a
-CHECK_PRELOAD=
-else
-DEP=../library/libmbedtls.$(DLEXT)
-CHECK_PRELOAD= LD_PRELOAD=../library/libmbedtls.$(DLEXT)
-endif
+DEP=../library/build/$(CPU_DIR)/libpolarssl.a
+xCHECK_PRELOAD=
 
 ifdef DEBUG
 LOCAL_CFLAGS += -g3
