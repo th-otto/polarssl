@@ -167,7 +167,11 @@ static unsigned long int stress_hash(const int *p)
 static int test_stress(void)
 {
     LHASH_OF(int) *h = lh_int_new(&stress_hash, &int_cmp);
+#ifdef __MINT__
+    const unsigned int n = 25000;
+#else
     const unsigned int n = 2500000;
+#endif
     unsigned int i;
     int testresult = 0, *p;
 

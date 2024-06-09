@@ -1254,4 +1254,5 @@ test/x509_time_test
 test/x509_time_test.d
 test/x509aux
 test/x509aux.d
+test/test-runs
 util/shlib_wrap.sh

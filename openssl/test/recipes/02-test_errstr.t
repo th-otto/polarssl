@@ -28,8 +28,8 @@ setup('test_errstr');
 # perl, and may thereby get different error messages for the
 # same error.
 # The safest is not to test under such circumstances.
-plan skip_all => 'This is unsupported for cross compiled configurations'
-    if config('CROSS_COMPILE');
+#plan skip_all => 'This is unsupported for cross compiled configurations'
+#    if config('CROSS_COMPILE');
 
 # The same can be said when compiling OpenSSL with mingw configuration
 # on Windows when built with msys perl.  Similar problems are also observed

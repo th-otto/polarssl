@@ -80,7 +80,7 @@ PROGRAMS = \
 	test/x509aux \
 	$(empty)
 
-SCRIPTS=apps/tsget.pl
+SCRIPTS=apps/tsget.pl util/shlib_wrap.sh
 
 GENERATED_MANDATORY= apps/progs.h crypto/buildinf.h include/crypto/bn_conf.h include/crypto/dso_conf.h include/openssl/opensslconf.h
 GENERATED = \
@@ -190,7 +190,7 @@ build_all_generated: $(GENERATED_MANDATORY) $(GENERATED)
 	@ : 
 
 test: tests
-tests: $(PROGRAMS) $(ENGINES) link-utils
+tests: $(PROGRAMS) $(ENGINES) link-utils util/shlib_wrap.sh
 	@ : 
 	( cd test; \
 	  mkdir -p test-runs; \
