@@ -1,4 +1,5 @@
 include ../configvars
+include ../silent.mak
 
 LOCAL_CFLAGS  = $(CFLAGS) $(WARNING_CFLAGS)
 LDFLAGS = -s
@@ -8,7 +9,7 @@ LDLIBS  = -lldg -lgem -lz
 HEADER =
 
 # list C files here
-COBJS = main.c mbedtls.c
+COBJS = main.c mbedtls.c openssl.c
 
 # list assembler files here
 SOBJS =
@@ -17,24 +18,23 @@ SRCFILES = $(HEADER) $(COBJS) $(SOBJS)
 
 OBJS = $(COBJS:.c=.o)
 
-all: build_polarssl build_mbedtls
+all: \
+	build/68000/polarssl.ldg build/68020/polarssl.ldg build/coldfire/polarssl.ldg \
+	build/68000/mbedtls.ldg build/68020/mbedtls.ldg build/coldfire/mbedtls.ldg \
+	build/68000/openssl.ldg build/68020/openssl.ldg build/coldfire/openssl.ldg \
+	$(empty)
 
 define CC_TEMPLATE
 build/68000/$(1).o: .dirs $(1).c
-	$(CC) $(LOCAL_CFLAGS) $(MBEDTLS_INCLUDES) $(CFLAGS_m68000) -c $(1).c -o $$@
+	$(AM_V_CC)$(CC) $(CFLAGS_m68000) $(LOCAL_CFLAGS) $(2) -c $(1).c -o $$@
 build/68020/$(1).o: .dirs $(1).c
-	$(CC) $(LOCAL_CFLAGS) $(MBEDTLS_INCLUDES) $(CFLAGS_m68020) -c $(1).c -o $$@
+	$(AM_V_CC)$(CC) $(CFLAGS_m68020) $(LOCAL_CFLAGS) $(2) -c $(1).c -o $$@
 build/coldfire/$(1).o: .dirs $(1).c
-	$(CC) $(LOCAL_CFLAGS) $(MBEDTLS_INCLUDES) $(CFLAGS_coldire) -c $(1).c -o $$@
+	$(AM_V_CC)$(CC) $(CFLAGS_coldfire) $(LOCAL_CFLAGS) $(2) -c $(1).c -o $$@
 endef
-$(foreach f,$(OBJS:.o=),$(eval $(call CC_TEMPLATE,$(f))))
-
-
-build_polarssl: 
-	$(MAKE) MBEDTLS_INCLUDES=-I../polarssl/include build/68000/polarssl.ldg build/68020/polarssl.ldg build/coldfire/polarssl.ldg
-
-build_mbedtls: 
-	$(MAKE) MBEDTLS_INCLUDES=-I../mbedtls/include build/68000/mbedtls.ldg build/68020/mbedtls.ldg build/coldfire/mbedtls.ldg
+$(eval $(call CC_TEMPLATE,main,-I../polarssl/include))
+$(eval $(call CC_TEMPLATE,mbedtls,-I../mbedtls/include))
+$(eval $(call CC_TEMPLATE,openssl,-I../openssl/include))
 
 
 #############################
@@ -51,20 +51,30 @@ clean:
 	@touch $@
 
 build/68000/polarssl.ldg: build/68000/main.o ../polarssl/library/build/68000/libpolarssl.a
-	$(CC) build/68000/main.o $(CFLAGS) $(CFLAGS_m68000) ../polarssl/library/build/68000/libpolarssl.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
+	$(AM_V_CCLD)$(CC) $(CFLAGS_m68000) $(CFLAGS) build/68000/main.o ../polarssl/library/build/68000/libpolarssl.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
 
 build/68020/polarssl.ldg: build/68020/main.o ../polarssl/library/build/68020/libpolarssl.a
-	$(CC) build/68020/main.o $(CFLAGS) $(CFLAGS_m68020) ../polarssl/library/build/68020/libpolarssl.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
+	$(AM_V_CCLD)$(CC) $(CFLAGS_m68020) $(CFLAGS) build/68020/main.o ../polarssl/library/build/68020/libpolarssl.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
 
 build/coldfire/polarssl.ldg: build/coldfire/main.o ../polarssl/library/build/coldfire/libpolarssl.a
-	$(CC) build/coldfire/main.o $(CFLAGS) $(CFLAGS_coldfire) ../polarssl/library/build/coldfire/libpolarssl.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
+	$(AM_V_CCLD)$(CC) $(CFLAGS_coldfire) $(CFLAGS) build/coldfire/main.o ../polarssl/library/build/coldfire/libpolarssl.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
 
 
 build/68000/mbedtls.ldg: build/68000/mbedtls.o ../mbedtls/library/build/68000/libmbedtls.a ../mbedtls/library/build/68000/libmbedcrypto.a ../mbedtls/library/build/68000/libmbedx509.a
-	$(CC) build/68000/mbedtls.o $(CFLAGS) $(CFLAGS_m68000) ../mbedtls/library/build/68000/libmbedtls.a ../mbedtls/library/build/68000/libmbedcrypto.a ../mbedtls/library/build/68000/libmbedx509.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
+	$(AM_V_CCLD)$(CC) $(CFLAGS_m68000) $(CFLAGS) build/68000/mbedtls.o ../mbedtls/library/build/68000/libmbedtls.a ../mbedtls/library/build/68000/libmbedcrypto.a ../mbedtls/library/build/68000/libmbedx509.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
 
 build/68020/mbedtls.ldg: build/68020/mbedtls.o ../mbedtls/library/build/68020/libmbedtls.a ../mbedtls/library/build/68020/libmbedcrypto.a ../mbedtls/library/build/68020/libmbedx509.a
-	$(CC) build/68020/mbedtls.o $(CFLAGS) $(CFLAGS_m68020) ../mbedtls/library/build/68020/libmbedtls.a ../mbedtls/library/build/68020/libmbedcrypto.a ../mbedtls/library/build/68020/libmbedx509.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
+	$(AM_V_CCLD)$(CC) $(CFLAGS_m68020) $(CFLAGS) build/68020/mbedtls.o ../mbedtls/library/build/68020/libmbedtls.a ../mbedtls/library/build/68020/libmbedcrypto.a ../mbedtls/library/build/68020/libmbedx509.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
 
 build/coldfire/mbedtls.ldg: build/coldfire/mbedtls.o ../mbedtls/library/build/coldfire/libmbedtls.a ../mbedtls/library/build/coldfire/libmbedcrypto.a ../mbedtls/library/build/coldfire/libmbedx509.a
-	$(CC) build/coldfire/mbedtls.o $(CFLAGS) $(CFLAGS_coldfire) ../mbedtls/library/build/coldfire/libmbedtls.a ../mbedtls/library/build/coldfire/libmbedcrypto.a ../mbedtls/library/build/coldfire/libmbedx509.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
+	$(AM_V_CCLD)$(CC) $(CFLAGS_coldfire) $(CFLAGS) build/coldfire/mbedtls.o ../mbedtls/library/build/coldfire/libmbedtls.a ../mbedtls/library/build/coldfire/libmbedcrypto.a ../mbedtls/library/build/coldfire/libmbedx509.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
+
+
+build/68000/openssl.ldg: build/68000/openssl.o ../openssl/build/68000/libssl.a ../openssl/build/68000/libcrypto.a
+	$(AM_V_CCLD)$(CC) $(CFLAGS_m68000) $(CFLAGS) build/68000/openssl.o ../openssl/build/68000/libssl.a ../openssl/build/68000/libcrypto.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
+
+build/68020/openssl.ldg: build/68020/openssl.o ../openssl/build/68020/libssl.a ../openssl/build/68020/libcrypto.a
+	$(AM_V_CCLD)$(CC) $(CFLAGS_m68020) $(CFLAGS) build/68020/openssl.o ../openssl/build/68020/libssl.a ../openssl/build/68020/libcrypto.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
+
+build/coldfire/openssl.ldg: build/coldfire/openssl.o ../openssl/build/coldfire/libssl.a ../openssl/build/coldfire/libcrypto.a
+	$(AM_V_CCLD)$(CC) $(CFLAGS_coldfire) $(CFLAGS) build/coldfire/openssl.o ../openssl/build/coldfire/libssl.a ../openssl/build/coldfire/libcrypto.a $(LDLIBS) $(LDFLAGS) $(STACK) -o $@
